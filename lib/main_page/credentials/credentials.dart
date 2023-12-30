@@ -1,6 +1,8 @@
 import 'package:certracker/components/credentials_components/certification/certification_page.dart';
 import 'package:certracker/components/credentials_components/education/education_page.dart';
 import 'package:certracker/components/credentials_components/forms/cert_form.dart';
+import 'package:certracker/components/credentials_components/forms/edu_form.dart';
+import 'package:certracker/components/credentials_components/forms/lic_form.dart';
 import 'package:certracker/components/credentials_components/license/license_page.dart';
 import 'package:flutter/material.dart';
 import 'package:floating_action_bubble_custom/floating_action_bubble_custom.dart';
@@ -103,7 +105,12 @@ class _CredentialsScreenState extends State<CredentialsScreen>
               bubbleColor: Colors.white,
               icon: Icons.book,
               onPressed: () {
-                _animationController.reverse();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddEducationPage(),
+                  ),
+                );
               },
               style: const TextStyle(color: Colors.black),
             ),
@@ -113,7 +120,12 @@ class _CredentialsScreenState extends State<CredentialsScreen>
               bubbleColor: Colors.white,
               icon: Icons.label,
               onPressed: () {
-                _animationController.reverse();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddLicensePage(),
+                  ),
+                );
               },
               style: const TextStyle(color: Colors.black),
             ),

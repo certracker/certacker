@@ -2,21 +2,20 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class AddCertificationPage extends StatefulWidget {
-  const AddCertificationPage({Key? key}) : super(key: key);
+class AddEducationPage extends StatefulWidget {
+  const AddEducationPage({Key? key}) : super(key: key);
 
   @override
-  State<AddCertificationPage> createState() => _AddCertificationPageState();
+  State<AddEducationPage> createState() => _AddEducationPageState();
 }
 
-class _AddCertificationPageState extends State<AddCertificationPage> {
+class _AddEducationPageState extends State<AddEducationPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _certificationNameController =
       TextEditingController();
   final TextEditingController _recordNumberController = TextEditingController();
   final TextEditingController _issueDateController = TextEditingController();
   final TextEditingController _expiryDateController = TextEditingController();
-  bool _recordExpires = false;
   final TextEditingController _privateNoteController = TextEditingController();
 
   Future<void> getImageFromGallery() async {
@@ -54,7 +53,7 @@ class _AddCertificationPageState extends State<AddCertificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add Certification"),
+        title: const Text("Add Education"),
         centerTitle: true,
         elevation: 4,
       ),
@@ -67,38 +66,31 @@ class _AddCertificationPageState extends State<AddCertificationPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 const Text(
-                  "Certification Information",
+                  "School Information",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: _certificationNameController,
                   decoration: const InputDecoration(
-                    labelText: "Certification Name*",
+                    labelText: "Name of institution*",
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter Certification Name";
+                      return "Please enter Institution Name";
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
-                  controller: _recordNumberController,
-                  decoration: const InputDecoration(
-                    labelText: "Certification Record Number (optional)",
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
                   controller: _issueDateController,
                   decoration: const InputDecoration(
-                    labelText: "Issue Date*",
+                    labelText: "Degree*",
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter Issue Date";
+                      return "Please enter Degree";
                     }
                     return null;
                   },
@@ -107,50 +99,27 @@ class _AddCertificationPageState extends State<AddCertificationPage> {
                 TextFormField(
                   controller: _expiryDateController,
                   decoration: const InputDecoration(
-                    labelText: "Expiry Date*",
+                    labelText: "Field of study*",
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter Expiry Date";
+                      return "Please enter Field of study";
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _recordExpires,
-                      onChanged: (value) {
-                        setState(() {
-                          _recordExpires = value!;
-                        });
-                      },
-                    ),
-                    const Text("This record expires"),
-                  ],
+                 TextFormField(
+                  controller: _expiryDateController,
+                  decoration: const InputDecoration(
+                    labelText: "Graduation Date*",
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter Graduation Date*";
+                    }
+                    return null;
+                  },
                 ),
-                if (_recordExpires) ...[
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: "First Reminder",
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: "Second Reminder",
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: "Final Reminder",
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
                 const SizedBox(height: 20),
                 const Text(
                   "Upload Photo",
