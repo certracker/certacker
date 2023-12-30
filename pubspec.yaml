@@ -38,6 +38,7 @@ dependencies:
   table_calendar: ^3.0.9
   floating_action_bubble_custom: ^1.0.0+2
   image_picker: ^1.0.5
+  file_picker: ^6.1.1
 
 dev_dependencies:
   flutter_test:

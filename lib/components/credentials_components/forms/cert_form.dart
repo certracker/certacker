@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -20,11 +21,23 @@ class _AddCertificationPageState extends State<AddCertificationPage> {
 
 
   Future<void> getImageFromGallery() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       // Image selected from gallery - Perform operations here
+    }
+  }
+
+  Future<void> getDocument() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc'], // Add allowed document formats here
+    );
+
+    if (result != null) {
+      // Document selected - Perform operations here
+      // You can access the picked document using result.files.first
     }
   }
 
@@ -149,9 +162,9 @@ class _AddCertificationPageState extends State<AddCertificationPage> {
                   "Front",
                 ),
                 const SizedBox(height: 20),
-                InkWell(
+                GestureDetector(
                   onTap: () {
-                   getImageFromGallery();
+                    getImageFromGallery();
                   },
                   child: Material(
                     elevation: 4,
@@ -229,10 +242,9 @@ class _AddCertificationPageState extends State<AddCertificationPage> {
                   "Attach a file format of this credential",
                   style: TextStyle(fontSize: 15, color: Colors.grey),
                 ),
-                InkWell(
+                GestureDetector(
                   onTap: () {
-                    // Add functionality for when the third container is tapped
-                    // For example, navigate to a new screen or perform an action
+                    getDocument();
                   },
                   child: Material(
                     elevation: 4,
