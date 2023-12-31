@@ -7,11 +7,12 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('About', style: TextStyle(color: Colors.black)),
+        title: const Text("About CertTracker",
+            style: TextStyle(color: Colors.black)),
         centerTitle: true,
       ),
       body: const Center(
-        child: Text('This is the About page'),
+        child: Text("This is the About page"),
       ),
     );
   }
