@@ -1,3 +1,4 @@
+import 'package:certracker/components/credentials_components/license/page/license_detail.dart';
 import 'package:flutter/material.dart';
 
 class CerLicensePage extends StatefulWidget {
@@ -18,14 +19,14 @@ class _CerLicensePageState extends State<CerLicensePage> {
     super.initState();
     _certificationCards = [];
     _isSelected = [];
-    _initializeCertificationCards();
+    _initializeLicenseCards();
   }
 
-  void _initializeCertificationCards() async {
+  void _initializeLicenseCards() async {
     // Simulate fetching certification data
     await Future.delayed(const Duration(seconds: 1));
     setState(() {
-      _certificationCards = _getCertificationCards().toList();
+      _certificationCards = _getLicenseCards().toList();
       _isSelected = List.filled(_certificationCards.length, false);
     });
   }
@@ -80,7 +81,7 @@ class _CerLicensePageState extends State<CerLicensePage> {
               child: ListView.builder(
                 itemCount: _certificationCards.length,
                 itemBuilder: (context, index) {
-                  return _buildCertificationCard(
+                  return _buildLicenseCard(
                     _certificationCards[index]['title']!,
                     _certificationCards[index]['expiration']!,
                     index,
@@ -169,7 +170,7 @@ class _CerLicensePageState extends State<CerLicensePage> {
     }
   }
 
-  List<Map<String, String>> _getCertificationCards() {
+  List<Map<String, String>> _getLicenseCards() {
     // Replace this with your certification data list
     return [
       {
@@ -200,66 +201,87 @@ class _CerLicensePageState extends State<CerLicensePage> {
     ];
   }
 
-  Widget _buildCertificationCard(
-    String title,
-    String expiration,
-    int index,
-  ) {
-    return GestureDetector(
-      onLongPress: () {
+  Widget _buildLicenseCard(
+  String title,
+  String expiration,
+  int index,
+) {
+  return GestureDetector(
+    onTap: () {
+      if (_isSelectMode) {
         setState(() {
-          _isSelectMode = true;
-          _isSearchVisible = false;
+          // Toggle the selection
+          _isSelected[index] = !_isSelected[index];
         });
-      },
-      child: Card(
-        elevation: 3,
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              if (_isSelectMode)
-                Checkbox(
-                  value: _isSelected[index],
-                  onChanged: (value) {
-                    setState(() {
-                      _isSelected[index] = value!;
-                    });
-                  },
-                ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            expiration,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+      } else {
+        // Navigate to a new page when a card is tapped
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LicenseDetailPage(
+              title: title,
+              expiration: expiration,
+            ),
           ),
+        );
+      }
+    },
+    onLongPress: () {
+      setState(() {
+        _isSelectMode = true;
+        _isSearchVisible = false;
+        // Toggle the selection on long press
+        _isSelected[index] = !_isSelected[index];
+      });
+    },
+    child: Card(
+      elevation: 3,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            if (_isSelectMode)
+              Checkbox(
+                value: _isSelected[index],
+                onChanged: (value) {
+                  setState(() {
+                    _isSelected[index] = value!;
+                  });
+                },
+              ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          expiration,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _deleteSelectedItems() {
     setState(() {

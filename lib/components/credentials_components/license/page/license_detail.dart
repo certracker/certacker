@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CertificationDetailPage extends StatelessWidget {
+class LicenseDetailPage extends StatelessWidget {
   final String title;
   final String expiration;
 
-  const CertificationDetailPage(
+  const LicenseDetailPage(
       {super.key, required this.title, required this.expiration});
 
   @override
@@ -15,7 +15,7 @@ class CertificationDetailPage extends StatelessWidget {
           children: [
             const Expanded(
               child: Text(
-                'Certification Details',
+                'License Details',
                 overflow: TextOverflow.ellipsis,
               ),
             ),
