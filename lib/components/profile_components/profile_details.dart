@@ -41,7 +41,9 @@ class ProfileDetails extends StatelessWidget {
                 children: [
                   const CircleAvatar(
                     radius: 50,
-                    backgroundImage: AssetImage('assets/profile_avatar.png'),
+                    backgroundImage: NetworkImage(
+                      'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.camera_alt),

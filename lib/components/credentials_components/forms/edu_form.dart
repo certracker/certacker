@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,26 +20,65 @@ class _AddEducationPageState extends State<AddEducationPage> {
   final TextEditingController _expiryDateController = TextEditingController();
   final TextEditingController _privateNoteController = TextEditingController();
 
-  Future<void> getImageFromGallery() async {
+   Future<void> getImageFromGalleryBack() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      // Image selected from gallery - Perform operations here
+      displayImagePreview(image.path, isBack: true);
     }
   }
 
-  Future<void> getDocument() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc'], // Add allowed document formats here
-    );
+  Future<void> getImageFromGalleryFront() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
-    if (result != null) {
-      // Document selected - Perform operations here
-      // You can access the picked document using result.files.first
+    if (image != null) {
+      displayImagePreview(image.path, isBack: false);
     }
   }
+
+  void displayImagePreview(String imagePath, {required bool isBack}) {
+    setState(() {
+      final Widget selectedImage = Image.file(
+        File(imagePath),
+        width: 400,
+        height: 200,
+        fit: BoxFit.cover,
+      );
+
+      if (isBack) {
+        _selectedBackImages.clear();
+        _selectedBackImages.add(selectedImage);
+      } else {
+        _selectedFrontImages.clear();
+        _selectedFrontImages.add(selectedImage);
+      }
+    });
+  }
+
+ Future<void> getDocument() async {
+  FilePickerResult? result = await FilePicker.platform.pickFiles(
+    type: FileType.custom,
+    allowedExtensions: ['pdf', 'doc'], // Add allowed document formats here
+  );
+
+  if (result != null) {
+    displayDocumentPreview(result);
+  }
+}
+
+void displayDocumentPreview(FilePickerResult result) {
+  setState(() {
+    _selectedDocs.clear(); // Clear existing documents
+    _selectedDocs.add(result.files.first.name,); 
+  });
+}
+
+
+  final List<Widget> _selectedFrontImages = [];
+  final List<Widget> _selectedBackImages = [];
+  final List<String> _selectedDocs = [];
 
   @override
   void dispose() {
@@ -132,7 +173,7 @@ class _AddEducationPageState extends State<AddEducationPage> {
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
-                    getImageFromGallery();
+                    getImageFromGalleryFront();
                   },
                   child: Material(
                     elevation: 4,
@@ -144,22 +185,29 @@ class _AddEducationPageState extends State<AddEducationPage> {
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.grey[200],
                       ),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.upload, size: 50),
-                          SizedBox(height: 10),
-                          Text(
-                            "Upload Photo",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            "Supported formats: JPEG, PNG, JPG",
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
-                          ),
-                        ],
-                      ),
+                      child: _selectedFrontImages.isNotEmpty
+                          ? Wrap(
+                              spacing: 8.0,
+                              runSpacing: 8.0,
+                              children: _selectedFrontImages,
+                            )
+                          : const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.upload, size: 50),
+                                SizedBox(height: 10),
+                                Text(
+                                  "Upload Photo",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                SizedBox(height: 5),
+                                Text(
+                                  "Supported formats: JPEG, PNG, JPG",
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
                     ),
                   ),
                 ),
@@ -170,7 +218,7 @@ class _AddEducationPageState extends State<AddEducationPage> {
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
-                    getImageFromGallery();
+                    getImageFromGalleryBack();
                   },
                   child: Material(
                     elevation: 4,
@@ -182,22 +230,29 @@ class _AddEducationPageState extends State<AddEducationPage> {
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.grey[200],
                       ),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.upload, size: 50),
-                          SizedBox(height: 10),
-                          Text(
-                            "Upload Photo",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            "Supported formats: JPEG, PNG, JPG",
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
-                          ),
-                        ],
-                      ),
+                      child: _selectedBackImages.isNotEmpty
+                          ? Wrap(
+                              spacing: 8.0,
+                              runSpacing: 8.0,
+                              children: _selectedBackImages,
+                            )
+                          : const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.upload, size: 50),
+                                SizedBox(height: 10),
+                                Text(
+                                  "Upload Photo",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                SizedBox(height: 5),
+                                Text(
+                                  "Supported formats: JPEG, PNG, JPG",
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
                     ),
                   ),
                 ),
@@ -224,22 +279,40 @@ class _AddEducationPageState extends State<AddEducationPage> {
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.grey[200],
                       ),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.upload, size: 50),
-                          SizedBox(height: 10),
-                          Text(
-                            "Upload Files",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            "Supported format: DOC, PDF",
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
-                          ),
-                        ],
-                      ),
+                      child: _selectedDocs.isNotEmpty
+                          ? Wrap(
+                              spacing: 8.0,
+                              runSpacing: 8.0,
+                              children: _selectedDocs
+                                  .map(
+                                    (doc) => Chip(
+                                      label: Text(doc),
+                                      // Customize chip appearance as needed
+                                      // For example:
+                                      backgroundColor: Colors.blue,
+                                      labelStyle:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  )
+                                  .toList(),
+                            )
+                          : const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.upload, size: 50),
+                                SizedBox(height: 10),
+                                Text(
+                                  "Upload Files",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                SizedBox(height: 5),
+                                Text(
+                                  "Supported format: DOC, PDF",
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
                     ),
                   ),
                 ),
