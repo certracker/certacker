@@ -8,12 +8,12 @@ class CerEducationPage extends StatefulWidget {
 }
 
 class _CerEducationPageState extends State<CerEducationPage> {
-  bool _isSelectMode = false;
+ bool _isSelectMode = false;
   late List<bool> _isSelected;
-  late List<Map<String, String>> _certificationCards =
-      []; // Initialize with an empty list
+  late List<Map<String, String>> _certificationCards = [];
+  bool _isSearchVisible = true;
 
- @override
+  @override
   void initState() {
     super.initState();
     _certificationCards = [];
@@ -21,8 +21,7 @@ class _CerEducationPageState extends State<CerEducationPage> {
     _initializeCertificationCards();
   }
 
-
-Future<void> _initializeCertificationCards() async {
+  void _initializeCertificationCards() async {
     // Simulate fetching certification data
     await Future.delayed(const Duration(seconds: 1));
     setState(() {
@@ -31,53 +30,51 @@ Future<void> _initializeCertificationCards() async {
     });
   }
 
+  void _openBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+             ListTile(
+                leading: const Icon(Icons.check_circle_outline),
+                title: const Text("Select Multiple"),
+                onTap: () {
+                  setState(() {
+                    _isSelectMode = true;
+                    _isSearchVisible = false;
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text("Recycle bin"),
+                onTap: () {
+                  // Handle your action here
+                  Navigator.pop(context);
+                },
+              ),
+              // Add more list items as needed
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          if (_isSelectMode)
-            Row(
-              children: [
-                _actionButton(
-                  Icons.delete,
-                  'Delete',
-                  Colors.red,
-                  onPressed: () {
-                    _deleteSelectedItems();
-                  },
-                ),
-                _actionButton(
-                  Icons.share,
-                  'Share',
-                  Colors.green,
-                  onPressed: () {
-                    _shareSelectedItems();
-                  },
-                ),
-              ],
-            ),
-          const SizedBox(width: 10),
-        ],
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 50,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-              ),
-            ),
+            _buildSearchBarOrActions(),
             const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
@@ -97,6 +94,81 @@ Future<void> _initializeCertificationCards() async {
     );
   }
 
+  Widget _buildSearchBarOrActions() {
+    if (_isSelectMode) {
+      return Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isSelectMode = false;
+                _isSearchVisible = true;
+              });
+            },
+            child: const Icon(Icons.arrow_back),
+          ),
+          const Spacer(),
+          Row(
+            children: [
+              TextButton.icon(
+                onPressed: () {
+                  _deleteSelectedItems();
+                },
+                icon: const Icon(Icons.delete),
+                label: const Text('Delete'),
+                style: ButtonStyle(
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  _shareSelectedItems();
+                },
+                icon: const Icon(Icons.share),
+                label: const Text('Share'),
+              ),
+            ],
+          ),
+        ],
+      );
+    } else {
+      return GestureDetector(
+        onLongPress: () {
+          setState(() {
+            _isSelectMode = true;
+            _isSearchVisible = false;
+          });
+        },
+        child: SizedBox(
+          height: 50,
+          child: _isSearchVisible
+              ? Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _openBottomSheet(context);
+                      },
+                      icon: const Icon(Icons.more_vert),
+                    ),
+                  ],
+                )
+              : null,
+        ),
+      );
+    }
+  }
+
   List<Map<String, String>> _getCertificationCards() {
     // Replace this with your certification data list
     return [
@@ -108,41 +180,24 @@ Future<void> _initializeCertificationCards() async {
         'title': 'Education Name 2',
         'expiration': 'Expiring 15 July 2025',
       },
-
-       {
+      {
         'title': 'Education Name 3',
         'expiration': 'Expiring 15 July 2025',
       },
-       {
+      {
         'title': 'Education Name 4',
         'expiration': 'Expiring 15 July 2025',
       },
-       {
+      {
         'title': 'Education Name 5',
         'expiration': 'Expiring 15 July 2025',
       },
-       {
+      {
         'title': 'Education Name 6',
         'expiration': 'Expiring 15 July 2025',
       },
       // Add more certification cards as needed
     ];
-  }
-
-  Widget _actionButton(
-    IconData icon,
-    String text,
-    Color color, {
-    required VoidCallback onPressed,
-  }) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, color: color),
-      label: Text(
-        text,
-        style: TextStyle(color: color),
-      ),
-    );
   }
 
   Widget _buildCertificationCard(
@@ -153,7 +208,8 @@ Future<void> _initializeCertificationCards() async {
     return GestureDetector(
       onLongPress: () {
         setState(() {
-          _isSelectMode = !_isSelectMode;
+          _isSelectMode = true;
+          _isSearchVisible = false;
         });
       },
       child: Card(
@@ -195,14 +251,6 @@ Future<void> _initializeCertificationCards() async {
                         ],
                       ),
                     ),
-                    if (!_isSelectMode)
-                      const Row(
-                        children: [
-                          Icon(Icons.edit, color: Colors.blue),
-                          SizedBox(width: 10),
-                          Icon(Icons.share, color: Colors.green),
-                        ],
-                      ),
                   ],
                 ),
               ),
@@ -222,9 +270,12 @@ Future<void> _initializeCertificationCards() async {
         }
       }
       _isSelectMode = false;
+      _isSearchVisible = true;
     });
   }
 
   void _shareSelectedItems() {
-    }
+    // Implement share functionality here
+  }
 }
+

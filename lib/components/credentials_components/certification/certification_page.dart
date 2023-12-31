@@ -1,3 +1,4 @@
+import 'package:certracker/components/credentials_components/certification/page/certification_detail.dart';
 import 'package:flutter/material.dart';
 
 class CerCertificationPage extends StatefulWidget {
@@ -10,10 +11,10 @@ class CerCertificationPage extends StatefulWidget {
 class _CerCertificationPageState extends State<CerCertificationPage> {
   bool _isSelectMode = false;
   late List<bool> _isSelected;
-  late List<Map<String, String>> _certificationCards =
-      []; // Initialize with an empty list
+  late List<Map<String, String>> _certificationCards = [];
+  bool _isSearchVisible = true;
 
- @override
+  @override
   void initState() {
     super.initState();
     _certificationCards = [];
@@ -21,8 +22,7 @@ class _CerCertificationPageState extends State<CerCertificationPage> {
     _initializeCertificationCards();
   }
 
-
-Future<void> _initializeCertificationCards() async {
+  void _initializeCertificationCards() async {
     // Simulate fetching certification data
     await Future.delayed(const Duration(seconds: 1));
     setState(() {
@@ -31,53 +31,51 @@ Future<void> _initializeCertificationCards() async {
     });
   }
 
+  void _openBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+             ListTile(
+                leading: const Icon(Icons.check_circle_outline),
+                title: const Text("Select Multiple"),
+                onTap: () {
+                  setState(() {
+                    _isSelectMode = true;
+                    _isSearchVisible = false;
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text("Recycle bin"),
+                onTap: () {
+                  // Handle your action here
+                  Navigator.pop(context);
+                },
+              ),
+              // Add more list items as needed
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          if (_isSelectMode)
-            Row(
-              children: [
-                _actionButton(
-                  Icons.delete,
-                  'Delete',
-                  Colors.red,
-                  onPressed: () {
-                    _deleteSelectedItems();
-                  },
-                ),
-                _actionButton(
-                  Icons.share,
-                  'Share',
-                  Colors.green,
-                  onPressed: () {
-                    _shareSelectedItems();
-                  },
-                ),
-              ],
-            ),
-          const SizedBox(width: 10),
-        ],
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 50,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-              ),
-            ),
+            _buildSearchBarOrActions(),
             const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
@@ -97,6 +95,81 @@ Future<void> _initializeCertificationCards() async {
     );
   }
 
+  Widget _buildSearchBarOrActions() {
+    if (_isSelectMode) {
+      return Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isSelectMode = false;
+                _isSearchVisible = true;
+              });
+            },
+            child: const Icon(Icons.arrow_back),
+          ),
+          const Spacer(),
+          Row(
+            children: [
+              TextButton.icon(
+                onPressed: () {
+                  _deleteSelectedItems();
+                },
+                icon: const Icon(Icons.delete),
+                label: const Text('Delete'),
+                style: ButtonStyle(
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  _shareSelectedItems();
+                },
+                icon: const Icon(Icons.share),
+                label: const Text('Share'),
+              ),
+            ],
+          ),
+        ],
+      );
+    } else {
+      return GestureDetector(
+        onLongPress: () {
+          setState(() {
+            _isSelectMode = true;
+            _isSearchVisible = false;
+          });
+        },
+        child: SizedBox(
+          height: 50,
+          child: _isSearchVisible
+              ? Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _openBottomSheet(context);
+                      },
+                      icon: const Icon(Icons.more_vert),
+                    ),
+                  ],
+                )
+              : null,
+        ),
+      );
+    }
+  }
+
   List<Map<String, String>> _getCertificationCards() {
     // Replace this with your certification data list
     return [
@@ -108,20 +181,19 @@ Future<void> _initializeCertificationCards() async {
         'title': 'Certification Name 2',
         'expiration': 'Expiring 15 July 2025',
       },
-
-       {
+      {
         'title': 'Certification Name 3',
         'expiration': 'Expiring 15 July 2025',
       },
-       {
+      {
         'title': 'Certification Name 4',
         'expiration': 'Expiring 15 July 2025',
       },
-       {
+      {
         'title': 'Certification Name 5',
         'expiration': 'Expiring 15 July 2025',
       },
-       {
+      {
         'title': 'Certification Name 6',
         'expiration': 'Expiring 15 July 2025',
       },
@@ -129,89 +201,88 @@ Future<void> _initializeCertificationCards() async {
     ];
   }
 
-  Widget _actionButton(
-    IconData icon,
-    String text,
-    Color color, {
-    required VoidCallback onPressed,
-  }) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, color: color),
-      label: Text(
-        text,
-        style: TextStyle(color: color),
-      ),
-    );
-  }
-
-  Widget _buildCertificationCard(
-    String title,
-    String expiration,
-    int index,
-  ) {
-    return GestureDetector(
-      onLongPress: () {
+ Widget _buildCertificationCard(
+  String title,
+  String expiration,
+  int index,
+) {
+  return GestureDetector(
+    onTap: () {
+      if (_isSelectMode) {
         setState(() {
-          _isSelectMode = !_isSelectMode;
+          // Toggle the selection
+          _isSelected[index] = !_isSelected[index];
         });
-      },
-      child: Card(
-        elevation: 3,
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              if (_isSelectMode)
-                Checkbox(
-                  value: _isSelected[index],
-                  onChanged: (value) {
-                    setState(() {
-                      _isSelected[index] = value!;
-                    });
-                  },
-                ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            expiration,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (!_isSelectMode)
-                      const Row(
-                        children: [
-                          Icon(Icons.edit, color: Colors.blue),
-                          SizedBox(width: 10),
-                          Icon(Icons.share, color: Colors.green),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-            ],
+      } else {
+        // Navigate to a new page when a card is tapped
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CertificationDetailPage(
+              title: title,
+              expiration: expiration,
+            ),
           ),
+        );
+      }
+    },
+    onLongPress: () {
+      setState(() {
+        _isSelectMode = true;
+        _isSearchVisible = false;
+        // Toggle the selection on long press
+        _isSelected[index] = !_isSelected[index];
+      });
+    },
+    child: Card(
+      elevation: 3,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            if (_isSelectMode)
+              Checkbox(
+                value: _isSelected[index],
+                onChanged: (value) {
+                  setState(() {
+                    _isSelected[index] = value!;
+                  });
+                },
+              ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          expiration,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   void _deleteSelectedItems() {
     setState(() {
@@ -222,9 +293,12 @@ Future<void> _initializeCertificationCards() async {
         }
       }
       _isSelectMode = false;
+      _isSearchVisible = true;
     });
   }
 
   void _shareSelectedItems() {
-    }
+    // Implement share functionality here
+  }
 }
+
