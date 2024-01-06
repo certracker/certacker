@@ -322,7 +322,7 @@ void displayDocumentPreview(FilePickerResult result) {
                                       // For example:
                                       backgroundColor: Colors.blue,
                                       labelStyle:
-                                          TextStyle(color: Colors.white),
+                                          const TextStyle(color: Colors.white),
                                     ),
                                   )
                                   .toList(),

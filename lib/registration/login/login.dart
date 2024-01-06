@@ -1,5 +1,6 @@
 import 'package:certracker/components/colors/app_colors.dart';
 import 'package:certracker/registration/complete_profile/complete_profile.dart';
+import 'package:certracker/registration/forgetpd/enter_email.dart';
 import 'package:certracker/registration/signup/signup.dart';
 import 'package:flutter/material.dart';
 
@@ -69,7 +70,12 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           TextButton(
                             onPressed: () {
-                              // Implement forgot password logic
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ForgotPasswordEmailScreen(),
+                                  ));
                             },
                             child: const Text(
                               'Forgot Password?',

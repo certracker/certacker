@@ -1,14 +1,20 @@
 import 'package:certracker/components/colors/app_colors.dart';
 import 'package:certracker/registration/login/login.dart';
+import 'package:certracker/registration/verification/verification.dart';
 import 'package:flutter/material.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    // double screenWidth = MediaQuery.of(context).size.width;
+  State<SignUpPage> createState() => _SignUpPageState();
+}
 
+class _SignUpPageState extends State<SignUpPage> {
+  bool _isChecked = false;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
@@ -32,7 +38,7 @@ class SignUpPage extends StatelessWidget {
                 children: [
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'Full Name',
+                      labelText: "First Name",
                       border: UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: Colors.grey,
@@ -44,7 +50,19 @@ class SignUpPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   TextFormField(
                     decoration: const InputDecoration(
-                      labelText: 'Email',
+                      labelText: "Last Name",
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey,
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: "Email",
                       border: UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: Colors.grey,
@@ -57,7 +75,7 @@ class SignUpPage extends StatelessWidget {
                   TextFormField(
                     obscureText: true,
                     decoration: const InputDecoration(
-                      labelText: 'Password',
+                      labelText: "Password",
                       border: UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: Colors.grey,
@@ -70,7 +88,7 @@ class SignUpPage extends StatelessWidget {
                   TextFormField(
                     obscureText: true,
                     decoration: const InputDecoration(
-                      labelText: 'Confirm Password',
+                      labelText: "Confirm Password",
                       border: UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: Colors.grey,
@@ -83,10 +101,11 @@ class SignUpPage extends StatelessWidget {
                   Row(
                     children: [
                       Checkbox(
-                        value:
-                            false, // Use a state variable to handle checkbox value
+                        value: _isChecked,
                         onChanged: (value) {
-                          // Implement your logic here
+                          setState(() {
+                            _isChecked = value!;
+                          });
                         },
                       ),
                       const Text('I agree to the terms and conditions'),
@@ -136,7 +155,11 @@ class SignUpPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   TextButton.icon(
                     onPressed: () {
-                      // Implement sign up with Google logic here
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const VerificationPage()),
+                      );
                     },
                     icon: const Icon(Icons.g_translate),
                     label: const Text('Sign Up with Google'),

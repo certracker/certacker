@@ -69,6 +69,7 @@ flutter:
     - assets/images/onboarding/
     - assets/images/login/
     - assets/images/signup/
+    - assets/images/forgetpassword/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,4 +1,5 @@
-import 'package:certracker/registration/signup/signup.dart';
+import 'package:certracker/onboarding/onboarding.dart';
+// import 'package:certracker/registration/signup/signup.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: SignUpPage(),
+      home: OnboardingScreens(),
       debugShowCheckedModeBanner: false,
     );
   }
