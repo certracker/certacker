@@ -1,94 +1,178 @@
-import 'package:certracker/components/home_components/current_screen.dart';
-import 'package:certracker/components/home_components/expired_screen.dart';
-import 'package:certracker/components/home_components/expiring_soon_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  int selectedIndex = 0;
+
+  void selectItem(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        elevation: 4, // Adjust the elevation as needed
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.grey[300],
-                  child: const Icon(Icons.person, size: 40, color: Colors.grey),
-                ),
-                const Text(
-                  "Welcome, Devin!",
-                  style: TextStyle(fontSize: 18),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.notifications),
-                      onPressed: () {
-                        // Add notification icon onPressed action
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.calendar_today),
-                      onPressed: () {
-                        // Add calendar icon onPressed action
-                      },
-                    ),
-                  ],
-                )
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                DashboardBox(color: Colors.green, title: "Current", count: 0),
-                DashboardBox(color: Colors.orange, title: "Expiring", count: 0),
-                DashboardBox(color: Colors.red, title: "Expired", count: 0),
-              ],
-            ),
-            const SizedBox(height: 50),
-            Expanded(
-              child: TableCalendar(
-                locale: "en_US",
-                calendarFormat: CalendarFormat.month,
-                headerStyle: const HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                ),
-                calendarStyle: const CalendarStyle(
-                  todayDecoration: BoxDecoration(
-                    color: Colors.blueAccent,
-                    shape: BoxShape.circle,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Material(
+            elevation: 4, // Adjust the elevation as needed
+            child: Container(
+              color: const Color(0XFF591A8F),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.grey[300],
+                    child: const Icon(Icons.person, size: 40, color: Colors.grey),
                   ),
-                  selectedDecoration: BoxDecoration(
-                    color: Colors.redAccent,
-                    shape: BoxShape.circle,
+                  const Text(
+                    "Welcome, Devin!",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
                   ),
-                  todayTextStyle: TextStyle(color: Colors.white),
-                  selectedTextStyle: TextStyle(color: Colors.white),
-                ),
-                onDaySelected: (selectedDate, focusedDate) {
-                  // Handle day selection
-                },
-                focusedDay: DateTime.now(), // Provide a valid DateTime here
-                firstDay:
-                    DateTime.utc(2023, 1, 1), // Example: Set to January 1, 2023
-                lastDay: DateTime.utc(
-                    2023, 12, 31), // Example: Set to December 31, 2023
-                // Add more properties and callbacks as needed
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.search, color: Colors.white),
+                        onPressed: () {
+                          // Add notification icon onPressed action
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.more_vert, color: Colors.white),
+                        onPressed: () {
+                          // Add calendar icon onPressed action
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
+          ),
+          Container(
+            color: Colors.white,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FilterItem(
+                  text: 'All',
+                  isSelected: selectedIndex == 0,
+                  onTap: () => selectItem(0),
+                ),
+                FilterItem(
+                  imagePath: "assets/images/icons/1.png",
+                  isSelected: selectedIndex == 1,
+                  onTap: () => selectItem(1),
+                ),
+                FilterItem(
+                  imagePath: "assets/images/icons/2.png",
+                  isSelected: selectedIndex == 2,
+                  onTap: () => selectItem(2),
+                ),
+                FilterItem(
+                  imagePath: "assets/images/icons/3.png",
+                  isSelected: selectedIndex == 3,
+                  onTap: () => selectItem(3),
+                ),
+                FilterItem(
+                  imagePath: "assets/images/icons/4.png",
+                  isSelected: selectedIndex == 4,
+                  onTap: () => selectItem(4),
+                ),
+                FilterItem(
+                  imagePath: "assets/images/icons/5.png",
+                  isSelected: selectedIndex == 5,
+                  onTap: () => selectItem(5),
+                ),
+                FilterItem(
+                  imagePath: "assets/images/icons/6.png",
+                  isSelected: selectedIndex == 6,
+                  onTap: () => selectItem(6),
+                ),
+                FilterItem(
+                  imagePath: "assets/images/icons/7.png",
+                  isSelected: selectedIndex == 7,
+                  onTap: () => selectItem(7),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: IndexedStack(
+              index: selectedIndex,
+              children: const [
+                PageOne(),
+                PageTwo(),
+                PageThree(),
+                PageFour(),
+                PageFive(),
+                PageSix(),
+                PageSeven(),
+                PageEight(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FilterItem extends StatelessWidget {
+  final String? imagePath;
+  final String? text;
+  final bool isSelected;
+  final VoidCallback? onTap;
+
+  const FilterItem({
+    Key? key,
+    this.imagePath,
+    this.text,
+    this.isSelected = false,
+    this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (imagePath != null)
+              Image.asset(
+                imagePath!,
+              ),
+            if (text != null)
+              Text(
+                text!,
+                style: TextStyle(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            if (isSelected)
+              Container(
+                height: 2,
+                width: 20,
+                color: Colors.blue,
+                margin: const EdgeInsets.only(top: 4),
+              ),
           ],
         ),
       ),
@@ -96,66 +180,98 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-class DashboardBox extends StatelessWidget {
-  final Color color;
-  final String title;
-  final int count;
-
-  const DashboardBox({
-    Key? key,
-    required this.color,
-    required this.title,
-    required this.count,
-  }) : super(key: key);
+class PageOne extends StatelessWidget {
+  const PageOne({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (title == "Current") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const CurrentPage()),
-          );
-        } else if (title == "Expiring") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ExpiringSoonPage()),
-          );
-        } else if (title == "Expired") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ExpiredPage()),
-          );
-        }
-      },
-      child: Container(
-        width: 100,
-        height: 100,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              '($count)',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('This is Page 1'),
+    );
+  }
+}
+
+class PageTwo extends StatelessWidget {
+  const PageTwo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('This is Page 2'),
+    );
+  }
+}
+
+class PageThree extends StatelessWidget {
+  const PageThree({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('This is Page 3'),
+    );
+  }
+}
+
+class PageFour extends StatelessWidget {
+  const PageFour({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('This is Page 4'),
+    );
+  }
+}
+
+class PageFive extends StatelessWidget {
+  const PageFive({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('This is Page 5'),
+    );
+  }
+}
+
+class PageSix extends StatelessWidget {
+  const PageSix({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('This is Page 6'),
+    );
+  }
+}
+
+class PageSeven extends StatelessWidget {
+  const PageSeven({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('This is Page 7'),
+    );
+  }
+}
+
+class PageEight extends StatelessWidget {
+  const PageEight({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('This is Page 8'),
     );
   }
 }

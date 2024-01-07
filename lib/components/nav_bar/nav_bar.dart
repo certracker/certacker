@@ -1,4 +1,3 @@
-import 'package:certracker/main_page/credentials/credentials.dart';
 import 'package:certracker/main_page/home/home.dart';
 import 'package:certracker/main_page/profile/profile.dart';
 import 'package:certracker/main_page/settings/settings.dart';
@@ -16,7 +15,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
-    const CredentialsScreen(),
     const ProfileScreen(),
     const SettingsScreen(),
   ];
@@ -36,10 +34,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Credentials',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

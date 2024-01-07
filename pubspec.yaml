@@ -35,8 +35,6 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  table_calendar: ^3.0.9
-  floating_action_bubble_custom: ^1.0.0+2
   shared_preferences: ^2.2.2
   image_picker: ^1.0.5
   file_picker: ^6.1.1
@@ -70,6 +68,7 @@ flutter:
     - assets/images/login/
     - assets/images/signup/
     - assets/images/forgetpassword/
+    - assets/images/icons/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
