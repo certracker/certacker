@@ -12,9 +12,7 @@ class TravelForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TextFormField(
@@ -42,7 +40,6 @@ class TravelForm extends StatelessWidget {
             ),
           ),
         ],
-      ),
     );
   }
 }

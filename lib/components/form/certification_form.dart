@@ -9,7 +9,7 @@ class CertificationForm extends StatelessWidget {
   final TextEditingController certificationSecondReminderController =
       TextEditingController();
   final TextEditingController certificationFinalReminderController = TextEditingController();
-  final TextEditingController certificationRrivateNoteController = TextEditingController();
+  final TextEditingController certificationPrivateNoteController = TextEditingController();
 
   CertificationForm({super.key});
 
@@ -248,7 +248,7 @@ class CertificationForm extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextFormField(
-          controller: certificationRrivateNoteController,
+          controller: certificationPrivateNoteController,
           maxLines: 5,
           decoration: const InputDecoration(
             hintText: 'Type here...',
