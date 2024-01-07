@@ -1,3 +1,4 @@
+import 'package:certracker/components/form/add_credential.dart';
 import 'package:certracker/components/home_components/pages/Certification.dart';
 import 'package:certracker/components/home_components/pages/Education.dart';
 import 'package:certracker/components/home_components/pages/License.dart';
@@ -144,7 +145,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Add your action when the button is pressed
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const AddCredentialPage()));
         },
         backgroundColor: const Color(0xFF591A8F),
         shape: RoundedRectangleBorder(
