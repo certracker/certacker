@@ -99,24 +99,6 @@ class _AddCredentialPageState extends State<AddCredentialPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TextFormField(
-                      controller: titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Title',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: detailsController,
-                      maxLines: 5,
-                      decoration: const InputDecoration(
-                        labelText: 'Details',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Render form based on selectedCategory
                     renderFormByCategory(selectedCategory),
                   ],
                 ),
