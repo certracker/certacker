@@ -28,60 +28,61 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        elevation: 4, // Adjust the elevation as needed
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Material(
-            elevation: 4, // Adjust the elevation as needed
-            child: Container(
-              color: const Color(0XFF591A8F),
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.grey[300],
-                    child:
-                        const Icon(Icons.person, size: 40, color: Colors.grey),
-                  ),
-                  const Text(
-                    "Welcome, Devin!",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  ),
-                  Row(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(150.0),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          elevation: 4, 
+          flexibleSpace: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Material(
+                elevation: 4,
+                child: Container(
+                  color: const Color(0XFF591A8F),
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.search, color: Colors.white),
-                        onPressed: () {
-                          // Add notification icon onPressed action
-                        },
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.grey[300],
+                        child:
+                            const Icon(Icons.person, size: 40, color: Colors.grey),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.more_vert, color: Colors.white),
-                        onPressed: () {
-                          // Add calendar icon onPressed action
-                        },
+                      const Text(
+                        "Welcome, Devin!",
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.search, color: Colors.white),
+                            onPressed: () {
+                              // Add notification icon onPressed action
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.more_vert, color: Colors.white),
+                            onPressed: () {
+                              // Add calendar icon onPressed action
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-          Material(
-            elevation: 4, // Adjust the elevation as needed
-            shadowColor: Colors.grey, // Optional: customize shadow color
-            child: Container(
-              height: 50,
-              color: Colors.white,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+              Material(
+                elevation: 4,
+                shadowColor: Colors.grey, 
+                child: Container(
+                  height: 50,
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                   FilterItem(
                     text: 'All',
                     isSelected: selectedIndex == 0,
@@ -123,25 +124,27 @@ class _DashboardPageState extends State<DashboardPage> {
                     onTap: () => selectItem(7),
                   ),
                 ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-          Expanded(
-            child: IndexedStack(
-              index: selectedIndex,
-              children: const [
-                AllPage(),
-                CertificationPage(),
-                LicensesPage(),
-                EducationPage(),
-                VaccinationPage(),
-                TravelPage(),
-                CEUCMEPage(),
-                OthersPage(),
-              ],
-            ),
-          ),
-        ],
+        ),
+      ),
+      body: Expanded(
+        child: IndexedStack(
+          index: selectedIndex,
+          children: const [
+            AllPage(),
+            CertificationPage(),
+            LicensesPage(),
+            EducationPage(),
+            VaccinationPage(),
+            TravelPage(),
+            CEUCMEPage(),
+            OthersPage(),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -150,14 +153,13 @@ class _DashboardPageState extends State<DashboardPage> {
         backgroundColor: const Color(0xFF591A8F),
         shape: RoundedRectangleBorder(
           borderRadius:
-              BorderRadius.circular(50), // Adjust the circular border radius
+              BorderRadius.circular(50),
         ),
         child: const Icon(Icons.add, color: Colors.white, size: 50),
       ),
     );
   }
 }
-
 class FilterItem extends StatelessWidget {
   final String? imagePath;
   final String? text;
