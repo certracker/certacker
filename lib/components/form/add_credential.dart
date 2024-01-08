@@ -24,19 +24,19 @@ class _AddCredentialPageState extends State<AddCredentialPage> {
 
   Widget renderFormByCategory(String category) {
     switch (category) {
-      case 'Certification':
+      case "Certification":
         return CertificationForm();
-      case 'License':
+      case "License":
         return LicenseForm();
-      case 'Education':
+      case "Education":
         return EducationForm();
-      case 'Vaccination':
+      case "Vaccination":
         return VaccinationForm();
-      case 'Travel':
+      case "Travel":
         return const TravelForm();
-      case 'CEU/CME':
+      case "CEU/CME":
         return CEUForm();
-      case 'Others':
+      case "Others":
         return OthersForm();
       default:
         return const SizedBox();

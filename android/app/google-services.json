@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "912576608221",
+    "project_id": "certracker",
+    "storage_bucket": "certracker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:912576608221:android:bcf8d6dc6d05bc59f9a834",
+        "android_client_info": {
+          "package_name": "com.example.certracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtRjnrk0iYXLrziZToCKUg82-hnw8cxZw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

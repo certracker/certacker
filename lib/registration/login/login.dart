@@ -1,7 +1,7 @@
 import 'package:certracker/components/colors/app_colors.dart';
-import 'package:certracker/registration/complete_profile/complete_profile.dart';
 import 'package:certracker/registration/forgetpd/enter_email.dart';
 import 'package:certracker/registration/signup/signup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -14,11 +14,32 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _isObscured = true;
 
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
   void _togglePasswordVisibility() {
     setState(() {
       _isObscured = !_isObscured;
     });
   }
+
+  void signUserIn() async {
+  try {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailController.text,
+      password: passwordController.text,
+    );
+    // Navigate to the next screen upon successful login
+    // e.g., Navigator.push(context, MaterialPageRoute(builder: (context) => NextScreen()));
+  } catch (e) {
+    // Display error message to the user
+    print("Error signing in: $e");
+    // You can display a SnackBar or AlertDialog to show the error to the user
+    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error signing in")));
+    // showDialog(...); // Show an AlertDialog
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +62,9 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   const SizedBox(height: 140),
                   TextFormField(
+                    controller: emailController,
                     decoration: const InputDecoration(
-                      labelText: 'Email',
+                      labelText: "Email",
                       border: UnderlineInputBorder(),
                     ),
                   ),
@@ -51,9 +73,10 @@ class _LoginPageState extends State<LoginPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextFormField(
+                        controller: passwordController,
                         obscureText: _isObscured,
                         decoration: InputDecoration(
-                          labelText: 'Password',
+                          labelText: "Password",
                           border: const UnderlineInputBorder(),
                           suffixIcon: GestureDetector(
                             onTap: _togglePasswordVisibility,
@@ -71,14 +94,15 @@ class _LoginPageState extends State<LoginPage> {
                           TextButton(
                             onPressed: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ForgotPasswordEmailScreen(),
-                                  ));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ForgotPasswordEmailScreen(),
+                                ),
+                              );
                             },
                             child: const Text(
-                              'Forgot Password?',
+                              "Forgot Password?",
                               style: TextStyle(color: Colors.red),
                             ),
                           ),
@@ -89,13 +113,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 20),
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ProfilePage()),
-                      );
-                    },
+                    onTap: signUserIn,
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
