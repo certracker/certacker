@@ -33,7 +33,7 @@ class _AddCredentialPageState extends State<AddCredentialPage> {
       case 'Vaccination':
         return VaccinationForm();
       case 'Travel':
-        return TravelForm();
+        return const TravelForm();
       case 'CEU/CME':
         return CEUForm();
       case 'Others':
@@ -46,66 +46,76 @@ class _AddCredentialPageState extends State<AddCredentialPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Add Credential",
-          style: TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent, // Set the background color to transparent
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [CustomColors.gradientStart, CustomColors.gradientEnd],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+        appBar: AppBar(
+          title: const Text(
+            "Add Credential",
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
+          backgroundColor:
+              Colors.transparent, // Set the background color to transparent
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [CustomColors.gradientStart, CustomColors.gradientEnd],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DropdownButtonFormField<String>(
-                value: selectedCategory.isNotEmpty ? selectedCategory : null,
-                hint: const Text('Select a category'),
-                items: categoryData.map((Category category) {
-                  return DropdownMenuItem<String>(
-                    value: category.category,
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          category.imagePath,
-                          width: 20,
-                          height: 20,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(category.category),
-                      ],
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DropdownButtonFormField<String>(
+                  value: selectedCategory.isNotEmpty ? selectedCategory : null,
+                  hint: const Text("Select a category"),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
-                  );
-                }).toList(),
-                onChanged: (String? value) {
-                  setState(() {
-                    selectedCategory = value ?? '';
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              if (selectedCategory.isNotEmpty)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    renderFormByCategory(selectedCategory),
-                  ],
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16.0),
+                  ),
+                  items: categoryData.map((Category category) {
+                    return DropdownMenuItem<String>(
+                      value: category.category,
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            category.imagePath,
+                            width: 20,
+                            height: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(category.category),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? value) {
+                    setState(() {
+                      selectedCategory = value ?? '';
+                    });
+                  },
                 ),
-            ],
+                const SizedBox(height: 40),
+                if (selectedCategory.isEmpty)
+                  const Text(
+                    "Please select a category",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 30),
+                  ),
+                if (selectedCategory.isNotEmpty)
+                  renderFormByCategory(selectedCategory),
+              ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }
