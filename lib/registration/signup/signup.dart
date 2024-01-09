@@ -1,6 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:certracker/components/colors/app_colors.dart';
+import 'package:certracker/model/user/user_model.dart';
+import 'package:certracker/registration/complete_profile/complete_profile.dart';
 import 'package:certracker/registration/login/login.dart';
-import 'package:certracker/registration/verification/verification.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -11,7 +16,50 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
   bool _isChecked = false;
+
+  Future<void> _signUp() async {
+    try {
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text,
+      );
+
+      UserModel newUser = UserModel(
+        firstName: firstNameController.text.trim(),
+        lastName: lastNameController.text.trim(),
+        email: userCredential.user!.email!,
+        profilePicture: 'https://example.com/default_profile_image.png',
+      );
+
+      await _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set(newUser.toJson());
+
+      // Send email verification
+      await userCredential.user!.sendEmailVerification();
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfilePage()),
+      );
+    } catch (e) {
+      // Handle signup errors
+      print('Error during sign-up: $e');
+      // Show a snackbar or other UI to inform the user about the error
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +85,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextFormField(
+                    controller: firstNameController,
                     decoration: const InputDecoration(
                       labelText: "First Name",
                       border: UnderlineInputBorder(
@@ -49,6 +98,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    controller: lastNameController,
                     decoration: const InputDecoration(
                       labelText: "Last Name",
                       border: UnderlineInputBorder(
@@ -61,6 +111,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    controller: emailController,
                     decoration: const InputDecoration(
                       labelText: "Email",
                       border: UnderlineInputBorder(
@@ -73,6 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    controller: passwordController,
                     obscureText: true,
                     decoration: const InputDecoration(
                       labelText: "Password",
@@ -86,6 +138,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    controller: confirmPasswordController,
                     obscureText: true,
                     decoration: const InputDecoration(
                       labelText: "Confirm Password",
@@ -114,7 +167,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 20),
                   GestureDetector(
                     onTap: () {
-                      // Your button logic
+                      _signUp();
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -155,11 +208,11 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 20),
                   TextButton.icon(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const VerificationPage()),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) => const VerificationPage()),
+                      // );
                     },
                     icon: const Icon(Icons.g_translate),
                     label: const Text('Sign Up with Google'),

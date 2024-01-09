@@ -4,10 +4,15 @@ import 'package:certracker/components/settings_components/edit_profile/edit_prof
 import 'package:certracker/components/settings_components/help/help_page.dart';
 import 'package:certracker/components/settings_components/log_out/log_out_page.dart';
 import 'package:certracker/components/settings_components/notification/Notification_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+
+  void signUserOut(){
+    FirebaseAuth.instance.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +29,15 @@ class SettingsScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: _buildSettingsCard(context),
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: _buildSettingsCard(context),
+          ),
+          const SizedBox(height: 20),
+          _buildLogoutContainer(context),
+        ],
       ),
     );
   }
@@ -38,7 +49,6 @@ class SettingsScreen extends StatelessWidget {
       'Change Password',
       'Help',
       'About',
-      'Log Out',
     ];
 
     return Card(
@@ -55,6 +65,35 @@ class SettingsScreen extends StatelessWidget {
             final String text = settings[index];
             return _buildSettingsItem(context, text);
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoutContainer(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF6F0A0A),
+        borderRadius: BorderRadius.circular(10.0), // Adding border radius
+      ),
+      child: InkWell(
+        onTap: () {
+          signUserOut();
+        },
+        child: const Row(
+          children: [
+            Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+            SizedBox(width: 10),
+            Text(
+              'Log Out',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ],
         ),
       ),
     );
@@ -91,7 +130,7 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
         ),
-        if (text != 'Log Out')
+        if (text != 'About')
           const Divider(
               height: 0), // Add divider for each item except the last one
       ],

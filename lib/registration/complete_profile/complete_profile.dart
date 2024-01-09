@@ -1,5 +1,10 @@
-import 'package:certracker/components/nav_bar/nav_bar.dart';
+import 'dart:io';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -9,13 +14,75 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _zipCodeController = TextEditingController();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  late User? _user;
+  final ImagePicker _picker = ImagePicker();
+  String _imageUrl = ''; // To store the URL of the uploaded image
+
+  @override
+  void initState() {
+    super.initState();
+    _user = _auth.currentUser;
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    if (_user != null) {
+      DocumentSnapshot<Map<String, dynamic>> userData =
+          await _firestore.collection('users').doc(_user!.uid).get();
+      if (userData.exists) {
+        setState(() {
+          _phoneController.text = userData['phone'] ?? '';
+          _dobController.text = userData['dob'] ?? '';
+          _stateController.text = userData['state'] ?? '';
+          _cityController.text = userData['city'] ?? '';
+          _zipCodeController.text = userData['zipCode'] ?? '';
+          _imageUrl = userData['profilePicture'] ?? '';
+        });
+      }
+    }
+  }
+
+  Future<void> updateUserData() async {
+    if (_user != null) {
+      await _firestore.collection('users').doc(_user!.uid).update({
+        'phone': _phoneController.text,
+        'dob': _dobController.text,
+        'state': _stateController.text,
+        'city': _cityController.text,
+        'zipCode': _zipCodeController.text,
+        'profilePicture': _imageUrl,
+      });
+    }
+  }
+
+  Future<void> _getImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+    if (pickedFile != null) {
+      final imageFile = pickedFile.path;
+      final imageFileName = pickedFile.path.split('/').last;
+
+      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('profile_images')
+          .child(imageFileName);
+
+      await ref.putFile(File(imageFile));
+
+      final imageUrl = await ref.getDownloadURL();
+      setState(() {
+        _imageUrl = imageUrl;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,17 +117,21 @@ class _ProfilePageState extends State<ProfilePage> {
           children: <Widget>[
             const SizedBox(height: 20),
             GestureDetector(
-              onTap: () {
-                // Logic to add profile picture
+              onTap: () async {
+                await _getImage(ImageSource.gallery);
               },
               child: CircleAvatar(
                 radius: 70,
                 backgroundColor: Colors.grey[300],
-                child: const Icon(
-                  Icons.person,
-                  size: 70,
-                  color: Colors.grey,
-                ),
+                backgroundImage:
+                    _imageUrl.isEmpty ? null : NetworkImage(_imageUrl),
+                child: _imageUrl.isEmpty
+                    ? const Icon(
+                        Icons.camera_alt,
+                        size: 70,
+                        color: Colors.grey,
+                      )
+                    : null,
               ),
             ),
             const SizedBox(height: 20),
@@ -70,26 +141,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _fullNameController,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: 'Full Name',
-                labelStyle: TextStyle(color: Colors.white),
-                border: UnderlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _emailController,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                labelStyle: TextStyle(color: Colors.white),
-                border: UnderlineInputBorder(),
               ),
             ),
             const SizedBox(height: 12),
@@ -107,12 +158,31 @@ class _ProfilePageState extends State<ProfilePage> {
             TextFormField(
               controller: _dobController,
               style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Date of Birth',
-                labelStyle: TextStyle(color: Colors.white),
-                border: UnderlineInputBorder(),
+                labelStyle: const TextStyle(color: Colors.white),
+                border: const UnderlineInputBorder(),
+                suffixIcon: IconButton(
+                  onPressed: () async {
+                    final DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                    );
+                    if (pickedDate != null &&
+                        pickedDate != _dobController.text) {
+                      setState(() {
+                        _dobController.text =
+                            pickedDate.toString().split(' ')[0];
+                      });
+                    }
+                  },
+                  icon: const Icon(Icons.calendar_today, color: Colors.white),
+                ),
               ),
               keyboardType: TextInputType.datetime,
+              readOnly: true, // Disable manual keyboard input
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -148,13 +218,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Action when Finish button is pressed
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const BottomNavBar(),
-                  ),
-                );
+                updateUserData();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,

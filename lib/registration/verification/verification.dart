@@ -1,53 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class VerificationPage extends StatelessWidget {
-  const VerificationPage({Key? key}) : super(key: key);
+class VerificationPage extends StatefulWidget {
+  final String email;
+  final bool isEmailVerified;
+
+  const VerificationPage({
+    Key? key,
+    required this.email,
+    required this.isEmailVerified,
+  }) : super(key: key);
+
+  @override
+  State<VerificationPage> createState() => _VerificationPageState();
+}
+
+class _VerificationPageState extends State<VerificationPage> {
+  bool _emailVerified = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailVerified = widget.isEmailVerified;
+    _listenToEmailVerification(); // Listen for changes in email verification
+  }
+
+  void _listenToEmailVerification() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null && user.emailVerified) {
+        setState(() {
+          _emailVerified = true;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final List<FocusNode> focusNodes = List.generate(4, (index) => FocusNode());
-
-    void onChanged(String value, int index) {
-      final nextIndex = index + 1;
-      if (value.isNotEmpty && nextIndex < focusNodes.length) {
-        FocusScope.of(context).requestFocus(focusNodes[nextIndex]);
-      }
-    }
-
-    List<Widget> buildInputFields() {
-  return List.generate(
-    4,
-    (index) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5.0),
-      child: SizedBox(
-        width: 50,
-        height: 50,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(
-            child: TextFormField(
-              focusNode: focusNodes[index],
-              textAlign: TextAlign.center,
-              keyboardType: TextInputType.number,
-              maxLength: 1,
-              style: const TextStyle(fontSize: 20),
-              decoration: const InputDecoration(
-                counter: SizedBox.shrink(),
-                border: InputBorder.none,
-              ),
-              onChanged: (value) => onChanged(value, index),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
-
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -56,25 +45,28 @@ class VerificationPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text(
-              "Email verification",
+              "Email Verification",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 32 , fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            const Text(
-              "We have sent an OTP code to your email and********son@gmail.com. Enter the OTP code below to verify.",
+            Text(
+              "We have sent an OTP code to your email ${widget.email}. "
+              "Enter the OTP code below to verify.",
               textAlign: TextAlign.left,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 3,
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: buildInputFields(),
-            ),
+            if (_emailVerified)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/home');
+                },
+                child: const Text('Go to Home'),
+              ),
             const SizedBox(height: 20),
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -86,7 +78,7 @@ class VerificationPage extends StatelessWidget {
                   child: const Text("Didn't receive email?"),
                 ),
                 const Text(
-                  "You can resend code in 52s",
+                  "You can resend the code in 52s",
                   style: TextStyle(color: Colors.grey),
                 ),
               ],

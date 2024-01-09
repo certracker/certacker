@@ -1,5 +1,5 @@
 import 'package:certracker/components/nav_bar/nav_bar.dart';
-import 'package:certracker/onboarding/onboarding.dart';
+import 'package:certracker/registration/login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +19,7 @@ class AuthPage extends StatelessWidget {
 
             // Check if the user is not logged in
             else {
-              return const OnboardingScreens();
+              return const LoginPage();
             }
           }),
     );
