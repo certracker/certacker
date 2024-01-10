@@ -50,10 +50,10 @@ class _SignUpPageState extends State<SignUpPage> {
       // Send email verification
       await userCredential.user!.sendEmailVerification();
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfilePage()),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const CompleteProfile()),
+      // );
     } catch (e) {
       // Handle signup errors
       print('Error during sign-up: $e');
@@ -166,8 +166,46 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 20),
                   GestureDetector(
-                    onTap: () {
-                      _signUp();
+                    onTap: () async {
+                      showDialog(
+                        context: context,
+                        barrierDismissible:
+                            false, // Prevent dismissing the dialog on tap outside
+                        builder: (BuildContext context) {
+                          return const Center(
+                            child:
+                                CircularProgressIndicator(), // Show loading indicator
+                          );
+                        },
+                      );
+
+                      try {
+                        // Your sign-up logic or any asynchronous operation here (simulated with a delay for demonstration)
+                        await _signUp();
+
+                        Navigator.of(context)
+                            .pop(); // Dismiss the loading indicator dialog
+
+                        // Navigate to your desired page after the operation
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const CompleteProfile(),
+                          ),
+                        );
+                      } catch (e) {
+                        Navigator.of(context)
+                            .pop(); // Dismiss the loading indicator dialog on error
+
+                        // Handle the error if necessary
+                        print('Error during sign-up: $e');
+                        // Show a SnackBar or any other feedback to the user about the error
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content:
+                                Text('Failed to sign up. Please try again.'),
+                          ),
+                        );
+                      }
                     },
                     child: Container(
                       decoration: BoxDecoration(

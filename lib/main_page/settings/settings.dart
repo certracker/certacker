@@ -1,18 +1,28 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:certracker/components/settings_components/about/about_page.dart';
 import 'package:certracker/components/settings_components/change_password/change_password_page.dart';
 import 'package:certracker/components/settings_components/edit_profile/edit_profile.dart';
 import 'package:certracker/components/settings_components/help/help_page.dart';
 import 'package:certracker/components/settings_components/log_out/log_out_page.dart';
 import 'package:certracker/components/settings_components/notification/Notification_page.dart';
+import 'package:certracker/registration/login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  void signUserOut(){
-    FirebaseAuth.instance.signOut();
-  }
+  void signUserOut(BuildContext context) async {
+  await FirebaseAuth.instance.signOut();
+
+  // Navigate to the login page after signing out
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (context) => const LoginPage()),
+    (route) => false,
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -71,33 +81,34 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildLogoutContainer(BuildContext context) {
-    return Container(
+  return GestureDetector(
+    onTap: () {
+      signUserOut(context);
+    },
+    child: Container(
       margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: const Color(0xFF6F0A0A),
         borderRadius: BorderRadius.circular(10.0), // Adding border radius
       ),
-      child: InkWell(
-        onTap: () {
-          signUserOut();
-        },
-        child: const Row(
-          children: [
-            Icon(
-              Icons.logout,
-              color: Colors.white,
-            ),
-            SizedBox(width: 10),
-            Text(
-              'Log Out',
-              style: TextStyle(fontSize: 16, color: Colors.white),
-            ),
-          ],
-        ),
+      child: const Row(
+        children: [
+          Icon(
+            Icons.logout,
+            color: Colors.white,
+          ),
+          SizedBox(width: 10),
+          Text(
+            'Log Out',
+            style: TextStyle(fontSize: 16, color: Colors.white),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildSettingsItem(BuildContext context, String text) {
     return Column(

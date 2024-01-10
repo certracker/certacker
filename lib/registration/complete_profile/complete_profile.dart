@@ -1,19 +1,22 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
+import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class CompleteProfile extends StatefulWidget {
+  const CompleteProfile({Key? key}) : super(key: key);
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<CompleteProfile> createState() => _CompleteProfileState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _CompleteProfileState extends State<CompleteProfile> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _stateController = TextEditingController();
@@ -217,19 +220,51 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                updateUserData();
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  barrierDismissible:
+                      false, // Prevent dismissing the dialog on tap outside
+                  builder: (BuildContext context) {
+                    return const Center(
+                      child:
+                          CircularProgressIndicator(), // Show loading indicator
+                    );
+                  },
+                );
+
+                try {
+                  await updateUserData();
+
+                  Navigator.of(context)
+                      .pop(); // Dismiss the loading indicator dialog
+
+                  // Navigate to BottomNavBar or your desired page after updating
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const BottomNavBar()), // Replace with your navigation
+                  );
+                } catch (e) {
+                  Navigator.of(context)
+                      .pop(); // Dismiss the loading indicator dialog on error
+
+                  // Handle the error if necessary
+                  print('Error updating user data: $e');
+                  // Show a SnackBar or any other feedback to the user about the error
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content:
+                          Text('Failed to update user data. Please try again.'),
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 165, vertical: 10),
-                textStyle: const TextStyle(fontSize: 16),
-              ),
+                  borderRadius: BorderRadius.circular(10),
+                )
+                  ),
               child: const Text('Finish'),
             ),
             const SizedBox(height: 20),

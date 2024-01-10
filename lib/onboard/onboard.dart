@@ -2,14 +2,14 @@ import 'package:certracker/components/colors/app_colors.dart';
 import 'package:certracker/registration/signup/signup.dart';
 import 'package:flutter/material.dart';
 
-class OnboardingScreens extends StatefulWidget {
-  const OnboardingScreens({super.key});
+class OnBoard extends StatefulWidget {
+  const OnBoard({super.key});
 
   @override
-  State<OnboardingScreens> createState() => _OnboardingScreensState();
+  State<OnBoard> createState() => _OnBoardState();
 }
 
-class _OnboardingScreensState extends State<OnboardingScreens> {
+class _OnBoardState extends State<OnBoard> {
   int _currentPage = 0;
   final PageController _pageController = PageController(initialPage: 0);
 
