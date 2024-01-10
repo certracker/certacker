@@ -1,3 +1,4 @@
+import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
 
 class TravelForm extends StatefulWidget {
@@ -37,8 +38,7 @@ class _TravelFormState extends State<TravelForm> {
         const SizedBox(height: 16),
         Row(
           children: [
-            const Text("Document Type: ",
-                style: TextStyle(fontSize: 16)),
+            const Text("Document Type: ", style: TextStyle(fontSize: 16)),
             Radio<String>(
               value: "Passport",
               groupValue: documentType,
@@ -49,7 +49,9 @@ class _TravelFormState extends State<TravelForm> {
               },
             ),
             const Text("Passport",
-                style: TextStyle(fontSize: 14,)),
+                style: TextStyle(
+                  fontSize: 14,
+                )),
             Radio<String>(
               value: "Driver’s License",
               groupValue: documentType,
@@ -60,7 +62,9 @@ class _TravelFormState extends State<TravelForm> {
               },
             ),
             const Text("Driver’s License",
-                style: TextStyle(fontSize: 14,)),
+                style: TextStyle(
+                  fontSize: 14,
+                )),
           ],
         ),
         const SizedBox(height: 16),
@@ -241,8 +245,30 @@ class _TravelFormState extends State<TravelForm> {
         Align(
           alignment: Alignment.center,
           child: GestureDetector(
-            onTap: () {
-              // Your button logic
+            onTap: () async {
+              // Retrieve values from the TextEditingControllers
+              String frontImageUrl = ''; // Get the actual image URL
+              String backImageUrl = ''; // Get the actual image URL
+              String travelCountry = travelCountryController.text;
+              String placeOfIssue = travelPlaceOfIssueController.text;
+              String documentNumber = travelDocumentNumberController.text;
+              String issueDate = travelIssueDateController.text;
+              String expiryDate = travelExpiryDateController.text;
+              String travelPrivateNote = travelPrivateNoteController.text;
+
+              // Call the service function to save travel data
+              await TravelService.saveTravelData(
+                frontImageUrl: frontImageUrl,
+                backImageUrl: backImageUrl,
+                travelCountry: travelCountry,
+                placeOfIssue: placeOfIssue,
+                documentNumber: documentNumber,
+                issueDate: issueDate,
+                expiryDate: expiryDate,
+                travelPrivateNote: travelPrivateNote,
+                documentType:
+                    documentType, // Include the selected document type
+              );
             },
             child: Container(
               width: 400,

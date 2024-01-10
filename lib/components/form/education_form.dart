@@ -1,12 +1,17 @@
+import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
 
 class EducationForm extends StatelessWidget {
   final TextEditingController educationNameController = TextEditingController();
-  final TextEditingController educationdegreeController = TextEditingController();
+  final TextEditingController educationdegreeController =
+      TextEditingController();
   final TextEditingController startDateController = TextEditingController();
-  final TextEditingController educationFieldController = TextEditingController();
-  final TextEditingController educationGraduationController = TextEditingController();
-  final TextEditingController educationprivateNoteController = TextEditingController();
+  final TextEditingController educationFieldController =
+      TextEditingController();
+  final TextEditingController educationGraduationController =
+      TextEditingController();
+  final TextEditingController educationprivateNoteController =
+      TextEditingController();
 
   EducationForm({super.key});
 
@@ -176,8 +181,28 @@ class EducationForm extends StatelessWidget {
         Align(
           alignment: Alignment.center,
           child: GestureDetector(
-            onTap: () {
-              // Your button logic
+            onTap: () async {
+              // Retrieve values from the TextEditingControllers
+              String educationName = educationNameController.text;
+              String educationDegree = educationdegreeController.text;
+              String startDate = startDateController.text;
+              String educationField = educationFieldController.text;
+              String graduationDate = educationGraduationController.text;
+              String educationPrivateNote = educationprivateNoteController.text;
+              String frontImageUrl = ''; // Get the actual image URL
+              String backImageUrl = ''; // Get the actual image URL
+
+              // Call the service function to save education data
+              await EducationService.saveEducationData(
+                educationName: educationName,
+                educationDegree: educationDegree,
+                startDate: startDate,
+                educationField: educationField,
+                graduationDate: graduationDate,
+                educationPrivateNote: educationPrivateNote,
+                frontImageUrl: frontImageUrl,
+                backImageUrl: backImageUrl,
+              );
             },
             child: Container(
               width: 400,

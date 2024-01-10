@@ -1,15 +1,23 @@
+import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
 
 class CertificationForm extends StatelessWidget {
-  final TextEditingController certificationNameController = TextEditingController();
-  final TextEditingController certificationNumberController = TextEditingController();
-  final TextEditingController certificationIssueDateController = TextEditingController();
-  final TextEditingController certificationExpiryDateController = TextEditingController();
-  final TextEditingController certificationFirstReminderController = TextEditingController();
+  final TextEditingController certificationNameController =
+      TextEditingController();
+  final TextEditingController certificationNumberController =
+      TextEditingController();
+  final TextEditingController certificationIssueDateController =
+      TextEditingController();
+  final TextEditingController certificationExpiryDateController =
+      TextEditingController();
+  final TextEditingController certificationFirstReminderController =
+      TextEditingController();
   final TextEditingController certificationSecondReminderController =
       TextEditingController();
-  final TextEditingController certificationFinalReminderController = TextEditingController();
-  final TextEditingController certificationPrivateNoteController = TextEditingController();
+  final TextEditingController certificationFinalReminderController =
+      TextEditingController();
+  final TextEditingController certificationPrivateNoteController =
+      TextEditingController();
 
   CertificationForm({super.key});
 
@@ -259,8 +267,39 @@ class CertificationForm extends StatelessWidget {
         Align(
           alignment: Alignment.center,
           child: GestureDetector(
-            onTap: () {
-              // Your button logic
+            onTap: () async {
+              // Assuming you have retrieved the values from the TextEditingController instances
+              String certificationName = certificationNameController.text;
+              String certificationNumber = certificationNumberController.text;
+              String frontImageUrl =
+                  'front_image_url'; // Replace with actual URL
+              String backImageUrl = 'back_image_url'; // Replace with actual URL
+              String certificationIssueDate =
+                  certificationIssueDateController.text;
+              String certificationExpiryDate =
+                  certificationExpiryDateController.text;
+              String certificationFirstReminder =
+                  certificationFirstReminderController.text;
+              String certificationSecondReminder =
+                  certificationSecondReminderController.text;
+              String certificationFinalReminder =
+                  certificationFinalReminderController.text;
+              String certificationPrivateNote =
+                  certificationPrivateNoteController.text;
+
+// Call the saveCertificationData method with the gathered data
+              await CertificationService.saveCertificationData(
+                certificationName: certificationName,
+                certificationNumber: certificationNumber,
+                frontImageUrl: frontImageUrl,
+                backImageUrl: backImageUrl,
+                certificationIssueDate: certificationIssueDate,
+                certificationExpiryDate: certificationExpiryDate,
+                certificationFirstReminder: certificationFirstReminder,
+                certificationSecondReminder: certificationSecondReminder,
+                certificationFinalReminder: certificationFinalReminder,
+                certificationPrivateNote: certificationPrivateNote,
+              );
             },
             child: Container(
               width: 400,

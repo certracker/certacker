@@ -1,16 +1,21 @@
+import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
 
 class OthersForm extends StatelessWidget {
- final TextEditingController otherNameController = TextEditingController();
+  final TextEditingController otherNameController = TextEditingController();
   final TextEditingController otherNumberController = TextEditingController();
-  final TextEditingController otherIssueDateController = TextEditingController();
-  final TextEditingController otherExpiryDateController = TextEditingController();
-  final TextEditingController otherFirstReminderController = TextEditingController();
+  final TextEditingController otherIssueDateController =
+      TextEditingController();
+  final TextEditingController otherExpiryDateController =
+      TextEditingController();
+  final TextEditingController otherFirstReminderController =
+      TextEditingController();
   final TextEditingController otherSecondReminderController =
       TextEditingController();
-  final TextEditingController otherFinalReminderController = TextEditingController();
-  final TextEditingController otherPrivateNoteController = TextEditingController();
-
+  final TextEditingController otherFinalReminderController =
+      TextEditingController();
+  final TextEditingController otherPrivateNoteController =
+      TextEditingController();
 
   OthersForm({super.key});
 
@@ -260,8 +265,35 @@ class OthersForm extends StatelessWidget {
         Align(
           alignment: Alignment.center,
           child: GestureDetector(
-            onTap: () {
-              // Your button logic
+            onTap: () async {
+              // Retrieve values from the TextEditingControllers
+              String othersName = otherNameController.text;
+              String othersDetails =
+                  ''; // Get the details from your UI or elsewhere
+              String frontImageUrl = ''; // Get the actual image URL
+              String backImageUrl = ''; // Get the actual image URL
+              String otherNumber = otherNumberController.text;
+              String otherIssueDate = otherIssueDateController.text;
+              String otherExpiryDate = otherExpiryDateController.text;
+              String otherFirstReminder = otherFirstReminderController.text;
+              String otherSecondReminder = otherSecondReminderController.text;
+              String otherFinalReminder = otherFinalReminderController.text;
+              String otherPrivateNote = otherPrivateNoteController.text;
+
+              // Call the service function to save Others data
+              await OthersService.saveOthersData(
+                othersName: othersName,
+                othersDetails: othersDetails,
+                frontImageUrl: frontImageUrl,
+                backImageUrl: backImageUrl,
+                otherNumber: otherNumber,
+                otherIssueDate: otherIssueDate,
+                otherExpiryDate: otherExpiryDate,
+                otherFirstReminder: otherFirstReminder,
+                otherSecondReminder: otherSecondReminder,
+                otherFinalReminder: otherFinalReminder,
+                otherPrivateNote: otherPrivateNote,
+              );
             },
             child: Container(
               width: 400,

@@ -1,3 +1,4 @@
+import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
 
 class LicenseForm extends StatelessWidget {
@@ -13,7 +14,7 @@ class LicenseForm extends StatelessWidget {
       TextEditingController();
   final TextEditingController licenseFinalReminderController =
       TextEditingController();
-  final TextEditingController licenseRrivateNoteController =
+  final TextEditingController licensePrivateNoteController =
       TextEditingController();
   final TextEditingController licenseStateController = TextEditingController();
 
@@ -262,7 +263,7 @@ class LicenseForm extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextFormField(
-          controller: licenseRrivateNoteController,
+          controller: licensePrivateNoteController,
           maxLines: 5,
           decoration: const InputDecoration(
             hintText: 'Type here...',
@@ -273,8 +274,36 @@ class LicenseForm extends StatelessWidget {
         Align(
           alignment: Alignment.center,
           child: GestureDetector(
-            onTap: () {
-              // Your button logic
+            onTap: () async {
+              // Call the service function to save license data
+              // Retrieve values from the TextEditingControllers
+              String licenseName = licenseNameController.text;
+              String licenseNumber = licenseNumberController.text;
+              String frontImageUrl = ''; // Get the actual image URL
+              String backImageUrl = ''; // Get the actual image URL
+              String licenseIssueDate = licenseIssueDateController.text;
+              String licenseExpiryDate = licenseExpiryDateController.text;
+              String licenseFirstReminder = licenseFirstReminderController.text;
+              String licenseSecondReminder =
+                  licenseSecondReminderController.text;
+              String licenseFinalReminder = licenseFinalReminderController.text;
+              String licensePrivateNote = licensePrivateNoteController.text;
+              String licenseState = licenseStateController.text;
+
+              // Call the service function to save license data
+              await LicenseService.saveLicenseData(
+                licenseName: licenseName,
+                licenseNumber: licenseNumber,
+                frontImageUrl: frontImageUrl,
+                backImageUrl: backImageUrl,
+                licenseIssueDate: licenseIssueDate,
+                licenseExpiryDate: licenseExpiryDate,
+                licenseFirstReminder: licenseFirstReminder,
+                licenseSecondReminder: licenseSecondReminder,
+                licenseFinalReminder: licenseFinalReminder,
+                licensePrivateNote: licensePrivateNote,
+                licenseState: licenseState,
+              );
             },
             child: Container(
               width: 400,

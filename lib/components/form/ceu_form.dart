@@ -1,12 +1,17 @@
+import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
 
 class CEUForm extends StatelessWidget {
-  final TextEditingController ceuProgramTitleController = TextEditingController();
-  final TextEditingController ceuProviderNameController = TextEditingController();
-  final TextEditingController ceuNumberOfContactHourController = TextEditingController();
-  // final TextEditingController ceuFieldController = TextEditingController();
-  final TextEditingController ceuCompletionDateController = TextEditingController();
-  final TextEditingController ceuprivateNoteController = TextEditingController();
+  final TextEditingController ceuProgramTitleController =
+      TextEditingController();
+  final TextEditingController ceuProviderNameController =
+      TextEditingController();
+  final TextEditingController ceuNumberOfContactHourController =
+      TextEditingController();
+  final TextEditingController ceuCompletionDateController =
+      TextEditingController();
+  final TextEditingController ceuprivateNoteController =
+      TextEditingController();
 
   CEUForm({super.key});
 
@@ -176,8 +181,27 @@ class CEUForm extends StatelessWidget {
         Align(
           alignment: Alignment.center,
           child: GestureDetector(
-            onTap: () {
-              // Your button logic
+            onTap: () async {
+              // Retrieve values from the TextEditingControllers
+              String frontImageUrl = ''; // Get the actual image URL
+              String backImageUrl = ''; // Get the actual image URL
+              String ceuProgramTitle = ceuProgramTitleController.text;
+              String ceuProviderName = ceuProviderNameController.text;
+              String ceuNumberOfContactHour =
+                  ceuNumberOfContactHourController.text;
+              String ceuCompletionDate = ceuCompletionDateController.text;
+              String ceuPrivateNote = ceuprivateNoteController.text;
+
+              // Call the service function to save CEU/CME data
+              await CEUCMEService.saveCEUData(
+                frontImageUrl: frontImageUrl,
+                backImageUrl: backImageUrl,
+                ceuProgramTitle: ceuProgramTitle,
+                ceuProviderName: ceuProviderName,
+                ceuNumberOfContactHour: ceuNumberOfContactHour,
+                ceuCompletionDate: ceuCompletionDate,
+                ceuPrivateNote: ceuPrivateNote,
+              );
             },
             child: Container(
               width: 400,

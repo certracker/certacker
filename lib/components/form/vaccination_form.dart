@@ -1,17 +1,23 @@
+import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
 
 class VaccinationForm extends StatelessWidget {
   final TextEditingController vaccineTypeController = TextEditingController();
-  final TextEditingController vaccineManufacturerController = TextEditingController();
-  final TextEditingController vaccineLotNumberController = TextEditingController();
-  final TextEditingController vaccineIssueDateController = TextEditingController();
-  final TextEditingController vaccineExpiryDateController = TextEditingController();
-  final TextEditingController vaccinePrivateNoteController = TextEditingController();
+  final TextEditingController vaccineManufacturerController =
+      TextEditingController();
+  final TextEditingController vaccineLotNumberController =
+      TextEditingController();
+  final TextEditingController vaccineIssueDateController =
+      TextEditingController();
+  final TextEditingController vaccineExpiryDateController =
+      TextEditingController();
+  final TextEditingController vaccinePrivateNoteController =
+      TextEditingController();
 
   VaccinationForm({super.key});
 
   @override
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -198,8 +204,32 @@ class VaccinationForm extends StatelessWidget {
         Align(
           alignment: Alignment.center,
           child: GestureDetector(
-            onTap: () {
-              // Your button logic
+            onTap: () async {
+              // Retrieve values from the TextEditingControllers
+              String vaccinationType = vaccineTypeController.text;
+              String vaccinationManufacturer = vaccineManufacturerController.text;
+              String frontImageUrl = ''; // Get the actual image URL
+              String backImageUrl = ''; // Get the actual image URL
+              String vaccineType = vaccineTypeController.text;
+              String vaccineManufacturer = vaccineManufacturerController.text;
+              String vaccineLotNumber = vaccineLotNumberController.text;
+              String vaccineIssueDate = vaccineIssueDateController.text;
+              String vaccineExpiryDate = vaccineExpiryDateController.text;
+              String vaccinePrivateNote = vaccinePrivateNoteController.text;
+
+              // Call the service function to save vaccination data
+              await VaccinationService.saveVaccinationData(
+                vaccinationType: vaccinationType,
+                vaccinationManufacturer: vaccinationManufacturer,
+                frontImageUrl: frontImageUrl,
+                backImageUrl: backImageUrl,
+                vaccineType: vaccineType,
+                vaccineManufacturer: vaccineManufacturer,
+                vaccineLotNumber: vaccineLotNumber,
+                vaccineIssueDate: vaccineIssueDate,
+                vaccineExpiryDate: vaccineExpiryDate,
+                vaccinePrivateNote: vaccinePrivateNote,
+              );
             },
             child: Container(
               width: 400,
