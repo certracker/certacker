@@ -8,10 +8,8 @@ class AllPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color defaultCategoryColor =
-        const Color(0xFFF5415F);
-    String defaultCategoryImagePath =
-        "assets/images/icons/4.png"; 
+    Color defaultCategoryColor = const Color(0xFFF5415F);
+    String defaultCategoryImagePath = "assets/images/icons/4.png";
 
     return FutureBuilder(
       future: fetchUserData(),
@@ -29,7 +27,14 @@ class AllPage extends StatelessWidget {
         } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
           // If there's no data, show a message indicating no data available
           return const Center(
-            child: Text('No data available'),
+            child: Text(
+              "You have not added any credentials",
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
           );
         } else {
           // If data is available, build the UI using CategoryContainer
@@ -74,7 +79,6 @@ class AllPage extends StatelessWidget {
                   categoryImagePath = "assets/images/icons/7.png";
                   break;
                 default:
-                  
               }
 
               return CategoryContainer(
@@ -134,8 +138,7 @@ class AllPage extends StatelessWidget {
           userData.addAll(
             snapshot.docs.map((doc) => {
                   ...doc.data() as Map<String, dynamic>,
-                  'tableName':
-                      doc.reference.parent.id, // Extract tableName
+                  'tableName': doc.reference.parent.id, // Extract tableName
                 }),
           );
         }

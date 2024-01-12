@@ -30,7 +30,14 @@ class CertificationPage extends StatelessWidget {
         } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
           // If there's no data, show a message indicating no certification data
           return const Center(
-            child: Text('No certification data available'),
+            child: Text(
+              "You have not added any credentials",
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
           );
         } else {
           // If data is available, build the UI using CategoryContainer
