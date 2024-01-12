@@ -9,6 +9,7 @@ class TravelForm extends StatefulWidget {
 }
 
 class _TravelFormState extends State<TravelForm> {
+  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController travelCountryController = TextEditingController();
   final TextEditingController travelPlaceOfIssueController =
       TextEditingController();
@@ -22,6 +23,7 @@ class _TravelFormState extends State<TravelForm> {
       TextEditingController();
 
   String documentType = 'Passport'; // Default value
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -246,46 +248,61 @@ class _TravelFormState extends State<TravelForm> {
           alignment: Alignment.center,
           child: GestureDetector(
             onTap: () async {
-              // Retrieve values from the TextEditingControllers
-              String frontImageUrl = ''; // Get the actual image URL
-              String backImageUrl = ''; // Get the actual image URL
-              String travelCountry = travelCountryController.text;
-              String placeOfIssue = travelPlaceOfIssueController.text;
-              String documentNumber = travelDocumentNumberController.text;
-              String issueDate = travelIssueDateController.text;
-              String expiryDate = travelExpiryDateController.text;
-              String travelPrivateNote = travelPrivateNoteController.text;
+               if (_validateForm()) {
+                setState(() {
+                  isLoading = true;
+                });
+                // Retrieve values from the TextEditingControllers
+                String frontImageUrl = ''; // Get the actual image URL
+                String backImageUrl = ''; // Get the actual image URL
+                String travelCountry = travelCountryController.text;
+                String placeOfIssue = travelPlaceOfIssueController.text;
+                String documentNumber = travelDocumentNumberController.text;
+                String issueDate = travelIssueDateController.text;
+                String expiryDate = travelExpiryDateController.text;
+                String travelPrivateNote = travelPrivateNoteController.text;
 
-              // Call the service function to save travel data
-              await TravelService.saveTravelData(
-                frontImageUrl: frontImageUrl,
-                backImageUrl: backImageUrl,
-                travelCountry: travelCountry,
-                placeOfIssue: placeOfIssue,
-                documentNumber: documentNumber,
-                issueDate: issueDate,
-                expiryDate: expiryDate,
-                travelPrivateNote: travelPrivateNote,
-                documentType:
-                    documentType, // Include the selected document type
-              );
+                // Call the service function to save travel data
+                await TravelService.saveTravelData(
+                  frontImageUrl: frontImageUrl,
+                  backImageUrl: backImageUrl,
+                  travelCountry: travelCountry,
+                  placeOfIssue: placeOfIssue,
+                  documentNumber: documentNumber,
+                  issueDate: issueDate,
+                  expiryDate: expiryDate,
+                  travelPrivateNote: travelPrivateNote,
+                  documentType:
+                      documentType, // Include the selected document type
+                );
+                setState(() {
+                  isLoading = false;
+                });
+
+                // Navigate back to the dashboard
+                Navigator.pop(context);
+              } 
             },
-            child: Container(
-              width: 400,
-              height: 50,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: const Color(0xFF39115B),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                "Save Credential",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+            child: Visibility(
+              visible: !isLoading,
+              replacement: const CircularProgressIndicator(),
+              child: Container(
+                width: 400,
+                height: 50,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF39115B),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.all(10),
+                child: const Text(
+                  "Save Credential",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),
@@ -293,5 +310,9 @@ class _TravelFormState extends State<TravelForm> {
         ),
       ],
     );
+  }
+  bool _validateForm() {
+    // You can add more validation checks here if needed
+    return documentType.isNotEmpty;
   }
 }
