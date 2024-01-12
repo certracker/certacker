@@ -44,6 +44,13 @@ class CEUCMEPage extends StatelessWidget {
           List<Map<String, dynamic>> ceuCmeCategories =
               snapshot.data as List<Map<String, dynamic>>;
 
+          // Sort the ceuCmeCategories based on the timestamp
+          ceuCmeCategories.sort((a, b) {
+            Timestamp timestampA = a['timestamp'] ?? Timestamp(0, 0);
+            Timestamp timestampB = b['timestamp'] ?? Timestamp(0, 0);
+            return timestampB.compareTo(timestampA);
+          });
+
           return ListView(
             padding: const EdgeInsets.all(16),
             children: ceuCmeCategories.map((credentialsId) {

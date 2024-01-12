@@ -39,7 +39,9 @@ class AllPage extends StatelessWidget {
         } else {
           // If data is available, build the UI using CategoryContainer
           List<Map<String, dynamic>> allCategories =
-              snapshot.data as List<Map<String, dynamic>>;
+              (snapshot.data as List<Map<String, dynamic>>)
+                ..sort((a, b) =>
+                    (b['timestamp'] as Timestamp).compareTo(a['timestamp']));
 
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -74,6 +76,7 @@ class AllPage extends StatelessWidget {
                 case 'CEU':
                   categoryColor = const Color(0xFF789D1C);
                   categoryImagePath = "assets/images/icons/6.png";
+                  break;
                 case 'Others':
                   categoryColor = const Color(0xFF691B27);
                   categoryImagePath = "assets/images/icons/7.png";
@@ -102,7 +105,7 @@ class AllPage extends StatelessWidget {
       if (userId != null) {
         // Fetch data from multiple collections for the current user
         List<QuerySnapshot> snapshots = await Future.wait([
-          FirebaseFirestore.instance
+           FirebaseFirestore.instance
               .collection('Certification')
               .where('userId', isEqualTo: userId)
               .get(),
@@ -131,7 +134,6 @@ class AllPage extends StatelessWidget {
               .where('userId', isEqualTo: userId)
               .get(),
         ]);
-
         // Combine the results into a single list
         List<Map<String, dynamic>> userData = [];
         for (QuerySnapshot snapshot in snapshots) {
@@ -139,6 +141,7 @@ class AllPage extends StatelessWidget {
             snapshot.docs.map((doc) => {
                   ...doc.data() as Map<String, dynamic>,
                   'tableName': doc.reference.parent.id, // Extract tableName
+                  'timestamp': doc['timestamp'], // Add timestamp to each map
                 }),
           );
         }

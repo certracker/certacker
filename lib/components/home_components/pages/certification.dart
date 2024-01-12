@@ -44,6 +44,13 @@ class CertificationPage extends StatelessWidget {
           List<Map<String, dynamic>> certificationCategories =
               snapshot.data as List<Map<String, dynamic>>;
 
+          // Sort the certificationCategories based on the timestamp
+          certificationCategories.sort((a, b) {
+            Timestamp timestampA = a['timestamp'] ?? Timestamp(0, 0);
+            Timestamp timestampB = b['timestamp'] ?? Timestamp(0, 0);
+            return timestampB.compareTo(timestampA);
+          });
+
           return ListView(
             padding: const EdgeInsets.all(16),
             children: certificationCategories.map((credentialsId) {

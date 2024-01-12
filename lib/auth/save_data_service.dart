@@ -23,6 +23,9 @@ class SaveDataService {
     // Add the user ID as a field inside the document
     data['userId'] = userId;
 
+    // Add a timestamp field with the current server timestamp
+    data['timestamp'] = FieldValue.serverTimestamp();
+
     await documentReference.set(data);
   }
 
