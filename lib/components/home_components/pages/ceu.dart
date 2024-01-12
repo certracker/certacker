@@ -76,7 +76,7 @@ class CEUCMEPage extends StatelessWidget {
     } catch (e) {
       // Handle errors
       print('Error fetching CEU/CME data: $e');
-      throw e;
+      rethrow;
     }
   }
 }

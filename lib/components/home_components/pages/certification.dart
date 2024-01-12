@@ -76,7 +76,7 @@ class CertificationPage extends StatelessWidget {
     } catch (e) {
       // Handle errors
       print('Error fetching certification data: $e');
-      throw e;
+      rethrow;
     }
   }
 }

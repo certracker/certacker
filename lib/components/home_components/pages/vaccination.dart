@@ -76,7 +76,7 @@ class VaccinationPage extends StatelessWidget {
     } catch (e) {
       // Handle errors
       print('Error fetching Vaccination data: $e');
-      throw e;
+      rethrow;
     }
   }
 }

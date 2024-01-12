@@ -76,7 +76,7 @@ class TravelPage extends StatelessWidget {
     } catch (e) {
       // Handle errors
       print('Error fetching Travel data: $e');
-      throw e;
+      rethrow;
     }
   }
 }

@@ -76,7 +76,7 @@ class LicensesPage extends StatelessWidget {
     } catch (e) {
       // Handle errors
       print('Error fetching License data: $e');
-      throw e;
+      rethrow;
     }
   }
 }

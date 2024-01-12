@@ -148,7 +148,7 @@ class AllPage extends StatelessWidget {
     } catch (e) {
       // Handle errors
       print('Error fetching user data: $e');
-      throw e;
+      rethrow;
     }
   }
 }

@@ -76,7 +76,7 @@ class OthersPage extends StatelessWidget {
     } catch (e) {
       // Handle errors
       print('Error fetching Others data: $e');
-      throw e;
+      rethrow;
     }
   }
 }

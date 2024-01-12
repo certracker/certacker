@@ -76,7 +76,7 @@ class EducationPage extends StatelessWidget {
     } catch (e) {
       // Handle errors
       print('Error fetching Education data: $e');
-      throw e;
+      rethrow;
     }
   }
 }
