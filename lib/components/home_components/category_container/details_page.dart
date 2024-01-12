@@ -1,3 +1,10 @@
+import 'package:certracker/components/home_components/category_container/details_pages/cert_details.dart';
+import 'package:certracker/components/home_components/category_container/details_pages/ceu_details.dart';
+import 'package:certracker/components/home_components/category_container/details_pages/edu_details.dart';
+import 'package:certracker/components/home_components/category_container/details_pages/license_details.dart';
+import 'package:certracker/components/home_components/category_container/details_pages/others_details.dart';
+import 'package:certracker/components/home_components/category_container/details_pages/travel_details.dart';
+import 'package:certracker/components/home_components/category_container/details_pages/vaccinate_details.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -62,12 +69,34 @@ class _DetailsPageState extends State<DetailsPage> {
       'Education': 'Education',
       'Vaccination': 'Vaccination',
       'Travel': 'Travel',
-      'CEU/CME': 'CEU',
+      'CEU': 'CEU',
       'Others': 'Others',
     };
 
     return categoryCollectionMap[category] ?? '';
   }
+
+ Widget buildDetailsUI(Map<String, dynamic> details) {
+  switch (widget.category) {
+    case 'Certification':
+      return CertificationDetails(details: details);
+    case 'License':
+      return LicenseDetails(details: details);
+    case 'Education':
+      return EducationDetails(details: details);
+    case 'Vaccination':
+      return VaccinationDetails(details: details);
+    case 'Travel':
+      return TravelDetails(details: details);
+    case 'CEU':
+      return CEUDetails(details: details);
+    case 'Others':
+      return OthersDetails(details: details);
+    default:
+      return Text('No details available for this category.'); // Default case, you can customize as needed
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +113,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     Image.asset(
                       widget.imagePath,
                       width: double.infinity,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fitHeight,
                     ),
                     Container(
                       color: widget.color.withOpacity(0.7),
@@ -177,10 +206,9 @@ class _DetailsPageState extends State<DetailsPage> {
                     Map<String, dynamic> details =
                         snapshot.data as Map<String, dynamic>;
 
-                    return Column(
-                      children: [
-                        Text('Details: ${details.toString()}'),
-                      ],
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: buildDetailsUI(details),
                     );
                   }
                 },

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'details_page.dart'; // Import your details page file
+import 'details_page.dart';
 
 class CategoryContainer extends StatelessWidget {
   final String title;
