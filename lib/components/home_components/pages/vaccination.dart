@@ -19,13 +19,19 @@ class VaccinationPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // If still loading data, show a loading indicator
-          return const CircularProgressIndicator();
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         } else if (snapshot.hasError) {
           // If there's an error, show an error message
-          return Text('Error: ${snapshot.error}');
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
         } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
           // If there's no data, show a message indicating no Vaccination data
-          return const Text('No Vaccination data available');
+          return const Center(
+            child:  Text('No Vaccination data available'),
+          );
         } else {
           // If data is available, build the UI using CategoryContainer
           List<Map<String, dynamic>> vaccinationCategories =
