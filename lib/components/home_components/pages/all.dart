@@ -15,17 +15,14 @@ class AllPage extends StatelessWidget {
       future: fetchUserData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // If still loading data, show a loading indicator
           return const Center(
             child: CircularProgressIndicator(),
           );
         } else if (snapshot.hasError) {
-          // If there's an error, show an error message
           return Center(
             child: Text('Error: ${snapshot.error}'),
           );
         } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
-          // If there's no data, show a message indicating no data available
           return const Center(
             child: Text(
               "You have not added any credentials",
@@ -37,21 +34,17 @@ class AllPage extends StatelessWidget {
             ),
           );
         } else {
-          // If data is available, build the UI using CategoryContainer
-          List<Map<String, dynamic>> allCategories =
-              (snapshot.data as List<Map<String, dynamic>>)
-                ..sort((a, b) =>
-                    (b['timestamp'] as Timestamp).compareTo(a['timestamp']));
+          List<Map<String, dynamic>> allCategories = (snapshot.data
+              as List<Map<String, dynamic>>)
+            ..sort((a, b) =>
+                (b['timestamp'] as Timestamp).compareTo(a['timestamp']));
 
           return ListView(
             padding: const EdgeInsets.all(16),
             children: allCategories.map((credentialsId) {
               String tableName = credentialsId['tableName'];
-              Color categoryColor = defaultCategoryColor; // Set a default color
-              String categoryImagePath =
-                  defaultCategoryImagePath; // Set a default image path
-
-              // Set specific color and image path based on tableName
+              Color categoryColor = defaultCategoryColor;
+              String categoryImagePath = defaultCategoryImagePath;
               switch (tableName) {
                 case 'Certification':
                   categoryColor = const Color(0xFF8A6C0A);
@@ -99,13 +92,11 @@ class AllPage extends StatelessWidget {
 
   Future<List<Map<String, dynamic>>> fetchUserData() async {
     try {
-      // Get the current user's ID
       String? userId = AuthenticationService().getCurrentUserId();
 
       if (userId != null) {
-        // Fetch data from multiple collections for the current user
         List<QuerySnapshot> snapshots = await Future.wait([
-           FirebaseFirestore.instance
+          FirebaseFirestore.instance
               .collection('Certification')
               .where('userId', isEqualTo: userId)
               .get(),
@@ -134,25 +125,21 @@ class AllPage extends StatelessWidget {
               .where('userId', isEqualTo: userId)
               .get(),
         ]);
-        // Combine the results into a single list
         List<Map<String, dynamic>> userData = [];
         for (QuerySnapshot snapshot in snapshots) {
           userData.addAll(
             snapshot.docs.map((doc) => {
                   ...doc.data() as Map<String, dynamic>,
-                  'tableName': doc.reference.parent.id, // Extract tableName
-                  'timestamp': doc['timestamp'], // Add timestamp to each map
+                  'tableName': doc.reference.parent.id,
+                  'timestamp': doc['timestamp'],
                 }),
           );
         }
-
         return userData;
       } else {
-        // Handle if the user ID is null (user not authenticated)
         throw Exception('User not authenticated!');
       }
     } catch (e) {
-      // Handle errors
       print('Error fetching user data: $e');
       rethrow;
     }
