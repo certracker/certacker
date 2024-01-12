@@ -1,28 +1,76 @@
+import 'package:certracker/auth/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:certracker/components/home_components/category_container/category_container.dart';
-import 'package:certracker/model/category/category_data.dart';
-import 'package:certracker/model/category/category_model.dart';
 import 'package:flutter/material.dart';
-
 
 class OthersPage extends StatelessWidget {
   const OthersPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<Category> othersCategories = categoryData
-        .where((category) => category.category == "Others")
-        .toList();
+    // Define color and imagePath variables
+    Color categoryColor =
+        const Color(0xFF691B27); // Change to the desired color
+    String categoryImagePath =
+        "assets/images/icons/7.png"; // Change to the desired image path
 
-    return ListView(
-        padding: const EdgeInsets.all(16),
-        children: othersCategories.map((category) {
-          return CategoryContainer(
-            title: category.title,
-            category: category.category,
-            imagePath: category.imagePath,
-            color: category.color,
+    return FutureBuilder(
+      future: fetchOthersData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // If still loading data, show a loading indicator
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          // If there's an error, show an error message
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
+          // If there's no data, show a message indicating no Others data
+          return const Text('No Others data available');
+        } else {
+          // If data is available, build the UI using CategoryContainer
+          List<Map<String, dynamic>> othersCategories =
+              snapshot.data as List<Map<String, dynamic>>;
+
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: othersCategories.map((credentialsId) {
+              return CategoryContainer(
+                title: credentialsId['Title'],
+                category: "Others",
+                imagePath: categoryImagePath,
+                color: categoryColor,
+              );
+            }).toList(),
           );
-        }).toList(),
+        }
+      },
     );
+  }
+
+  Future<List<Map<String, dynamic>>> fetchOthersData() async {
+    try {
+      // Get the current user's ID
+      String? userId = AuthenticationService().getCurrentUserId();
+
+      if (userId != null) {
+        // Fetch Others data for the current user from Firestore
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('Others')
+            .where('userId', isEqualTo: userId)
+            .get();
+
+        // Convert the query snapshot into a list of Map<String, dynamic>
+        return querySnapshot.docs
+            .map((doc) => doc.data() as Map<String, dynamic>)
+            .toList();
+      } else {
+        // Handle if the user ID is null (user not authenticated)
+        throw Exception('User not authenticated!');
+      }
+    } catch (e) {
+      // Handle errors
+      print('Error fetching Others data: $e');
+      throw e;
+    }
   }
 }

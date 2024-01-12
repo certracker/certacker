@@ -6,26 +6,32 @@ import 'package:flutter/services.dart';
 
 class SaveDataService {
   static Future<void> saveData({
-    required String category,
+    required String tableName,
     required Map<String, dynamic> data,
     required String userId,
+    required String credentialsId,
   }) async {
     await Firebase.initializeApp();
 
-    CollectionReference userCollection =
-        FirebaseFirestore.instance.collection('users');
-    DocumentReference userDocRef = userCollection.doc(userId);
-    CollectionReference categoryCollection =
-        userDocRef.collection('credentials').doc(category).collection('items');
+    // Create a new collection for the table (e.g., 'Certification')
+    CollectionReference tableCollection =
+        FirebaseFirestore.instance.collection(tableName,);
 
-    await categoryCollection.add(data);
+    // Create a new document under the collection with the unique credentials ID
+    DocumentReference documentReference = tableCollection.doc(credentialsId);
+
+    // Add the user ID as a field inside the document
+    data['userId'] = userId;
+
+    await documentReference.set(data);
+  }
+
+  static String generateUniqueCredentialsId() {
+    return DateTime.now().millisecondsSinceEpoch.toString();
   }
 
   static Future<String> uploadImageToStorage(String imagePath) async {
     Reference ref = FirebaseStorage.instance.ref().child(imagePath);
-    // Replace this logic with your image upload logic
-    // For example:
-    // Upload a sample image from the assets folder
     final imageBytes = (await rootBundle.load(imagePath)).buffer.asUint8List();
     UploadTask uploadTask = ref.putData(imageBytes);
 
@@ -35,6 +41,43 @@ class SaveDataService {
     return imageUrl;
   }
 }
+
+class DynamicTableService {
+  static Future<void> saveDataToTable({
+    required String title,
+    required String tableName,
+    required Map<String, dynamic> data,
+  }) async {
+    String credentialsId = SaveDataService.generateUniqueCredentialsId();
+    String? userId = AuthenticationService().getCurrentUserId();
+
+    if (userId != null) {
+      data['Title'] = title;
+      await SaveDataService.saveData(
+        tableName: tableName,
+        data: data,
+        userId: userId,
+        credentialsId: credentialsId,
+      );
+    } else {
+      throw Exception('User not authenticated!');
+    }
+  }
+}
+
+class CategoryService {
+  static Future<List<Map<String, dynamic>>> getAllCategories() async {
+    await Firebase.initializeApp();
+
+    CollectionReference categoriesCollection =
+        FirebaseFirestore.instance.collection('categories');
+
+    QuerySnapshot categoriesSnapshot = await categoriesCollection.get();
+
+    return categoriesSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+  }
+}
+
 
 class CertificationService {
   static Future<void> saveCertificationData({
@@ -50,9 +93,11 @@ class CertificationService {
     required String certificationPrivateNote,
     // Add other necessary fields for Certification
   }) async {
-    String category = 'Certification';
+    String tableName = 'Certification';
+    // Assuming you have a method to generate a unique credentialsId
+    String credentialsId = generateUniqueCredentialsId();
     Map<String, dynamic> data = {
-      'certificationName': certificationName,
+      'Title': certificationName,
       'certificationNumber': certificationNumber,
       'frontImageUrl': frontImageUrl,
       'backImageUrl': backImageUrl,
@@ -68,14 +113,23 @@ class CertificationService {
     // Get the current user's ID
     String? userId = AuthenticationService().getCurrentUserId();
     if (userId != null) {
-      await SaveDataService.saveData(category: category, data: data, userId: userId);
+      await SaveDataService.saveData(
+        tableName: tableName,
+        data: data,
+        userId: userId,
+        credentialsId: credentialsId,
+      );
     } else {
       // Handle if the user ID is null (user not authenticated)
       throw Exception('User not authenticated!');
     }
   }
-}
 
+  // A placeholder method for generating unique credentialsId
+  static String generateUniqueCredentialsId() {
+    return DateTime.now().millisecondsSinceEpoch.toString();
+  }
+}
 
 
 class LicenseService {
@@ -91,39 +145,44 @@ class LicenseService {
     required String licenseFinalReminder,
     required String licensePrivateNote,
     required String licenseState,
-    // Add other necessary fields for License
   }) async {
-    String category = 'License';
-    Map<String, dynamic> data = {
-      'licenseName': licenseName,
-      'licenseNumber': licenseNumber,
-      'frontImageUrl': frontImageUrl,
-      'backImageUrl': backImageUrl,
-      'licenseIssueDate': licenseIssueDate,
-      'licenseExpiryDate': licenseExpiryDate,
-      'licenseFirstReminder': licenseFirstReminder,
-      'licenseSecondReminder': licenseSecondReminder,
-      'licenseFinalReminder': licenseFinalReminder,
-      'licensePrivateNote': licensePrivateNote,
-      'licenseState': licenseState,
-      // Add other fields for License
-    };
-
-    // Get the current user's ID
+    String tableName = 'License';
+    String credentialsId = generateUniqueCredentialsId();
     String? userId = AuthenticationService().getCurrentUserId();
+
     if (userId != null) {
+      Map<String, dynamic> data = {
+        'Title': licenseName,
+        'licenseNumber': licenseNumber,
+        'frontImageUrl': frontImageUrl,
+        'backImageUrl': backImageUrl,
+        'licenseIssueDate': licenseIssueDate,
+        'licenseExpiryDate': licenseExpiryDate,
+        'licenseFirstReminder': licenseFirstReminder,
+        'licenseSecondReminder': licenseSecondReminder,
+        'licenseFinalReminder': licenseFinalReminder,
+        'licensePrivateNote': licensePrivateNote,
+        'licenseState': licenseState,
+        // Add other fields for License
+      };
+
+      // Save license data to the database
       await SaveDataService.saveData(
-        category: category,
+        tableName: tableName,
         data: data,
         userId: userId,
+        credentialsId: credentialsId,
       );
     } else {
-      // Handle if the user ID is null (user not authenticated)
       throw Exception('User not authenticated!');
     }
   }
-}
 
+  // A placeholder method for generating unique credentialsId
+  static String generateUniqueCredentialsId() {
+    return DateTime.now().millisecondsSinceEpoch.toString();
+  }
+}
 
 class EducationService {
   static Future<void> saveEducationData({
@@ -135,115 +194,39 @@ class EducationService {
     required String educationPrivateNote,
     required String frontImageUrl,
     required String backImageUrl,
-    // Add other necessary fields for Education
   }) async {
-    String category = 'Education';
-    Map<String, dynamic> data = {
-      'educationName': educationName,
-      'educationDegree': educationDegree,
-      'startDate': startDate,
-      'educationField': educationField,
-      'graduationDate': graduationDate,
-      'educationPrivateNote': educationPrivateNote,
-      'frontImageUrl': frontImageUrl,
-      'backImageUrl': backImageUrl,
-      // Add other fields for Education
-    };
-
+    String tableName = 'Education';
+    String credentialsId = generateUniqueCredentialsId();
     String? userId = AuthenticationService().getCurrentUserId();
+
     if (userId != null) {
+      Map<String, dynamic> data = {
+        'Title': educationName,
+        'educationDegree': educationDegree,
+        'startDate': startDate,
+        'educationField': educationField,
+        'graduationDate': graduationDate,
+        'educationPrivateNote': educationPrivateNote,
+        'frontImageUrl': frontImageUrl,
+        'backImageUrl': backImageUrl,
+        // Add other fields for Education
+      };
+
+      // Save education data to the database
       await SaveDataService.saveData(
-        category: category,
+        tableName: tableName,
         data: data,
         userId: userId,
+        credentialsId: credentialsId,
       );
     } else {
       throw Exception('User not authenticated!');
     }
   }
-}
 
-
-class VaccinationService {
-  static Future<void> saveVaccinationData({
-    required String vaccinationType,
-    required String vaccinationManufacturer,
-    required String frontImageUrl,
-    required String backImageUrl,
-    required String vaccineType,
-    required String vaccineManufacturer,
-    required String vaccineLotNumber,
-    required String vaccineIssueDate,
-    required String vaccineExpiryDate,
-    required String vaccinePrivateNote,
-    // Add other necessary fields for Vaccination
-  }) async {
-    String category = 'Vaccination';
-    Map<String, dynamic> data = {
-      'vaccinationName': vaccinationType,
-      'vaccinationDate': vaccinationManufacturer,
-      'frontImageUrl': frontImageUrl,
-      'backImageUrl': backImageUrl,
-      'vaccineType': vaccineType,
-      'vaccineManufacturer': vaccineManufacturer,
-      'vaccineLotNumber': vaccineLotNumber,
-      'vaccineIssueDate': vaccineIssueDate,
-      'vaccineExpiryDate': vaccineExpiryDate,
-      'vaccinePrivateNote': vaccinePrivateNote,
-      // Add other fields for Vaccination
-    };
-
-    String? userId = AuthenticationService().getCurrentUserId();
-    if (userId != null) {
-      await SaveDataService.saveData(
-        category: category,
-        data: data,
-        userId: userId,
-      );
-    } else {
-      throw Exception('User not authenticated!');
-    }
-  }
-}
-
-
-class TravelService {
-  static Future<void> saveTravelData({
-    required String frontImageUrl,
-    required String backImageUrl,
-    required String travelCountry,
-    required String placeOfIssue,
-    required String documentNumber,
-    required String issueDate,
-    required String expiryDate,
-    required String travelPrivateNote,
-    required String documentType, 
-    // Add other necessary fields for Travel
-  }) async {
-    String category = 'Travel';
-    Map<String, dynamic> data = {
-      'frontImageUrl': frontImageUrl,
-      'backImageUrl': backImageUrl,
-      'travelCountry': travelCountry,
-      'placeOfIssue': placeOfIssue,
-      'documentNumber': documentNumber,
-      'issueDate': issueDate,
-      'expiryDate': expiryDate,
-      'travelPrivateNote': travelPrivateNote,
-      'documentType': documentType, // Include document type in data
-      // Add other fields for Travel
-    };
-
-    String? userId = AuthenticationService().getCurrentUserId();
-    if (userId != null) {
-      await SaveDataService.saveData(
-        category: category,
-        data: data,
-        userId: userId,
-      );
-    } else {
-      throw Exception('User not authenticated!');
-    }
+  // A placeholder method for generating unique credentialsId
+  static String generateUniqueCredentialsId() {
+    return DateTime.now().millisecondsSinceEpoch.toString();
   }
 }
 
@@ -257,30 +240,38 @@ class CEUCMEService {
     required String ceuNumberOfContactHour,
     required String ceuCompletionDate,
     required String ceuPrivateNote,
-    // Add other necessary fields for CEU/CME
   }) async {
-    String category = 'CEU';
-    Map<String, dynamic> data = {
-      'frontImageUrl': frontImageUrl,
-      'backImageUrl': backImageUrl,
-      'ceuProgramTitle': ceuProgramTitle,
-      'ceuProviderName': ceuProviderName,
-      'ceuNumberOfContactHour': ceuNumberOfContactHour,
-      'ceuCompletionDate': ceuCompletionDate,
-      'ceuPrivateNote': ceuPrivateNote,
-      // Add other fields for CEU/CME
-    };
-
+    String tableName = 'CEU';
+    String credentialsId = generateUniqueCredentialsId();
     String? userId = AuthenticationService().getCurrentUserId();
+
     if (userId != null) {
+      Map<String, dynamic> data = {
+        'frontImageUrl': frontImageUrl,
+        'backImageUrl': backImageUrl,
+        'Title': ceuProgramTitle,
+        'ceuProviderName': ceuProviderName,
+        'ceuNumberOfContactHour': ceuNumberOfContactHour,
+        'ceuCompletionDate': ceuCompletionDate,
+        'ceuPrivateNote': ceuPrivateNote,
+        // Add other fields for CEU/CME
+      };
+
+      // Save CEU/CME data to the database
       await SaveDataService.saveData(
-        category: category,
+        tableName: tableName,
         data: data,
         userId: userId,
+        credentialsId: credentialsId,
       );
     } else {
       throw Exception('User not authenticated!');
     }
+  }
+
+  // A placeholder method for generating unique credentialsId
+  static String generateUniqueCredentialsId() {
+    return DateTime.now().millisecondsSinceEpoch.toString();
   }
 }
 
@@ -298,33 +289,142 @@ class OthersService {
     required String otherSecondReminder,
     required String otherFinalReminder,
     required String otherPrivateNote,
-    // Add other necessary fields for Others
   }) async {
-    String category = 'Others';
-    Map<String, dynamic> data = {
-      'othersName': othersName,
-      'othersDetails': othersDetails,
-      'frontImageUrl': frontImageUrl,
-      'backImageUrl': backImageUrl,
-      'otherNumber': otherNumber,
-      'otherIssueDate': otherIssueDate,
-      'otherExpiryDate': otherExpiryDate,
-      'otherFirstReminder': otherFirstReminder,
-      'otherSecondReminder': otherSecondReminder,
-      'otherFinalReminder': otherFinalReminder,
-      'otherPrivateNote': otherPrivateNote,
-      // Add other fields for Others
-    };
-
+    String tableName = 'Others';
+    String credentialsId = generateUniqueCredentialsId();
     String? userId = AuthenticationService().getCurrentUserId();
+
     if (userId != null) {
+      Map<String, dynamic> data = {
+        'Title': othersName,
+        'othersDetails': othersDetails,
+        'frontImageUrl': frontImageUrl,
+        'backImageUrl': backImageUrl,
+        'otherNumber': otherNumber,
+        'otherIssueDate': otherIssueDate,
+        'otherExpiryDate': otherExpiryDate,
+        'otherFirstReminder': otherFirstReminder,
+        'otherSecondReminder': otherSecondReminder,
+        'otherFinalReminder': otherFinalReminder,
+        'otherPrivateNote': otherPrivateNote,
+        // Add other fields for Others
+      };
+
+      // Save Others data to the database
       await SaveDataService.saveData(
-        category: category,
+        tableName: tableName,
         data: data,
         userId: userId,
+        credentialsId: credentialsId,
       );
     } else {
       throw Exception('User not authenticated!');
     }
   }
+
+  // A placeholder method for generating unique credentialsId
+  static String generateUniqueCredentialsId() {
+    return DateTime.now().millisecondsSinceEpoch.toString();
+  }
 }
+
+
+class TravelService {
+  static Future<void> saveTravelData({
+    required String frontImageUrl,
+    required String backImageUrl,
+    required String travelCountry,
+    required String placeOfIssue,
+    required String documentNumber,
+    required String issueDate,
+    required String expiryDate,
+    required String travelPrivateNote,
+    required String documentType,
+  }) async {
+    String tableName = 'Travel';
+    String credentialsId = generateUniqueCredentialsId();
+    String? userId = AuthenticationService().getCurrentUserId();
+
+    if (userId != null) {
+      Map<String, dynamic> data = {
+        'frontImageUrl': frontImageUrl,
+        'backImageUrl': backImageUrl,
+        'travelCountry': travelCountry,
+        'placeOfIssue': placeOfIssue,
+        'documentNumber': documentNumber,
+        'issueDate': issueDate,
+        'expiryDate': expiryDate,
+        'travelPrivateNote': travelPrivateNote,
+        'Title': documentType,
+        // Add other fields for Travel
+      };
+
+      // Save Travel data to the database
+      await SaveDataService.saveData(
+        tableName: tableName,
+        data: data,
+        userId: userId,
+        credentialsId: credentialsId,
+      );
+    } else {
+      throw Exception('User not authenticated!');
+    }
+  }
+
+  // A placeholder method for generating unique credentialsId
+  static String generateUniqueCredentialsId() {
+    return DateTime.now().millisecondsSinceEpoch.toString();
+  }
+}
+
+
+class VaccinationService {
+  static Future<void> saveVaccinationData({
+    required String vaccinationType,
+    required String vaccinationManufacturer,
+    required String frontImageUrl,
+    required String backImageUrl,
+    required String vaccineType,
+    required String vaccineManufacturer,
+    required String vaccineLotNumber,
+    required String vaccineIssueDate,
+    required String vaccineExpiryDate,
+    required String vaccinePrivateNote,
+  }) async {
+    String tableName = 'Vaccination';
+    String credentialsId = generateUniqueCredentialsId();
+    String? userId = AuthenticationService().getCurrentUserId();
+
+    if (userId != null) {
+      Map<String, dynamic> data = {
+        'Title': vaccinationType,
+        'vaccinationManufacturer': vaccinationManufacturer,
+        'frontImageUrl': frontImageUrl,
+        'backImageUrl': backImageUrl,
+        'vaccineType': vaccineType,
+        'vaccineManufacturer': vaccineManufacturer,
+        'vaccineLotNumber': vaccineLotNumber,
+        'vaccineIssueDate': vaccineIssueDate,
+        'vaccineExpiryDate': vaccineExpiryDate,
+        'vaccinePrivateNote': vaccinePrivateNote,
+        // Add other fields for Vaccination
+      };
+
+      // Save Vaccination data to the database
+      await SaveDataService.saveData(
+        tableName: tableName,
+        data: data,
+        userId: userId,
+        credentialsId: credentialsId,
+      );
+    } else {
+      throw Exception('User not authenticated!');
+    }
+  }
+
+  // A placeholder method for generating unique credentialsId
+  static String generateUniqueCredentialsId() {
+    return DateTime.now().millisecondsSinceEpoch.toString();
+  }
+}
+

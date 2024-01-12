@@ -1,28 +1,76 @@
+import 'package:certracker/auth/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:certracker/components/home_components/category_container/category_container.dart';
-import 'package:certracker/model/category/category_data.dart';
-import 'package:certracker/model/category/category_model.dart';
 import 'package:flutter/material.dart';
-
 
 class LicensesPage extends StatelessWidget {
   const LicensesPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<Category> licenseCategories = categoryData
-        .where((category) => category.category == "License")
-        .toList();
+    // Define color and imagePath variables
+    Color categoryColor =
+        const Color(0xFF591A8F); // Change to the desired color
+    String categoryImagePath =
+        "assets/images/icons/2.png"; // Change to the desired image path
 
-    return ListView(
-        padding: const EdgeInsets.all(16),
-        children: licenseCategories.map((category) {
-          return CategoryContainer(
-            title: category.title,
-            category: category.category,
-            imagePath: category.imagePath,
-            color: category.color,
+    return FutureBuilder(
+      future: fetchLicenseData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // If still loading data, show a loading indicator
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          // If there's an error, show an error message
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
+          // If there's no data, show a message indicating no license data
+          return const Text('No License data available');
+        } else {
+          // If data is available, build the UI using CategoryContainer
+          List<Map<String, dynamic>> licenseCategories =
+              snapshot.data as List<Map<String, dynamic>>;
+
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: licenseCategories.map((credentialsId) {
+              return CategoryContainer(
+                title: credentialsId['Title'],
+                category: "License",
+                imagePath: categoryImagePath,
+                color: categoryColor,
+              );
+            }).toList(),
           );
-        }).toList(),
+        }
+      },
     );
+  }
+
+  Future<List<Map<String, dynamic>>> fetchLicenseData() async {
+    try {
+      // Get the current user's ID
+      String? userId = AuthenticationService().getCurrentUserId();
+
+      if (userId != null) {
+        // Fetch License data for the current user from Firestore
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('License')
+            .where('userId', isEqualTo: userId)
+            .get();
+
+        // Convert the query snapshot into a list of Map<String, dynamic>
+        return querySnapshot.docs
+            .map((doc) => doc.data() as Map<String, dynamic>)
+            .toList();
+      } else {
+        // Handle if the user ID is null (user not authenticated)
+        throw Exception('User not authenticated!');
+      }
+    } catch (e) {
+      // Handle errors
+      print('Error fetching License data: $e');
+      throw e;
+    }
   }
 }

@@ -63,6 +63,7 @@ class _AddCredentialPageState extends State<AddCredentialPage> {
               ),
             ),
           ),
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
         body: SingleChildScrollView(
           child: Padding(

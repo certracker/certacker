@@ -50,7 +50,7 @@ class _TravelFormState extends State<TravelForm> {
             ),
             const Text("Passport",
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 11,
                 )),
             Radio<String>(
               value: "Driver’s License",
@@ -63,7 +63,7 @@ class _TravelFormState extends State<TravelForm> {
             ),
             const Text("Driver’s License",
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 11,
                 )),
           ],
         ),
