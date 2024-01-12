@@ -16,93 +16,175 @@ class DetailsPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _DetailsPageState createState() => _DetailsPageState();
+  State<DetailsPage> createState() => _DetailsPageState();
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-  // Define variables to store details fetched from Firestore
-  String detailsTitle = "";
-  String detailsDescription = "";
+  late Future<Map<String, dynamic>> fetchData;
 
   @override
   void initState() {
     super.initState();
-    // Fetch details from Firestore when the page is initialized
-    fetchDetailsFromFirestore();
+    fetchData = fetchDetails();
   }
 
-  Future<void> fetchDetailsFromFirestore() async {
+  Future<Map<String, dynamic>> fetchDetails() async {
     try {
-      // Replace 'your_collection_name' with the actual Firestore collection name
-      String collectionName = ''; // Add your Firestore collection name
-      String titleField = 'Title';
-      String descriptionField = 'Description';
+      String collectionName = getCategoryCollectionName(widget.category);
 
-      // Fetch details based on the clicked container's title
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection(collectionName)
-          .where(titleField, isEqualTo: widget.title)
+          .where('Title', isEqualTo: widget.title)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Get the first document (assuming title is unique)
-        var document = querySnapshot.docs[0].data() as Map<String, dynamic>?;
+        Map<String, dynamic> details =
+            querySnapshot.docs.first.data() as Map<String, dynamic>;
 
-        // Update state with details if the document is not null
-        if (document != null) {
-          setState(() {
-            detailsTitle = document[titleField] ?? '';
-            detailsDescription = document[descriptionField] ?? '';
-          });
-        }
+        // Exclude 'userId' and 'timestamp' fields
+        details.remove('userId');
+        details.remove('timestamp');
+
+        return details;
+      } else {
+        throw Exception('Details not found!');
       }
     } catch (e) {
-      // Handle errors
       print('Error fetching details: $e');
+      rethrow;
     }
+  }
+
+  String getCategoryCollectionName(String category) {
+    Map<String, String> categoryCollectionMap = {
+      'Certification': 'Certification',
+      'License': 'License',
+      'Education': 'Education',
+      'Vaccination': 'Vaccination',
+      'Travel': 'Travel',
+      'CEU/CME': 'CEU',
+      'Others': 'Others',
+    };
+
+    return categoryCollectionMap[category] ?? '';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: widget.color.withOpacity(0.3),
-              ),
-              child: Center(
-                child: Image.asset(
-                  widget.imagePath,
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.contain,
+            AppBar(
+              automaticallyImplyLeading: false,
+              flexibleSpace: SizedBox(
+                height: 170,
+                child: Stack(
+                  children: [
+                    Image.asset(
+                      widget.imagePath,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                    Container(
+                      color: widget.color.withOpacity(0.7),
+                    ),
+                    Positioned(
+                      top: 16.0,
+                      left: 16.0,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        color: Colors.white, // Set arrow back icon color to white
+                      ),
+                    ),
+                    Positioned(
+                      top: 16.0,
+                      right: 16.0,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              // Handle edit action
+                            },
+                            color: Colors.white, // Set edit icon color to white
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.share),
+                            onPressed: () {
+                              // Handle share action
+                            },
+                            color: Colors.white, // Set share icon color to white
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              // Handle delete action
+                            },
+                            color: Colors.white, // Set delete icon color to white
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 16.0,
+                      left: 16.0,
+                      right: 16.0,
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              widget.title,
+                              style: const TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              widget.category,
+                              style: const TextStyle(
+                                fontSize: 18.0,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Category: ${widget.category}',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Details Title: $detailsTitle',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Details Description: $detailsDescription',
-              style: TextStyle(fontSize: 16),
+            Expanded(
+              child: FutureBuilder(
+                future: fetchData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData) {
+                    return const Center(child: Text('Details not available.'));
+                  } else {
+                    Map<String, dynamic> details =
+                        snapshot.data as Map<String, dynamic>;
+
+                    return Column(
+                      children: [
+                        Text('Details: ${details.toString()}'),
+                      ],
+                    );
+                  }
+                },
+              ),
             ),
           ],
         ),
