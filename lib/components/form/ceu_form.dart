@@ -242,12 +242,14 @@ class _CEUFormState extends State<CEUForm> {
                   });
 
                   // Retrieve values from the TextEditingControllers
-                   String frontImageURL =
-                      await SaveDataService.uploadImageToStorage(
-                          frontImageUrl!);
-                  String backImageURL =
-                      await SaveDataService.uploadImageToStorage(
-                          backImageUrl!);
+                  String frontImageURL = frontImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!)
+                      : '';
+                  String backImageURL = backImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          backImageUrl!)
+                      : '';
                   String ceuProgramTitle = ceuProgramTitleController.text;
                   String ceuProviderName = ceuProviderNameController.text;
                   String ceuNumberOfContactHour =

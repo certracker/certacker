@@ -341,12 +341,14 @@ class _LicenseFormState extends State<LicenseForm> {
                   // Retrieve values from the TextEditingControllers
                   String licenseName = licenseNameController.text;
                   String licenseNumber = licenseNumberController.text;
-                  String frontImageURL =
-                      await SaveDataService.uploadImageToStorage(
-                          frontImageUrl!);
-                  String backImageURL =
-                      await SaveDataService.uploadImageToStorage(
-                          backImageUrl!); // Get the actual image URL
+                  String frontImageURL = frontImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!)
+                      : '';
+                  String backImageURL = backImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          backImageUrl!)
+                      : '';
                   String licenseIssueDate = licenseIssueDateController.text;
                   String licenseExpiryDate = licenseExpiryDateController.text;
                   String licenseFirstReminder =

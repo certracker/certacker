@@ -37,6 +37,10 @@ class SaveDataService {
   }
 
   static Future<String> uploadImageToStorage(String imagePath) async {
+    if (imagePath.isEmpty) {
+      return ''; // Return an empty string for empty image paths
+    }
+
     Reference ref = FirebaseStorage.instance.ref().child(imagePath);
     final File imageFile = File(imagePath);
 

@@ -204,7 +204,7 @@ class _OthersFormState extends State<OthersForm> {
             ),
           ),
           const SizedBox(height: 16),
-         GestureDetector(
+          GestureDetector(
             onTap: () async {
               final XFile? pickedFile =
                   await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -329,12 +329,14 @@ class _OthersFormState extends State<OthersForm> {
                   // Retrieve values from the TextEditingControllers
                   String othersName = otherNameController.text;
                   // String othersDetails = otherDetailsController.text;
-                 String frontImageURL =
-                      await SaveDataService.uploadImageToStorage(
-                          frontImageUrl!);
-                  String backImageURL =
-                      await SaveDataService.uploadImageToStorage(
-                          backImageUrl!);  // Get the actual image URL
+                  String frontImageURL = frontImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!)
+                      : '';
+                  String backImageURL = backImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          backImageUrl!)
+                      : ''; // Get the actual image URL
                   String otherNumber = otherNumberController.text;
                   String otherIssueDate = otherIssueDateController.text;
                   String otherExpiryDate = otherExpiryDateController.text;

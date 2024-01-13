@@ -30,7 +30,7 @@ class _EducationFormState extends State<EducationForm> {
   final TextEditingController educationprivateNoteController =
       TextEditingController();
 
-      String? frontImageUrl;
+  String? frontImageUrl;
   String? backImageUrl;
 
   bool isLoading = false;
@@ -248,12 +248,14 @@ class _EducationFormState extends State<EducationForm> {
                   String graduationDate = educationGraduationController.text;
                   String educationPrivateNote =
                       educationprivateNoteController.text;
-                  String frontImageURL =
-                      await SaveDataService.uploadImageToStorage(
-                          frontImageUrl!);
-                  String backImageURL =
-                      await SaveDataService.uploadImageToStorage(
-                          backImageUrl!); 
+                  String frontImageURL = frontImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!)
+                      : '';
+                  String backImageURL = backImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          backImageUrl!)
+                      : '';
                   // Call the service function to save education data
                   await EducationService.saveEducationData(
                     educationName: educationName,
@@ -262,7 +264,7 @@ class _EducationFormState extends State<EducationForm> {
                     educationField: educationField,
                     graduationDate: graduationDate,
                     educationPrivateNote: educationPrivateNote,
-                     frontImageUrl: frontImageURL,
+                    frontImageUrl: frontImageURL,
                     backImageUrl: backImageURL,
                   );
                   setState(() {

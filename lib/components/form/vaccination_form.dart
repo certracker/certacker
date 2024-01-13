@@ -141,7 +141,7 @@ class _VaccinationFormState extends State<VaccinationForm> {
             ),
           ),
           const SizedBox(height: 16),
-  GestureDetector(
+          GestureDetector(
             onTap: () async {
               final XFile? pickedFile =
                   await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -267,12 +267,14 @@ class _VaccinationFormState extends State<VaccinationForm> {
                   String vaccinationType = vaccineTypeController.text;
                   String vaccinationManufacturer =
                       vaccineManufacturerController.text;
-                 String frontImageURL =
-                      await SaveDataService.uploadImageToStorage(
-                          frontImageUrl!);
-                  String backImageURL =
-                      await SaveDataService.uploadImageToStorage(
-                          backImageUrl!); // Get the actual image URL
+                  String frontImageURL = frontImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!)
+                      : '';
+                  String backImageURL = backImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          backImageUrl!)
+                      : '';
                   String vaccineType = vaccineTypeController.text;
                   String vaccineManufacturer =
                       vaccineManufacturerController.text;
