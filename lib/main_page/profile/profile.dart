@@ -1,8 +1,13 @@
+import 'package:certracker/auth/auth_service.dart';
+import 'package:certracker/auth/user_data_service.dart';
 import 'package:certracker/components/colors/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final UserDataService _userDataService = UserDataService();
+  final AuthenticationService _authenticationService = AuthenticationService();
+
+  ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,98 +19,139 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 250,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    CustomColors.gradientStart,
-                    CustomColors.gradientEnd,
-                  ],
-                ),
-              ),
-              child: Column(
+        child: FutureBuilder(
+          future: _userDataService
+              .getUserDetails(_authenticationService.getCurrentUserId() ?? ''),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            } else {
+              final userData = snapshot.data as Map<String, dynamic>? ?? {};
+              return Column(
                 children: [
+                  Container(
+                    height: 330,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          CustomColors.gradientStart,
+                          CustomColors.gradientEnd,
+                        ],
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton.icon(
+                              onPressed: () {
+                                // Add your edit logic here
+                                // Navigate to the edit profile screen or show a bottom sheet for editing
+                              },
+                              icon: const Icon(Icons.edit),
+                              label: const Text('Edit'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            const Text(
+                              "Profile",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 35,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildAvatar(),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 20),
-                  const Text(
-                  "Profile",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 35,
-                    // fontWeight: FontWeight.bold,
-                  )
-                ),
-                  _buildAvatar(),
-                ]
-              )
-            ),
-            const SizedBox(height: 20),
-            Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  const SizedBox(height: 20),
-                  _buildDetailRow('Full Name', 'John Doe'),
-                  // _buildDetailRow('Username', 'johndoe123'),
-                  _buildDetailRow('Email', 'john@example.com'),
-                  _buildDetailRow('Phone No', '+1234567890'),
-                  _buildDetailRow('Date of Birth', '01/01/1990'),
-                  _buildDetailRow('State', 'California'),
-                  _buildDetailRow('City', 'San Francisco'),
-                  _buildDetailRow('Zip Code', '12345'),
-                  const SizedBox(height: 20),
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                        _buildDetailRow('Full Name',
+                            '${userData['firstName']} ${userData['lastName']}'),
+                        _buildDetailRow('Email', userData['email'] ?? ''),
+                        _buildDetailRow('Phone No', userData['phone'] ?? ''),
+                        _buildDetailRow('Date of Birth', userData['dob'] ?? ''),
+                        _buildDetailRow('State', userData['state'] ?? ''),
+                        _buildDetailRow('City', userData['city'] ?? ''),
+                        _buildDetailRow('Zip Code', userData['zipCode'] ?? ''),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
                 ],
-              ),
-            ),
-          ],
+              );
+            }
+          },
         ),
       ),
     );
   }
 
   Widget _buildAvatar() {
+    String? userId = _authenticationService.getCurrentUserId();
+
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(10), // Padding for the container
-        child: Stack(
-          children: [
-            CircleAvatar(
-              radius: 50, // Increase the radius for a larger avatar
-              backgroundColor: Colors.grey[300],
-              child: const Icon(
-                Icons.person,
-                size: 60, // Increase the icon size for a larger avatar
-                color: Colors.grey,
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: IconButton(
-                onPressed: () {
-                  // Handle camera icon press
-                  // Add your logic here for image selection
-                },
-                icon: const Icon(
-                  Icons.camera_alt,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ),
-            ),
-          ],
+        padding: const EdgeInsets.all(10),
+        child: FutureBuilder(
+          future: _userDataService.getUserDetails(userId ?? ''),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else {
+              final userData = snapshot.data as Map<String, dynamic>? ?? {};
+              final String profileImageUrl = userData['profilePicture'] ?? '';
+
+              return Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 80,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: profileImageUrl.isNotEmpty
+                        ? NetworkImage(profileImageUrl)
+                        : null,
+                    child: profileImageUrl.isEmpty
+                        ? const Icon(
+                            Icons.person,
+                            size: 60,
+                            color: Colors.grey,
+                          )
+                        : null,
+                  ),
+                ],
+              );
+            }
+          },
         ),
       ),
     );
@@ -121,6 +167,7 @@ class ProfileScreen extends StatelessWidget {
             title,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
+              fontSize: 20,
             ),
           ),
           const SizedBox(height: 4),
@@ -128,9 +175,10 @@ class ProfileScreen extends StatelessWidget {
             value,
             style: const TextStyle(
               color: Colors.grey,
+              fontSize: 18,
             ),
           ),
-          const Divider(), // Divider for each detail
+          const Divider(),
         ],
       ),
     );
