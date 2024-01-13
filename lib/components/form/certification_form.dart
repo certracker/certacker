@@ -1,4 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:io';
+
 import 'package:certracker/auth/save_data_service.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
 class CertificationForm extends StatefulWidget {
@@ -34,6 +39,9 @@ class _CertificationFormState extends State<CertificationForm> {
 
   final TextEditingController certificationPrivateNoteController =
       TextEditingController();
+
+  String? frontImageUrl;
+  String? backImageUrl;
 
   bool isLoading = false;
 
@@ -200,33 +208,48 @@ class _CertificationFormState extends State<CertificationForm> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40),
-                SizedBox(height: 8),
-                Text(
-                  "Add image",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Supported formats: JPEG, PNG, JPG",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
+          // Image upload for Front
+          GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  frontImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: frontImageUrl != null
+                  ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
             ),
           ),
+
           const SizedBox(height: 16),
           const Text(
             "Back",
@@ -236,34 +259,47 @@ class _CertificationFormState extends State<CertificationForm> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40),
-                SizedBox(height: 8),
-                Text(
-                  "Add image",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Supported formats: JPEG, PNG, JPG",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
+          // Image upload for Back
+          GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  backImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: backImageUrl != null
+                  ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
             ),
           ),
-          const SizedBox(height: 42),
           const Text(
             "Private Note",
             style: TextStyle(
@@ -300,10 +336,12 @@ class _CertificationFormState extends State<CertificationForm> {
                   String certificationName = certificationNameController.text;
                   String certificationNumber =
                       certificationNumberController.text;
-                  String frontImageUrl =
-                      'front_image_url'; // Replace with actual URL
-                  String backImageUrl =
-                      'back_image_url'; // Replace with actual URL
+                  String frontImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!);
+                  String backImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          backImageUrl!); 
                   String certificationIssueDate =
                       certificationIssueDateController.text;
                   String certificationExpiryDate =
@@ -321,8 +359,8 @@ class _CertificationFormState extends State<CertificationForm> {
                   await CertificationService.saveCertificationData(
                     certificationName: certificationName,
                     certificationNumber: certificationNumber,
-                    frontImageUrl: frontImageUrl,
-                    backImageUrl: backImageUrl,
+                    frontImageUrl: frontImageURL,
+                    backImageUrl: backImageURL,
                     certificationIssueDate: certificationIssueDate,
                     certificationExpiryDate: certificationExpiryDate,
                     certificationFirstReminder: certificationFirstReminder,
@@ -330,7 +368,7 @@ class _CertificationFormState extends State<CertificationForm> {
                     certificationFinalReminder: certificationFinalReminder,
                     certificationPrivateNote: certificationPrivateNote,
                   );
-                   setState(() {
+                  setState(() {
                     isLoading = false;
                   });
 

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CEUForm extends StatefulWidget {
   const CEUForm({super.key});
@@ -25,6 +28,9 @@ class _CEUFormState extends State<CEUForm> {
 
   final TextEditingController ceuprivateNoteController =
       TextEditingController();
+
+  String? frontImageUrl;
+  String? backImageUrl;
 
   bool isLoading = false;
 
@@ -111,31 +117,45 @@ class _CEUFormState extends State<CEUForm> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40),
-                SizedBox(height: 8),
-                Text(
-                  "Add image",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Supported formats: JPEG, PNG, JPG",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
+          // Image upload for Front
+          GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  frontImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: frontImageUrl != null
+                  ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
             ),
           ),
           const SizedBox(height: 16),
@@ -147,31 +167,44 @@ class _CEUFormState extends State<CEUForm> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40),
-                SizedBox(height: 8),
-                Text(
-                  "Add image",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Supported formats: JPEG, PNG, JPG",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
+          GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  backImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: backImageUrl != null
+                  ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
             ),
           ),
           const SizedBox(height: 42),
@@ -208,27 +241,31 @@ class _CEUFormState extends State<CEUForm> {
                     isLoading = true;
                   });
 
-                // Retrieve values from the TextEditingControllers
-                String frontImageUrl = ''; // Get the actual image URL
-                String backImageUrl = ''; // Get the actual image URL
-                String ceuProgramTitle = ceuProgramTitleController.text;
-                String ceuProviderName = ceuProviderNameController.text;
-                String ceuNumberOfContactHour =
-                    ceuNumberOfContactHourController.text;
-                String ceuCompletionDate = ceuCompletionDateController.text;
-                String ceuPrivateNote = ceuprivateNoteController.text;
-      
-                // Call the service function to save CEU/CME data
-                await CEUCMEService.saveCEUData(
-                  frontImageUrl: frontImageUrl,
-                  backImageUrl: backImageUrl,
-                  ceuProgramTitle: ceuProgramTitle,
-                  ceuProviderName: ceuProviderName,
-                  ceuNumberOfContactHour: ceuNumberOfContactHour,
-                  ceuCompletionDate: ceuCompletionDate,
-                  ceuPrivateNote: ceuPrivateNote,
-                );
-               setState(() {
+                  // Retrieve values from the TextEditingControllers
+                   String frontImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!);
+                  String backImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          backImageUrl!);
+                  String ceuProgramTitle = ceuProgramTitleController.text;
+                  String ceuProviderName = ceuProviderNameController.text;
+                  String ceuNumberOfContactHour =
+                      ceuNumberOfContactHourController.text;
+                  String ceuCompletionDate = ceuCompletionDateController.text;
+                  String ceuPrivateNote = ceuprivateNoteController.text;
+
+                  // Call the service function to save CEU/CME data
+                  await CEUCMEService.saveCEUData(
+                    frontImageUrl: frontImageURL,
+                    backImageUrl: backImageURL,
+                    ceuProgramTitle: ceuProgramTitle,
+                    ceuProviderName: ceuProviderName,
+                    ceuNumberOfContactHour: ceuNumberOfContactHour,
+                    ceuCompletionDate: ceuCompletionDate,
+                    ceuPrivateNote: ceuPrivateNote,
+                  );
+                  setState(() {
                     isLoading = false;
                   });
 

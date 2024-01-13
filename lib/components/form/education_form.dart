@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EducationForm extends StatefulWidget {
   const EducationForm({super.key});
@@ -26,6 +29,9 @@ class _EducationFormState extends State<EducationForm> {
 
   final TextEditingController educationprivateNoteController =
       TextEditingController();
+
+      String? frontImageUrl;
+  String? backImageUrl;
 
   bool isLoading = false;
 
@@ -112,31 +118,44 @@ class _EducationFormState extends State<EducationForm> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40),
-                SizedBox(height: 8),
-                Text(
-                  "Add image",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Supported formats: JPEG, PNG, JPG",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
+          GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  frontImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: frontImageUrl != null
+                  ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
             ),
           ),
           const SizedBox(height: 16),
@@ -148,31 +167,44 @@ class _EducationFormState extends State<EducationForm> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40),
-                SizedBox(height: 8),
-                Text(
-                  "Add image",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Supported formats: JPEG, PNG, JPG",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
+          GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  backImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: backImageUrl != null
+                  ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
             ),
           ),
           const SizedBox(height: 42),
@@ -216,9 +248,12 @@ class _EducationFormState extends State<EducationForm> {
                   String graduationDate = educationGraduationController.text;
                   String educationPrivateNote =
                       educationprivateNoteController.text;
-                  String frontImageUrl = ''; // Get the actual image URL
-                  String backImageUrl = ''; // Get the actual image URL
-
+                  String frontImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!);
+                  String backImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          backImageUrl!); 
                   // Call the service function to save education data
                   await EducationService.saveEducationData(
                     educationName: educationName,
@@ -227,8 +262,8 @@ class _EducationFormState extends State<EducationForm> {
                     educationField: educationField,
                     graduationDate: graduationDate,
                     educationPrivateNote: educationPrivateNote,
-                    frontImageUrl: frontImageUrl,
-                    backImageUrl: backImageUrl,
+                     frontImageUrl: frontImageURL,
+                    backImageUrl: backImageURL,
                   );
                   setState(() {
                     isLoading = false;

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class LicenseForm extends StatefulWidget {
   const LicenseForm({super.key});
@@ -35,6 +38,9 @@ class _LicenseFormState extends State<LicenseForm> {
 
   final TextEditingController licenseStateController = TextEditingController();
 
+  String? frontImageUrl;
+  String? backImageUrl;
+
   bool isLoading = false;
 
   @override
@@ -58,7 +64,7 @@ class _LicenseFormState extends State<LicenseForm> {
               labelText: "License Type*",
               border: OutlineInputBorder(),
             ),
-          validator: (value) {
+            validator: (value) {
               if (value == null || value.isEmpty) {
                 return "Please enter the License Type";
               }
@@ -208,31 +214,45 @@ class _LicenseFormState extends State<LicenseForm> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40),
-                SizedBox(height: 8),
-                Text(
-                  "Add image",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Supported formats: JPEG, PNG, JPG",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
+          // Image upload for Front
+          GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  frontImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: frontImageUrl != null
+                  ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
             ),
           ),
           const SizedBox(height: 16),
@@ -244,31 +264,44 @@ class _LicenseFormState extends State<LicenseForm> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40),
-                SizedBox(height: 8),
-                Text(
-                  "Add image",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Supported formats: JPEG, PNG, JPG",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
+          GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  backImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: backImageUrl != null
+                  ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
             ),
           ),
           const SizedBox(height: 42),
@@ -308,8 +341,12 @@ class _LicenseFormState extends State<LicenseForm> {
                   // Retrieve values from the TextEditingControllers
                   String licenseName = licenseNameController.text;
                   String licenseNumber = licenseNumberController.text;
-                  String frontImageUrl = ''; // Get the actual image URL
-                  String backImageUrl = ''; // Get the actual image URL
+                  String frontImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!);
+                  String backImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          backImageUrl!); // Get the actual image URL
                   String licenseIssueDate = licenseIssueDateController.text;
                   String licenseExpiryDate = licenseExpiryDateController.text;
                   String licenseFirstReminder =
@@ -325,8 +362,8 @@ class _LicenseFormState extends State<LicenseForm> {
                   await LicenseService.saveLicenseData(
                     licenseName: licenseName,
                     licenseNumber: licenseNumber,
-                    frontImageUrl: frontImageUrl,
-                    backImageUrl: backImageUrl,
+                    frontImageUrl: frontImageURL,
+                    backImageUrl: backImageURL,
                     licenseIssueDate: licenseIssueDate,
                     licenseExpiryDate: licenseExpiryDate,
                     licenseFirstReminder: licenseFirstReminder,

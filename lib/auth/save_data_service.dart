@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:certracker/auth/auth_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,8 +16,9 @@ class SaveDataService {
     await Firebase.initializeApp();
 
     // Create a new collection for the table (e.g., 'Certification')
-    CollectionReference tableCollection =
-        FirebaseFirestore.instance.collection(tableName,);
+    CollectionReference tableCollection = FirebaseFirestore.instance.collection(
+      tableName,
+    );
 
     // Create a new document under the collection with the unique credentials ID
     DocumentReference documentReference = tableCollection.doc(credentialsId);
@@ -35,13 +38,26 @@ class SaveDataService {
 
   static Future<String> uploadImageToStorage(String imagePath) async {
     Reference ref = FirebaseStorage.instance.ref().child(imagePath);
-    final imageBytes = (await rootBundle.load(imagePath)).buffer.asUint8List();
-    UploadTask uploadTask = ref.putData(imageBytes);
+    final File imageFile = File(imagePath);
 
-    TaskSnapshot snapshot = await uploadTask;
-    String imageUrl = await snapshot.ref.getDownloadURL();
+    try {
+      // Read the file as bytes
+      List<int> imageBytes = await imageFile.readAsBytes();
 
-    return imageUrl;
+      // Convert List<int> to Uint8List
+      Uint8List uint8List = Uint8List.fromList(imageBytes);
+
+      // Upload the bytes to Firebase Storage
+      UploadTask uploadTask = ref.putData(uint8List);
+
+      TaskSnapshot snapshot = await uploadTask;
+      String imageUrl = await snapshot.ref.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      throw Exception('Error uploading image');
+    }
   }
 }
 
@@ -77,10 +93,11 @@ class CategoryService {
 
     QuerySnapshot categoriesSnapshot = await categoriesCollection.get();
 
-    return categoriesSnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    return categoriesSnapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
   }
 }
-
 
 class CertificationService {
   static Future<void> saveCertificationData({
@@ -133,7 +150,6 @@ class CertificationService {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
 }
-
 
 class LicenseService {
   static Future<void> saveLicenseData({
@@ -233,7 +249,6 @@ class EducationService {
   }
 }
 
-
 class CEUCMEService {
   static Future<void> saveCEUData({
     required String frontImageUrl,
@@ -278,11 +293,10 @@ class CEUCMEService {
   }
 }
 
-
 class OthersService {
   static Future<void> saveOthersData({
     required String othersName,
-    required String othersDetails,
+    // required String othersDetails,
     required String frontImageUrl,
     required String backImageUrl,
     required String otherNumber,
@@ -300,7 +314,7 @@ class OthersService {
     if (userId != null) {
       Map<String, dynamic> data = {
         'Title': othersName,
-        'othersDetails': othersDetails,
+        // 'othersDetails': othersDetails,
         'frontImageUrl': frontImageUrl,
         'backImageUrl': backImageUrl,
         'otherNumber': otherNumber,
@@ -330,7 +344,6 @@ class OthersService {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
 }
-
 
 class TravelService {
   static Future<void> saveTravelData({
@@ -379,7 +392,6 @@ class TravelService {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
 }
-
 
 class VaccinationService {
   static Future<void> saveVaccinationData({
@@ -430,4 +442,3 @@ class VaccinationService {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
 }
-

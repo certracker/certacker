@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class VaccinationForm extends StatefulWidget {
   const VaccinationForm({super.key});
@@ -27,6 +30,9 @@ class _VaccinationFormState extends State<VaccinationForm> {
 
   final TextEditingController vaccinePrivateNoteController =
       TextEditingController();
+
+  String? frontImageUrl;
+  String? backImageUrl;
 
   bool isLoading = false;
 
@@ -135,31 +141,44 @@ class _VaccinationFormState extends State<VaccinationForm> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40),
-                SizedBox(height: 8),
-                Text(
-                  "Add image",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Supported formats: JPEG, PNG, JPG",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
+  GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  frontImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: frontImageUrl != null
+                  ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
             ),
           ),
           const SizedBox(height: 16),
@@ -171,31 +190,44 @@ class _VaccinationFormState extends State<VaccinationForm> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt, size: 40),
-                SizedBox(height: 8),
-                Text(
-                  "Add image",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "Supported formats: JPEG, PNG, JPG",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
+          GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  backImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: backImageUrl != null
+                  ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
             ),
           ),
           const SizedBox(height: 42),
@@ -235,21 +267,26 @@ class _VaccinationFormState extends State<VaccinationForm> {
                   String vaccinationType = vaccineTypeController.text;
                   String vaccinationManufacturer =
                       vaccineManufacturerController.text;
-                  String frontImageUrl = ''; // Get the actual image URL
-                  String backImageUrl = ''; // Get the actual image URL
+                 String frontImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!);
+                  String backImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          backImageUrl!); // Get the actual image URL
                   String vaccineType = vaccineTypeController.text;
-                  String vaccineManufacturer = vaccineManufacturerController.text;
+                  String vaccineManufacturer =
+                      vaccineManufacturerController.text;
                   String vaccineLotNumber = vaccineLotNumberController.text;
                   String vaccineIssueDate = vaccineIssueDateController.text;
                   String vaccineExpiryDate = vaccineExpiryDateController.text;
                   String vaccinePrivateNote = vaccinePrivateNoteController.text;
-      
+
                   // Call the service function to save vaccination data
                   await VaccinationService.saveVaccinationData(
                     vaccinationType: vaccinationType,
                     vaccinationManufacturer: vaccinationManufacturer,
-                    frontImageUrl: frontImageUrl,
-                    backImageUrl: backImageUrl,
+                    frontImageUrl: frontImageURL,
+                    backImageUrl: backImageURL,
                     vaccineType: vaccineType,
                     vaccineManufacturer: vaccineManufacturer,
                     vaccineLotNumber: vaccineLotNumber,
@@ -260,7 +297,7 @@ class _VaccinationFormState extends State<VaccinationForm> {
                   setState(() {
                     isLoading = false;
                   });
-      
+
                   // Navigate back to the dashboard
                   Navigator.pop(context);
                 } else {

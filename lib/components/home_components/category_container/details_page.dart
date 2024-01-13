@@ -93,7 +93,7 @@ class _DetailsPageState extends State<DetailsPage> {
     case 'Others':
       return OthersDetails(details: details);
     default:
-      return Text('No details available for this category.'); // Default case, you can customize as needed
+      return const Text('No details available for this category.'); // Default case, you can customize as needed
   }
 }
 

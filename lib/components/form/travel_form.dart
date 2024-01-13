@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class TravelForm extends StatefulWidget {
   const TravelForm({Key? key}) : super(key: key);
@@ -21,6 +24,9 @@ class _TravelFormState extends State<TravelForm> {
       TextEditingController();
   final TextEditingController travelPrivateNoteController =
       TextEditingController();
+
+  String? frontImageUrl;
+  String? backImageUrl;
 
   String documentType = 'Passport'; // Default value
   bool isLoading = false;
@@ -156,33 +162,46 @@ class _TravelFormState extends State<TravelForm> {
           ),
         ),
         const SizedBox(height: 16),
-        Container(
-          width: 400,
-          height: 200,
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.camera_alt, size: 40),
-              SizedBox(height: 8),
-              Text(
-                "Add image",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+       GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  frontImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
               ),
-              SizedBox(height: 4),
-              Text(
-                "Supported formats: JPEG, PNG, JPG",
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
+              child: frontImageUrl != null
+                  ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+            ),
           ),
-        ),
         const SizedBox(height: 16),
         const Text(
           "Back",
@@ -192,33 +211,46 @@ class _TravelFormState extends State<TravelForm> {
           ),
         ),
         const SizedBox(height: 16),
-        Container(
-          width: 400,
-          height: 200,
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.camera_alt, size: 40),
-              SizedBox(height: 8),
-              Text(
-                "Add image",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+        GestureDetector(
+            onTap: () async {
+              final XFile? pickedFile =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  backImageUrl = pickedFile.path;
+                });
+              }
+            },
+            child: Container(
+              width: 400,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
               ),
-              SizedBox(height: 4),
-              Text(
-                "Supported formats: JPEG, PNG, JPG",
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
+              child: backImageUrl != null
+                  ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+            ),
           ),
-        ),
         const SizedBox(height: 42),
         const Text(
           "Private Note",
@@ -248,13 +280,17 @@ class _TravelFormState extends State<TravelForm> {
           alignment: Alignment.center,
           child: GestureDetector(
             onTap: () async {
-               if (_validateForm()) {
+              if (_validateForm()) {
                 setState(() {
                   isLoading = true;
                 });
                 // Retrieve values from the TextEditingControllers
-                String frontImageUrl = ''; // Get the actual image URL
-                String backImageUrl = ''; // Get the actual image URL
+                 String frontImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          frontImageUrl!);
+                  String backImageURL =
+                      await SaveDataService.uploadImageToStorage(
+                          backImageUrl!); // Get the actual image URL
                 String travelCountry = travelCountryController.text;
                 String placeOfIssue = travelPlaceOfIssueController.text;
                 String documentNumber = travelDocumentNumberController.text;
@@ -264,8 +300,8 @@ class _TravelFormState extends State<TravelForm> {
 
                 // Call the service function to save travel data
                 await TravelService.saveTravelData(
-                  frontImageUrl: frontImageUrl,
-                  backImageUrl: backImageUrl,
+                  frontImageUrl: frontImageURL,
+                    backImageUrl: backImageURL,
                   travelCountry: travelCountry,
                   placeOfIssue: placeOfIssue,
                   documentNumber: documentNumber,
@@ -281,7 +317,7 @@ class _TravelFormState extends State<TravelForm> {
 
                 // Navigate back to the dashboard
                 Navigator.pop(context);
-              } 
+              }
             },
             child: Visibility(
               visible: !isLoading,
@@ -311,6 +347,7 @@ class _TravelFormState extends State<TravelForm> {
       ],
     );
   }
+
   bool _validateForm() {
     // You can add more validation checks here if needed
     return documentType.isNotEmpty;
