@@ -39,14 +39,14 @@ class CertificationDetails extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Front Image',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14.0,
                   ),
                 ),
                 const SizedBox(height: 8.0),
-                Container(
+                SizedBox(
                   width: 400,
                   height: 200,
                   child: Image.network(
@@ -62,14 +62,14 @@ class CertificationDetails extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Back Image',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14.0,
                   ),
                 ),
                 const SizedBox(height: 8.0),
-                Container(
+                SizedBox(
                   width: 400,
                   height: 200,
                   child: Image.network(
