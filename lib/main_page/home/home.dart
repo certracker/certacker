@@ -39,6 +39,56 @@ class _DashboardPageState extends State<DashboardPage> {
       setState(() {});
     }
   }
+  // Inside _DashboardPageState class
+void _showMoreOptions() {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Container(
+        height: 150,
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildBottomSheetItem(
+              icon: Icons.check_circle_outline,
+              text: 'Select Multiple',
+              onTap: () {
+                // Handle "Select Multiple" action
+                Navigator.pop(context); // Close the bottom sheet
+              },
+            ),
+            _buildBottomSheetItem(
+              icon: Icons.delete_outline_outlined,
+              text: 'Recycle Bin',
+              onTap: () {
+                // Handle "Recycle Bin" action
+                Navigator.pop(context); // Close the bottom sheet
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildBottomSheetItem({
+  required IconData icon,
+  required String text,
+  required VoidCallback onTap,
+}) {
+  return InkWell(
+    onTap: onTap,
+    child: Row(
+      children: [
+        Icon(icon),
+        const SizedBox(width: 12),
+        Text(text),
+      ],
+    ),
+  );
+}
 
   void selectItem(int index) {
     setState(() {
@@ -90,9 +140,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           IconButton(
                             icon: const Icon(Icons.more_vert,
                                 color: Colors.white),
-                            onPressed: () {
-                              // Add calendar icon onPressed action
-                            },
+                            onPressed: _showMoreOptions,
                           ),
                         ],
                       ),
