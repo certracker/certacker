@@ -16,22 +16,22 @@ class OthersDetails extends StatelessWidget {
             Row(
               children: [
                 Expanded(child: buildFieldColumn('Credential Name', details['Title'])),
-                Expanded(child: buildFieldColumn('Credential Record Number', details['certificationNumber'])),
+                Expanded(child: buildFieldColumn('Credential Record Number', details['otherNumber'])),
               ],
             ),
             const SizedBox(height: 16.0),
             Row(
               children: [
-                Expanded(child: buildFieldColumn('First Reminder', details['certificationFirstReminder'])),
-                Expanded(child: buildFieldColumn('Second Reminder', details['certificationSecondReminder'])),
-                Expanded(child: buildFieldColumn('Final Reminder', details['certificationFinalReminder'])),
+                Expanded(child: buildFieldColumn('First Reminder', details['otherFirstReminder'])),
+                Expanded(child: buildFieldColumn('Second Reminder', details['otherSecondReminder'])),
+                Expanded(child: buildFieldColumn('Final Reminder', details['otherFinalReminder'])),
               ],
             ),
             const SizedBox(height: 16.0),
             Row(
               children: [
-                Expanded(child: buildFieldColumn('Issue Date', details['certificationIssueDate'])),
-                Expanded(child: buildFieldColumn('Expiry Date', details['certificationExpiryDate'])),
+                Expanded(child: buildFieldColumn('Issue Date', details['otherIssueDate'])),
+                Expanded(child: buildFieldColumn('Expiry Date', details['otherExpiryDate'])),
                 // Add another Expanded for the second reminder if needed
               ],
             ),

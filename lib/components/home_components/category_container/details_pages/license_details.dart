@@ -16,22 +16,23 @@ class LicenseDetails extends StatelessWidget {
             Row(
               children: [
                 Expanded(child: buildFieldColumn('Credential Name', details['Title'])),
-                Expanded(child: buildFieldColumn('Credential Record Number', details['certificationNumber'])),
+                Expanded(child: buildFieldColumn('license Number', details['licenseNumber'])),
               ],
             ),
             const SizedBox(height: 16.0),
             Row(
               children: [
-                Expanded(child: buildFieldColumn('First Reminder', details['certificationFirstReminder'])),
-                Expanded(child: buildFieldColumn('Second Reminder', details['certificationSecondReminder'])),
-                Expanded(child: buildFieldColumn('Final Reminder', details['certificationFinalReminder'])),
+                Expanded(child: buildFieldColumn('First Reminder', details['licenseFirstReminder'])),
+                Expanded(child: buildFieldColumn('Second Reminder', details['licenseSecondReminder'])),
+                Expanded(child: buildFieldColumn('Final Reminder', details['licenseFinalReminder'])),
               ],
             ),
             const SizedBox(height: 16.0),
             Row(
               children: [
-                Expanded(child: buildFieldColumn('Issue Date', details['certificationIssueDate'])),
-                Expanded(child: buildFieldColumn('Expiry Date', details['certificationExpiryDate'])),
+                Expanded(child: buildFieldColumn('State', details['licenseState'])),
+                Expanded(child: buildFieldColumn('Issue Date', details['licenseIssueDate'])),
+                Expanded(child: buildFieldColumn('Expiry Date', details['licenseExpiryDate'])),
                 // Add another Expanded for the second reminder if needed
               ],
             ),
@@ -51,8 +52,8 @@ class LicenseDetails extends StatelessWidget {
                   height: 200,
                   child: Image.network(
                     details['frontImageUrl'],
-                    width: 150, // Set the width as per your design
-                    height: 150, // Set the height as per your design
+                    width: 150, 
+                    height: 150,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -74,8 +75,8 @@ class LicenseDetails extends StatelessWidget {
                   height: 200,
                   child: Image.network(
                     details['backImageUrl'],
-                    width: 150, // Set the width as per your design
-                    height: 150, // Set the height as per your design
+                    width: 150, 
+                    height: 150,
                     fit: BoxFit.cover,
                   ),
                 ),

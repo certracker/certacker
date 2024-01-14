@@ -19,22 +19,22 @@ class VaccinationDetails extends StatelessWidget {
                     child:
                         buildFieldColumn('Credential Name', details['Title'])),
                 Expanded(
-                    child: buildFieldColumn('Credential Record Number',
-                        details['certificationNumber'])),
+                    child: buildFieldColumn('Vaccination Manufacturer',
+                        details['vaccinationManufacturer'])),
               ],
             ),
             const SizedBox(height: 16.0),
             Row(
               children: [
                 Expanded(
-                    child: buildFieldColumn('First Reminder',
-                        details['certificationFirstReminder'])),
+                    child: buildFieldColumn('Lot Number',
+                        details['vaccineLotNumber'])),
+               Expanded(
+                    child: buildFieldColumn(
+                        'Issue Date', details['vaccineIssueDate'])),
                 Expanded(
-                    child: buildFieldColumn('Second Reminder',
-                        details['certificationSecondReminder'])),
-                Expanded(
-                    child: buildFieldColumn('Final Reminder',
-                        details['certificationFinalReminder'])),
+                    child: buildFieldColumn(
+                        'Expiry Date', details['vaccineExpiryDate'])),
               ],
             ),
             const SizedBox(height: 16.0),
@@ -42,10 +42,7 @@ class VaccinationDetails extends StatelessWidget {
               children: [
                 Expanded(
                     child: buildFieldColumn(
-                        'Issue Date', details['certificationIssueDate'])),
-                Expanded(
-                    child: buildFieldColumn(
-                        'Expiry Date', details['certificationExpiryDate'])),
+                        'Issue Date', details['vaccineIssueDate'])),
                 // Add another Expanded for the second reminder if needed
               ],
             ),

@@ -16,23 +16,15 @@ class CEUDetails extends StatelessWidget {
             Row(
               children: [
                 Expanded(child: buildFieldColumn('Credential Name', details['Title'])),
-                Expanded(child: buildFieldColumn('Credential Record Number', details['certificationNumber'])),
+                Expanded(child: buildFieldColumn('Provider Name', details['ceuProviderName'])),
               ],
             ),
             const SizedBox(height: 16.0),
             Row(
               children: [
-                Expanded(child: buildFieldColumn('First Reminder', details['certificationFirstReminder'])),
-                Expanded(child: buildFieldColumn('Second Reminder', details['certificationSecondReminder'])),
+                Expanded(child: buildFieldColumn('Number Of Contact Hour', details['ceuNumberOfContactHour'])),
+                Expanded(child: buildFieldColumn('Completion Date', details['ceuCompletionDate'])),
                 Expanded(child: buildFieldColumn('Final Reminder', details['certificationFinalReminder'])),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            Row(
-              children: [
-                Expanded(child: buildFieldColumn('Issue Date', details['certificationIssueDate'])),
-                Expanded(child: buildFieldColumn('Expiry Date', details['certificationExpiryDate'])),
-                // Add another Expanded for the second reminder if needed
               ],
             ),
             const SizedBox(height: 16.0),

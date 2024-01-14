@@ -15,23 +15,38 @@ class TravelDetails extends StatelessWidget {
           children: [
             Row(
               children: [
-                Expanded(child: buildFieldColumn('Credential Name', details['Title'])),
-                Expanded(child: buildFieldColumn('Credential Record Number', details['certificationNumber'])),
+                Expanded(
+                    child:
+                        buildFieldColumn('Credential Name', details['Title'])),
+                Expanded(
+                    child: buildFieldColumn(
+                        'Document Number', details['documentNumber'])),
               ],
             ),
             const SizedBox(height: 16.0),
             Row(
               children: [
-                Expanded(child: buildFieldColumn('First Reminder', details['certificationFirstReminder'])),
-                Expanded(child: buildFieldColumn('Second Reminder', details['certificationSecondReminder'])),
-                Expanded(child: buildFieldColumn('Final Reminder', details['certificationFinalReminder'])),
+                Expanded(
+                    child:
+                        buildFieldColumn('Country', details['travelCountry'])),
+                Expanded(
+                    child: buildFieldColumn(
+                        'Place of Issue', details['placeOfIssue'])),
               ],
             ),
             const SizedBox(height: 16.0),
             Row(
               children: [
-                Expanded(child: buildFieldColumn('Issue Date', details['certificationIssueDate'])),
-                Expanded(child: buildFieldColumn('Expiry Date', details['certificationExpiryDate'])),
+                Expanded(
+                    child:
+                        buildFieldColumn('Issue Date', details['issueDate'])),
+                Expanded(
+                    child:
+                        buildFieldColumn('Expiry Date', details['expiryDate'])),
+                Expanded(
+                    child: buildFieldColumn('Final Reminder',
+                        details['certificationFinalReminder'])),
+
                 // Add another Expanded for the second reminder if needed
               ],
             ),
