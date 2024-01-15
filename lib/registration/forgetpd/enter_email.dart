@@ -3,7 +3,7 @@ import 'package:certracker/registration/forgetpd/enter_opt.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordEmailScreen extends StatelessWidget {
-  const ForgotPasswordEmailScreen({Key? key}) : super(key: key);
+  const ForgotPasswordEmailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class TravelForm extends StatefulWidget {
-  const TravelForm({Key? key}) : super(key: key);
+  const TravelForm({super.key});
 
   @override
   State<TravelForm> createState() => _TravelFormState();

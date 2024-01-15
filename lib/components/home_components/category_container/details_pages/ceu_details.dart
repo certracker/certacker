@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CEUDetails extends StatelessWidget {
   final Map<String, dynamic> details;
 
-  const CEUDetails({Key? key, required this.details}) : super(key: key);
+  const CEUDetails({super.key, required this.details});
 
   @override
   Widget build(BuildContext context) {

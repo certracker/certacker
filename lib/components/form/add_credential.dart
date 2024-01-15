@@ -11,7 +11,7 @@ import 'package:certracker/model/category/category_model.dart';
 import 'package:flutter/material.dart';
 
 class AddCredentialPage extends StatefulWidget {
-  const AddCredentialPage({Key? key}) : super(key: key);
+  const AddCredentialPage({super.key});
 
   @override
   State<AddCredentialPage> createState() => _AddCredentialPageState();

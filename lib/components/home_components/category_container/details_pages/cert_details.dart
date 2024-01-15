@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CertificationDetails extends StatelessWidget {
   final Map<String, dynamic> details;
 
-  const CertificationDetails({Key? key, required this.details}) : super(key: key);
+  const CertificationDetails({super.key, required this.details});
 
   @override
   Widget build(BuildContext context) {

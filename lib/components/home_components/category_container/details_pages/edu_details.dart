@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class EducationDetails extends StatelessWidget {
   final Map<String, dynamic> details;
 
-  const EducationDetails({Key? key, required this.details}) : super(key: key);
+  const EducationDetails({super.key, required this.details});
 
   @override
   Widget build(BuildContext context) {

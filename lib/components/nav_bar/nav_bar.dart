@@ -4,7 +4,7 @@ import 'package:certracker/main_page/settings/settings.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavBar extends StatefulWidget {
-  const BottomNavBar({Key? key}) : super(key: key);
+  const BottomNavBar({super.key});
 
   @override
   State<BottomNavBar> createState() => _BottomNavBarState();
@@ -14,7 +14,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   int _selectedIndex = 0;
 
   static final List<Widget> _widgetOptions = <Widget>[
-    const DashboardPage(),
+    const HomeScreen(),
     ProfileScreen(),
     const SettingsScreen(),
   ];

@@ -15,12 +15,12 @@ class DetailsPage extends StatefulWidget {
   final Color color;
 
   const DetailsPage({
-    Key? key,
+    super.key,
     required this.title,
     required this.category,
     required this.imagePath,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   State<DetailsPage> createState() => _DetailsPageState();

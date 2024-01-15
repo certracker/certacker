@@ -10,7 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class CompleteProfile extends StatefulWidget {
-  const CompleteProfile({Key? key}) : super(key: key);
+  const CompleteProfile({super.key});
 
   @override
   State<CompleteProfile> createState() => _CompleteProfileState();

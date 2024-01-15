@@ -3,7 +3,7 @@ import 'package:certracker/registration/forgetpd/reset_password.dart';
 import 'package:flutter/material.dart';
 
 class EnterOTP extends StatelessWidget {
-  const EnterOTP({Key? key}) : super(key: key);
+  const EnterOTP({super.key});
 
   @override
   Widget build(BuildContext context) {

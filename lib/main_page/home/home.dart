@@ -11,14 +11,14 @@ import 'package:certracker/components/home_components/pages/ceu.dart';
 import 'package:certracker/components/home_components/pages/others.dart';
 import 'package:flutter/material.dart';
 
-class DashboardPage extends StatefulWidget {
-  const DashboardPage({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   final UserDataService _userDataService = UserDataService();
   final AuthenticationService _authService = AuthenticationService();
@@ -39,56 +39,57 @@ class _DashboardPageState extends State<DashboardPage> {
       setState(() {});
     }
   }
-  // Inside _DashboardPageState class
-void _showMoreOptions() {
-  showModalBottomSheet(
-    context: context,
-    builder: (context) {
-      return Container(
-        height: 150,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildBottomSheetItem(
-              icon: Icons.check_circle_outline,
-              text: 'Select Multiple',
-              onTap: () {
-                // Handle "Select Multiple" action
-                Navigator.pop(context); // Close the bottom sheet
-              },
-            ),
-            _buildBottomSheetItem(
-              icon: Icons.delete_outline_outlined,
-              text: 'Recycle Bin',
-              onTap: () {
-                // Handle "Recycle Bin" action
-                Navigator.pop(context); // Close the bottom sheet
-              },
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
 
-Widget _buildBottomSheetItem({
-  required IconData icon,
-  required String text,
-  required VoidCallback onTap,
-}) {
-  return InkWell(
-    onTap: onTap,
-    child: Row(
-      children: [
-        Icon(icon),
-        const SizedBox(width: 12),
-        Text(text),
-      ],
-    ),
-  );
-}
+  // Inside _DashboardPageState class
+  void _showMoreOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          height: 150,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildBottomSheetItem(
+                icon: Icons.check_circle_outline,
+                text: 'Select Multiple',
+                onTap: () {
+                  // Handle "Select Multiple" action
+                  Navigator.pop(context); // Close the bottom sheet
+                },
+              ),
+              _buildBottomSheetItem(
+                icon: Icons.delete_outline_outlined,
+                text: 'Recycle Bin',
+                onTap: () {
+                  // Handle "Recycle Bin" action
+                  Navigator.pop(context); // Close the bottom sheet
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBottomSheetItem({
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Icon(icon),
+          const SizedBox(width: 12),
+          Text(text),
+        ],
+      ),
+    );
+  }
 
   void selectItem(int index) {
     setState(() {
@@ -122,7 +123,6 @@ Widget _buildBottomSheetItem({
                         radius: 30,
                         backgroundColor: Colors.grey[300],
                         backgroundImage: NetworkImage(profilePicture),
-                        
                       ),
                       Text(
                         "Welcome, ${firstName.length > 6 ? '${firstName.substring(0, 6)}...' : firstName}!",
@@ -205,20 +205,18 @@ Widget _buildBottomSheetItem({
           ),
         ),
       ),
-      body: Expanded(
-        child: IndexedStack(
-          index: selectedIndex,
-          children: const [
-            AllPage(),
-            CertificationPage(),
-            LicensesPage(),
-            EducationPage(),
-            VaccinationPage(),
-            TravelPage(),
-            CEUCMEPage(),
-            OthersPage(),
-          ],
-        ),
+      body: IndexedStack(
+        index: selectedIndex,
+        children: const [
+          AllPage(),
+          CertificationPage(),
+          LicensesPage(),
+          EducationPage(),
+          VaccinationPage(),
+          TravelPage(),
+          CEUCMEPage(),
+          OthersPage(),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -244,12 +242,12 @@ class FilterItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const FilterItem({
-    Key? key,
+    super.key,
     this.imagePath,
     this.text,
     this.isSelected = false,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

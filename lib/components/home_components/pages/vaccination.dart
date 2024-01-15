@@ -4,7 +4,7 @@ import 'package:certracker/components/home_components/category_container/categor
 import 'package:flutter/material.dart';
 
 class VaccinationPage extends StatelessWidget {
-  const VaccinationPage({Key? key}) : super(key: key);
+  const VaccinationPage({super.key});
 
   @override
   Widget build(BuildContext context) {

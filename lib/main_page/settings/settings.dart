@@ -10,9 +10,14 @@ import 'package:certracker/registration/login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
   void signUserOut(BuildContext context) async {
   await FirebaseAuth.instance.signOut();
 
@@ -39,15 +44,17 @@ class SettingsScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: _buildSettingsCard(context),
-          ),
-          const SizedBox(height: 20),
-          _buildLogoutContainer(context),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: _buildSettingsCard(context),
+            ),
+            const SizedBox(height: 20),
+            _buildLogoutContainer(context),
+          ],
+        ),
       ),
     );
   }
@@ -108,7 +115,6 @@ class SettingsScreen extends StatelessWidget {
     ),
   );
 }
-
 
   Widget _buildSettingsItem(BuildContext context, String text) {
     return Column(

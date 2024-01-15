@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBtRjnrk0iYXLrziZToCKUg82-hnw8cxZw',
-    appId: '1:912576608221:android:bcf8d6dc6d05bc59f9a834',
+    appId: '1:912576608221:android:d312d65a8aef0289f9a834',
     messagingSenderId: '912576608221',
     projectId: 'certracker',
     storageBucket: 'certracker.appspot.com',
@@ -62,19 +62,19 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCBM7xusxdC9OFw6GUUopky2TMHOjV280Y',
-    appId: '1:912576608221:ios:ba745d12fbaa545ef9a834',
+    appId: '1:912576608221:ios:3ee7c39264ec8412f9a834',
     messagingSenderId: '912576608221',
     projectId: 'certracker',
     storageBucket: 'certracker.appspot.com',
-    iosBundleId: 'com.example.certracker',
+    iosBundleId: 'com.rn.certracker',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyCBM7xusxdC9OFw6GUUopky2TMHOjV280Y',
-    appId: '1:912576608221:ios:38e1a634da4b0548f9a834',
+    appId: '1:912576608221:ios:42bf0087d4a83b6ff9a834',
     messagingSenderId: '912576608221',
     projectId: 'certracker',
     storageBucket: 'certracker.appspot.com',
-    iosBundleId: 'com.example.certracker.RunnerTests',
+    iosBundleId: 'com.rn.certracker.RunnerTests',
   );
 }

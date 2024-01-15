@@ -4,7 +4,7 @@ import 'package:certracker/components/home_components/category_container/categor
 import 'package:flutter/material.dart';
 
 class TravelPage extends StatelessWidget {
-  const TravelPage({Key? key}) : super(key: key);
+  const TravelPage({super.key});
 
   @override
   Widget build(BuildContext context) {

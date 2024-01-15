@@ -8,12 +8,12 @@ class CategoryContainer extends StatelessWidget {
   final Color color;
 
   const CategoryContainer({
-    Key? key,
+    super.key,
     required this.title,
     required this.category,
     required this.imagePath,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

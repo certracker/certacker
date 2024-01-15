@@ -6,10 +6,10 @@ class VerificationPage extends StatefulWidget {
   final bool isEmailVerified;
 
   const VerificationPage({
-    Key? key,
+    super.key,
     required this.email,
     required this.isEmailVerified,
-  }) : super(key: key);
+  });
 
   @override
   State<VerificationPage> createState() => _VerificationPageState();
