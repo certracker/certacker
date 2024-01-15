@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:certracker/auth/save_data_service.dart';
+import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -316,7 +319,10 @@ class _TravelFormState extends State<TravelForm> {
                 });
 
                 // Navigate back to the dashboard
-                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BottomNavBar()),
+                );
               }
             },
             child: Visibility(

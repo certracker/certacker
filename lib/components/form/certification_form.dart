@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:certracker/auth/save_data_service.dart';
+import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -375,7 +376,10 @@ class _CertificationFormState extends State<CertificationForm> {
                   });
 
                   // Navigate back to the dashboard
-                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BottomNavBar()),
+                  );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
