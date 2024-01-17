@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:certracker/components/home_components/category_container/details_pages/cert_details.dart';
 import 'package:certracker/components/home_components/category_container/details_pages/ceu_details.dart';
 import 'package:certracker/components/home_components/category_container/details_pages/edu_details.dart';
@@ -5,6 +7,13 @@ import 'package:certracker/components/home_components/category_container/details
 import 'package:certracker/components/home_components/category_container/details_pages/others_details.dart';
 import 'package:certracker/components/home_components/category_container/details_pages/travel_details.dart';
 import 'package:certracker/components/home_components/category_container/details_pages/vaccinate_details.dart';
+import 'package:certracker/components/home_components/category_container/edit/certification_edit.dart';
+import 'package:certracker/components/home_components/category_container/edit/ceu_edit.dart';
+import 'package:certracker/components/home_components/category_container/edit/education_edit.dart';
+import 'package:certracker/components/home_components/category_container/edit/license_edit.dart';
+import 'package:certracker/components/home_components/category_container/edit/others_edit.dart';
+import 'package:certracker/components/home_components/category_container/edit/travel_edit.dart';
+import 'package:certracker/components/home_components/category_container/edit/vaccination_edit.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -34,6 +43,37 @@ class _DetailsPageState extends State<DetailsPage> {
     super.initState();
     fetchData = fetchDetails();
   }
+
+  void _handleEdit() async {
+  Map<String, dynamic> details = await fetchData;
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) {
+        switch (widget.category) {
+          case 'Certification':
+            return EditCertificationPage(initialDetails: details);
+          case 'License':
+            return EditLicensePage(initialDetails: details);
+          case 'Education':
+            return EditEducationPage(initialDetails: details);
+          case 'Vaccination':
+            return EditVaccinationPage(initialDetails: details);
+          case 'Travel':
+            return EditTravelPage(initialDetails: details);
+          case 'CEU':
+            return EditCEUPage(initialDetails: details);
+          case 'Others':
+            return EditOthersPage(initialDetails: details);
+          default:
+            return const Text('Edit form not available for this category.');
+        }
+      },
+    ),
+  );
+}
+
 
   Future<Map<String, dynamic>> fetchDetails() async {
     try {
@@ -76,27 +116,27 @@ class _DetailsPageState extends State<DetailsPage> {
     return categoryCollectionMap[category] ?? '';
   }
 
- Widget buildDetailsUI(Map<String, dynamic> details) {
-  switch (widget.category) {
-    case 'Certification':
-      return CertificationDetails(details: details);
-    case 'License':
-      return LicenseDetails(details: details);
-    case 'Education':
-      return EducationDetails(details: details);
-    case 'Vaccination':
-      return VaccinationDetails(details: details);
-    case 'Travel':
-      return TravelDetails(details: details);
-    case 'CEU':
-      return CEUDetails(details: details);
-    case 'Others':
-      return OthersDetails(details: details);
-    default:
-      return const Text('No details available for this category.'); // Default case, you can customize as needed
+  Widget buildDetailsUI(Map<String, dynamic> details) {
+    switch (widget.category) {
+      case 'Certification':
+        return CertificationDetails(details: details);
+      case 'License':
+        return LicenseDetails(details: details);
+      case 'Education':
+        return EducationDetails(details: details);
+      case 'Vaccination':
+        return VaccinationDetails(details: details);
+      case 'Travel':
+        return TravelDetails(details: details);
+      case 'CEU':
+        return CEUDetails(details: details);
+      case 'Others':
+        return OthersDetails(details: details);
+      default:
+        return const Text(
+            'No details available for this category.'); // Default case, you can customize as needed
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +166,7 @@ class _DetailsPageState extends State<DetailsPage> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        color: Colors.white, // Set arrow back icon color to white
+                        color: Colors.white,
                       ),
                     ),
                     Positioned(
@@ -136,9 +176,7 @@ class _DetailsPageState extends State<DetailsPage> {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.edit),
-                            onPressed: () {
-                              // Handle edit action
-                            },
+                            onPressed: _handleEdit,
                             color: Colors.white, // Set edit icon color to white
                           ),
                           IconButton(
@@ -146,14 +184,16 @@ class _DetailsPageState extends State<DetailsPage> {
                             onPressed: () {
                               // Handle share action
                             },
-                            color: Colors.white, // Set share icon color to white
+                            color:
+                                Colors.white, // Set share icon color to white
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () {
                               // Handle delete action
                             },
-                            color: Colors.white, // Set delete icon color to white
+                            color:
+                                Colors.white, // Set delete icon color to white
                           ),
                         ],
                       ),

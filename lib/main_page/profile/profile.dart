@@ -1,6 +1,7 @@
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/user_data_service.dart';
 import 'package:certracker/components/colors/app_colors.dart';
+import 'package:certracker/components/profile_components/edit_profile.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -54,8 +55,11 @@ class ProfileScreen extends StatelessWidget {
                           children: [
                             TextButton.icon(
                               onPressed: () {
-                                // Add your edit logic here
-                                // Navigate to the edit profile screen or show a bottom sheet for editing
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const EditProfile()),
+                                );
                               },
                               icon: const Icon(Icons.edit),
                               label: const Text('Edit'),
