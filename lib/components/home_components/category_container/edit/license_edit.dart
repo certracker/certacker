@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditLicensePage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
 
-   const EditLicensePage({super.key, required this.initialDetails});
+  const EditLicensePage({super.key, required this.initialDetails});
 
   @override
   State<EditLicensePage> createState() => _EditLicensePageState();
@@ -18,18 +21,32 @@ class _EditLicensePageState extends State<EditLicensePage> {
   late TextEditingController _stateController;
   late TextEditingController _issueDateController;
   late TextEditingController _expiryDateController;
+  late TextEditingController _frontImageController;
+  late TextEditingController _backImageController;
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.initialDetails['Title']);
-    _licenseNumberController = TextEditingController(text: widget.initialDetails['licenseNumber']);
-    _firstReminderController = TextEditingController(text: widget.initialDetails['licenseFirstReminder']);
-    _secondReminderController = TextEditingController(text: widget.initialDetails['licenseSecondReminder']);
-    _finalReminderController = TextEditingController(text: widget.initialDetails['licenseFinalReminder']);
-    _stateController = TextEditingController(text: widget.initialDetails['licenseState']);
-    _issueDateController = TextEditingController(text: widget.initialDetails['licenseIssueDate']);
-    _expiryDateController = TextEditingController(text: widget.initialDetails['licenseExpiryDate']);
+    _titleController =
+        TextEditingController(text: widget.initialDetails['Title']);
+    _licenseNumberController =
+        TextEditingController(text: widget.initialDetails['licenseNumber']);
+    _firstReminderController = TextEditingController(
+        text: widget.initialDetails['licenseFirstReminder']);
+    _secondReminderController = TextEditingController(
+        text: widget.initialDetails['licenseSecondReminder']);
+    _finalReminderController = TextEditingController(
+        text: widget.initialDetails['licenseFinalReminder']);
+    _stateController =
+        TextEditingController(text: widget.initialDetails['licenseState']);
+    _issueDateController =
+        TextEditingController(text: widget.initialDetails['licenseIssueDate']);
+    _expiryDateController =
+        TextEditingController(text: widget.initialDetails['licenseExpiryDate']);
+    _frontImageController =
+        TextEditingController(text: widget.initialDetails['frontImageUrl']);
+    _backImageController =
+        TextEditingController(text: widget.initialDetails['backImageUrl']);
   }
 
   @override
@@ -55,7 +72,9 @@ class _EditLicensePageState extends State<EditLicensePage> {
               buildTextField('Issue Date', _issueDateController),
               buildTextField('Expiry Date', _expiryDateController),
               const SizedBox(height: 16.0),
-              // Add Image pickers or editing options here if needed
+              buildImagePicker('Front Image', _frontImageController),
+              buildImagePicker('Back Image', _backImageController),
+              const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
                   // Save the edited data to the database
@@ -91,5 +110,85 @@ class _EditLicensePageState extends State<EditLicensePage> {
         const SizedBox(height: 16.0),
       ],
     );
+  }
+
+  Widget buildImagePicker(String labelText, TextEditingController controller) {
+    return GestureDetector(
+      onTap: () async {
+        final XFile? pickedFile =
+            await ImagePicker().pickImage(source: ImageSource.gallery);
+        if (pickedFile != null) {
+          setState(() {
+            controller.text = pickedFile.path;
+          });
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            labelText,
+            style: const TextStyle(
+              fontSize: 14.0,
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          Container(
+            width: 400,
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (controller.text.isNotEmpty)
+                  Image.file(
+                    File(controller.text),
+                    width: 400,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                if (_isNetworkUrl(controller.text))
+                  Image.network(
+                    controller.text,
+                    width: 400,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                if (controller.text.isEmpty && !_isNetworkUrl(controller.text))
+                  const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt, size: 40),
+                        SizedBox(height: 8),
+                        Text(
+                          "Add image",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Supported formats: JPEG, PNG, JPG",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16.0),
+        ],
+      ),
+    );
+  }
+
+  bool _isNetworkUrl(String url) {
+    return url.startsWith('http://') || url.startsWith('https://');
   }
 }
