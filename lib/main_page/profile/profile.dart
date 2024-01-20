@@ -1,7 +1,7 @@
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/user_data_service.dart';
 import 'package:certracker/components/colors/app_colors.dart';
-import 'package:certracker/components/profile_components/edit_profile.dart';
+import 'package:certracker/components/settings_components/edit_profile/edit_profile.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {

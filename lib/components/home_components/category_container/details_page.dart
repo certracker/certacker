@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/components/home_components/category_container/details_pages/cert_details.dart';
 import 'package:certracker/components/home_components/category_container/details_pages/ceu_details.dart';
 import 'package:certracker/components/home_components/category_container/details_pages/edu_details.dart';
@@ -53,7 +54,10 @@ class _DetailsPageState extends State<DetailsPage> {
       builder: (context) {
         switch (widget.category) {
           case 'Certification':
-            return EditCertificationPage(initialDetails: details);
+            return EditCertificationPage(
+              initialDetails: details,
+              credentialsId: details['credentialsId'],
+            );
           case 'License':
             return EditLicensePage(initialDetails: details);
           case 'Education':
@@ -78,9 +82,11 @@ class _DetailsPageState extends State<DetailsPage> {
   Future<Map<String, dynamic>> fetchDetails() async {
     try {
       String collectionName = getCategoryCollectionName(widget.category);
+      String userId = AuthenticationService().getCurrentUserId() ?? '';
 
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection(collectionName)
+          .where('userId', isEqualTo: userId)
           .where('Title', isEqualTo: widget.title)
           .get();
 
@@ -88,8 +94,10 @@ class _DetailsPageState extends State<DetailsPage> {
         Map<String, dynamic> details =
             querySnapshot.docs.first.data() as Map<String, dynamic>;
 
-        // Exclude 'userId' and 'timestamp' fields
-        details.remove('userId');
+        // Include 'credentialsId' in the details
+        details['credentialsId'] = querySnapshot.docs.first.id;
+
+        // Exclude 'timestamp' field
         details.remove('timestamp');
 
         return details;
@@ -101,6 +109,7 @@ class _DetailsPageState extends State<DetailsPage> {
       rethrow;
     }
   }
+
 
   String getCategoryCollectionName(String category) {
     Map<String, String> categoryCollectionMap = {

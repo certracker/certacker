@@ -6,8 +6,7 @@ import 'package:image_picker/image_picker.dart';
 class EditOthersPage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
 
-  const EditOthersPage({Key? key, required this.initialDetails})
-      : super(key: key);
+  const EditOthersPage({super.key, required this.initialDetails});
 
   @override
   State<EditOthersPage> createState() => _EditOthersPageState();

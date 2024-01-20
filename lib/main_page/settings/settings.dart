@@ -176,7 +176,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       case 'Profile':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const EditProfilePage()),
+          MaterialPageRoute(builder: (context) => const EditProfile()),
         );
         break;
       case 'Notification':

@@ -32,6 +32,58 @@ class SaveDataService {
     await documentReference.set(data);
   }
 
+ static Future<void> updateData({
+    required String tableName,
+    required String userId,
+    required String credentialsId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    await Firebase.initializeApp();
+
+    CollectionReference tableCollection =
+        FirebaseFirestore.instance.collection(tableName);
+
+    DocumentReference documentReference = tableCollection.doc(credentialsId);
+
+    try {
+      // Get existing data
+      DocumentSnapshot documentSnapshot = await documentReference.get();
+      if (documentSnapshot.exists) {
+        Map<String, dynamic> existingData =
+            documentSnapshot.data()! as Map<String, dynamic>;
+
+        // Check if the current user is the owner of the credential
+        if (existingData['userId'] == userId) {
+          // Merge existing data with updated data
+          Map<String, dynamic> newData = {...existingData, ...updatedData};
+
+          print('Updating document with ID: $credentialsId');
+          print('Existing data: $existingData');
+          print('Updated data: $updatedData');
+
+          // Update the document
+          await documentReference.update(newData);
+
+          print('Document updated successfully!');
+        } else {
+          // Throw an exception if the current user is not the owner
+          print('Current user does not have permission to edit this credential.');
+          throw Exception('Permission denied.');
+        }
+      } else {
+        // Handle the case where no document with the specified ID is found
+        print('Document with ID $credentialsId not found.');
+        throw Exception('Document not found.');
+      }
+    } catch (e) {
+      // Handle error
+      print('Error updating document: $e');
+      throw Exception('Error updating document');
+    }
+  }
+
+
+
   static String generateUniqueCredentialsId() {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
@@ -41,10 +93,10 @@ class SaveDataService {
       return ''; // Return an empty string for empty image paths
     }
 
-    Reference ref = FirebaseStorage.instance.ref().child(imagePath);
-    final File imageFile = File(imagePath);
-
     try {
+      Reference ref = FirebaseStorage.instance.ref().child(imagePath);
+      final File imageFile = File(imagePath);
+
       // Read the file as bytes
       List<int> imageBytes = await imageFile.readAsBytes();
 
@@ -52,9 +104,7 @@ class SaveDataService {
       Uint8List uint8List = Uint8List.fromList(imageBytes);
 
       // Upload the bytes to Firebase Storage
-      UploadTask uploadTask = ref.putData(uint8List);
-
-      TaskSnapshot snapshot = await uploadTask;
+      TaskSnapshot snapshot = await ref.putData(uint8List);
       String imageUrl = await snapshot.ref.getDownloadURL();
 
       return imageUrl;
@@ -104,6 +154,21 @@ class CategoryService {
 }
 
 class CertificationService {
+  static Future<void> updateCertificationData({
+    required String credentialsId,
+    required String userId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    String tableName = 'Certification';
+
+    await SaveDataService.updateData(
+      tableName: tableName,
+      userId: userId,
+      credentialsId: credentialsId,
+      updatedData: updatedData,
+    );
+  }
+
   static Future<void> saveCertificationData({
     required String certificationName,
     required String certificationNumber,
@@ -118,8 +183,7 @@ class CertificationService {
     // Add other necessary fields for Certification
   }) async {
     String tableName = 'Certification';
-    // Assuming you have a method to generate a unique credentialsId
-    String credentialsId = generateUniqueCredentialsId();
+    String credentialsId = SaveDataService.generateUniqueCredentialsId();
     Map<String, dynamic> data = {
       'Title': certificationName,
       'certificationNumber': certificationNumber,
@@ -156,6 +220,21 @@ class CertificationService {
 }
 
 class LicenseService {
+  static Future<void> updateLicenseData({
+    required String credentialsId,
+    required String userId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    String tableName = 'License';
+
+    await SaveDataService.updateData(
+      tableName: tableName,
+      userId: userId,
+      credentialsId: credentialsId,
+      updatedData: updatedData,
+    );
+  }
+
   static Future<void> saveLicenseData({
     required String licenseName,
     required String licenseNumber,
@@ -168,6 +247,7 @@ class LicenseService {
     required String licenseFinalReminder,
     required String licensePrivateNote,
     required String licenseState,
+    // Add other necessary fields for License
   }) async {
     String tableName = 'License';
     String credentialsId = generateUniqueCredentialsId();
@@ -207,7 +287,23 @@ class LicenseService {
   }
 }
 
+
 class EducationService {
+  static Future<void> updateEducationData({
+    required String credentialsId,
+    required String userId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    String tableName = 'Education';
+
+    await SaveDataService.updateData(
+      tableName: tableName,
+      userId: userId,
+      credentialsId: credentialsId,
+      updatedData: updatedData,
+    );
+  }
+
   static Future<void> saveEducationData({
     required String educationName,
     required String educationDegree,
@@ -217,6 +313,7 @@ class EducationService {
     required String educationPrivateNote,
     required String frontImageUrl,
     required String backImageUrl,
+    // Add other necessary fields for Education
   }) async {
     String tableName = 'Education';
     String credentialsId = generateUniqueCredentialsId();
@@ -253,7 +350,23 @@ class EducationService {
   }
 }
 
+
 class CEUCMEService {
+  static Future<void> updateCEUData({
+    required String credentialsId,
+    required String userId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    String tableName = 'CEU';
+
+    await SaveDataService.updateData(
+      tableName: tableName,
+      userId: userId,
+      credentialsId: credentialsId,
+      updatedData: updatedData,
+    );
+  }
+
   static Future<void> saveCEUData({
     required String frontImageUrl,
     required String backImageUrl,
@@ -262,6 +375,7 @@ class CEUCMEService {
     required String ceuNumberOfContactHour,
     required String ceuCompletionDate,
     required String ceuPrivateNote,
+    // Add other necessary fields for CEU/CME
   }) async {
     String tableName = 'CEU';
     String credentialsId = generateUniqueCredentialsId();
@@ -297,7 +411,23 @@ class CEUCMEService {
   }
 }
 
+
 class OthersService {
+  static Future<void> updateOthersData({
+    required String credentialsId,
+    required String userId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    String tableName = 'Others';
+
+    await SaveDataService.updateData(
+      tableName: tableName,
+      userId: userId,
+      credentialsId: credentialsId,
+      updatedData: updatedData,
+    );
+  }
+
   static Future<void> saveOthersData({
     required String othersName,
     // required String othersDetails,
@@ -310,6 +440,7 @@ class OthersService {
     required String otherSecondReminder,
     required String otherFinalReminder,
     required String otherPrivateNote,
+    // Add other necessary fields for Others
   }) async {
     String tableName = 'Others';
     String credentialsId = generateUniqueCredentialsId();
@@ -349,7 +480,23 @@ class OthersService {
   }
 }
 
+
 class TravelService {
+  static Future<void> updateTravelData({
+  required String userId,
+  required String credentialsId,
+  required Map<String, dynamic> updatedData,
+}) async {
+  String tableName = 'Travel';
+
+  await SaveDataService.updateData(
+    tableName: tableName,
+    userId: userId,
+    credentialsId: credentialsId,
+    updatedData: updatedData,
+  );
+}
+
   static Future<void> saveTravelData({
     required String frontImageUrl,
     required String backImageUrl,
@@ -360,6 +507,7 @@ class TravelService {
     required String expiryDate,
     required String travelPrivateNote,
     required String documentType,
+    // Add other necessary fields for Travel
   }) async {
     String tableName = 'Travel';
     String credentialsId = generateUniqueCredentialsId();
@@ -397,7 +545,23 @@ class TravelService {
   }
 }
 
+
 class VaccinationService {
+  static Future<void> updateVaccinationData({
+   required String userId,
+  required String credentialsId,
+  required Map<String, dynamic> updatedData,
+}) async {
+  String tableName = 'Vaccination';
+
+  await SaveDataService.updateData(
+    tableName: tableName,
+    userId: userId,
+    credentialsId: credentialsId,
+    updatedData: updatedData,
+  );
+}
+
   static Future<void> saveVaccinationData({
     required String vaccinationType,
     required String vaccinationManufacturer,
@@ -409,6 +573,7 @@ class VaccinationService {
     required String vaccineIssueDate,
     required String vaccineExpiryDate,
     required String vaccinePrivateNote,
+    // Add other necessary fields for Vaccination
   }) async {
     String tableName = 'Vaccination';
     String credentialsId = generateUniqueCredentialsId();

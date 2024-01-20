@@ -20,7 +20,7 @@ class VaccinationDetails extends StatelessWidget {
                         buildFieldColumn('Credential Name', details['Title'])),
                 Expanded(
                     child: buildFieldColumn('Vaccination Manufacturer',
-                        details['vaccinationManufacturer'])),
+                        details['vaccineManufacturer'])),
               ],
             ),
             const SizedBox(height: 16.0),
