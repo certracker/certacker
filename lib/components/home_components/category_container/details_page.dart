@@ -46,38 +46,45 @@ class _DetailsPageState extends State<DetailsPage> {
   }
 
   void _handleEdit() async {
-  Map<String, dynamic> details = await fetchData;
+    Map<String, dynamic> details = await fetchData;
 
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) {
-        switch (widget.category) {
-          case 'Certification':
-            return EditCertificationPage(
-              initialDetails: details,
-              credentialsId: details['credentialsId'],
-            );
-          case 'License':
-            return EditLicensePage(initialDetails: details);
-          case 'Education':
-            return EditEducationPage(initialDetails: details);
-          case 'Vaccination':
-            return EditVaccinationPage(initialDetails: details);
-          case 'Travel':
-            return EditTravelPage(initialDetails: details);
-          case 'CEU':
-            return EditCEUPage(initialDetails: details);
-          case 'Others':
-            return EditOthersPage(initialDetails: details);
-          default:
-            return const Text('Edit form not available for this category.');
-        }
-      },
-    ),
-  );
-}
-
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          switch (widget.category) {
+            case 'Certification':
+              return EditCertificationPage(
+                initialDetails: details,
+                credentialsId: details['credentialsId'],
+              );
+            case 'License':
+              return EditLicensePage(initialDetails: details,
+                credentialsId: details['credentialsId'],);
+            case 'Education':
+              return EditEducationPage(initialDetails: details,
+                credentialsId: details['credentialsId'],);
+            case 'Vaccination':
+              return EditVaccinationPage(initialDetails: details,
+                credentialsId: details['credentialsId'],);
+            case 'Travel':
+              return EditTravelPage(initialDetails: details,
+                credentialsId: details['credentialsId'],);
+            case 'CEU':
+              return EditCEUPage(
+                initialDetails: details,
+                credentialsId: details['credentialsId'],
+              );
+            case 'Others':
+              return EditOthersPage(initialDetails: details,
+                credentialsId: details['credentialsId'],);
+            default:
+              return const Text('Edit form not available for this category.');
+          }
+        },
+      ),
+    );
+  }
 
   Future<Map<String, dynamic>> fetchDetails() async {
     try {
@@ -110,7 +117,6 @@ class _DetailsPageState extends State<DetailsPage> {
     }
   }
 
-
   String getCategoryCollectionName(String category) {
     Map<String, String> categoryCollectionMap = {
       'Certification': 'Certification',
@@ -142,8 +148,7 @@ class _DetailsPageState extends State<DetailsPage> {
       case 'Others':
         return OthersDetails(details: details);
       default:
-        return const Text(
-            'No details available for this category.'); 
+        return const Text('No details available for this category.');
     }
   }
 

@@ -10,8 +10,13 @@ import 'package:image_picker/image_picker.dart';
 
 class EditEducationPage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
+  final String credentialsId; // Add this line
 
-  const EditEducationPage({super.key, required this.initialDetails});
+  const EditEducationPage({
+    super.key,
+    required this.initialDetails,
+    required this.credentialsId,
+  });
 
   @override
   State<EditEducationPage> createState() => _EditEducationPageState();
@@ -35,16 +40,16 @@ class _EditEducationPageState extends State<EditEducationPage> {
   void initState() {
     super.initState();
 
-    educationNameController = TextEditingController(
-        text: widget.initialDetails['Title'] ?? '');
-    educationdegreeController =
-        TextEditingController(text: widget.initialDetails['educationDegree'] ?? '');
-    educationFieldController =
-        TextEditingController(text: widget.initialDetails['educationField'] ?? '');
-    educationGraduationController =
-        TextEditingController(text: widget.initialDetails['graduationDate'] ?? '');
-    educationprivateNoteController =
-        TextEditingController(text: widget.initialDetails['educationPrivateNote'] ?? '');
+    educationNameController =
+        TextEditingController(text: widget.initialDetails['Title'] ?? '');
+    educationdegreeController = TextEditingController(
+        text: widget.initialDetails['educationDegree'] ?? '');
+    educationFieldController = TextEditingController(
+        text: widget.initialDetails['educationField'] ?? '');
+    educationGraduationController = TextEditingController(
+        text: widget.initialDetails['graduationDate'] ?? '');
+    educationprivateNoteController = TextEditingController(
+        text: widget.initialDetails['educationPrivateNote'] ?? '');
     frontImageUrl = widget.initialDetails['frontImageUrl'];
     backImageUrl = widget.initialDetails['backImageUrl'];
   }

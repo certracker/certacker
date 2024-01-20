@@ -10,8 +10,13 @@ import 'package:image_picker/image_picker.dart';
 
 class EditCEUPage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
+  final String credentialsId;
 
-  const EditCEUPage({super.key, required this.initialDetails});
+  const EditCEUPage({
+    super.key,
+    required this.initialDetails,
+    required this.credentialsId,
+  });
 
   @override
   State<EditCEUPage> createState() => _EditCEUPageState();
@@ -294,7 +299,7 @@ class _EditCEUPageState extends State<EditCEUPage> {
                           await CEUCMEService.updateCEUData(
                             credentialsId:
                                 widget.initialDetails['credentialsId'],
-                                userId: AuthenticationService().getCurrentUserId()!,
+                            userId: AuthenticationService().getCurrentUserId()!,
                             updatedData: {
                               'frontImageUrl': frontImageURL,
                               'backImageUrl': backImageURL,

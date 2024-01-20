@@ -10,8 +10,13 @@ import 'package:image_picker/image_picker.dart';
 
 class EditTravelPage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
+  final String credentialsId;
 
-  const EditTravelPage({super.key, required this.initialDetails});
+  const EditTravelPage({
+    super.key,
+    required this.initialDetails,
+    required this.credentialsId,
+  });
 
   @override
   State<EditTravelPage> createState() => _EditTravelPageState();
@@ -37,18 +42,18 @@ class _EditTravelPageState extends State<EditTravelPage> {
   void initState() {
     super.initState();
 
-    travelCountryController =
-        TextEditingController(text: widget.initialDetails['travelCountry'] ?? '');
-    travelPlaceOfIssueController =
-        TextEditingController(text: widget.initialDetails['placeOfIssue'] ?? '');
-    travelDocumentNumberController =
-        TextEditingController(text: widget.initialDetails['documentNumber'] ?? '');
+    travelCountryController = TextEditingController(
+        text: widget.initialDetails['travelCountry'] ?? '');
+    travelPlaceOfIssueController = TextEditingController(
+        text: widget.initialDetails['placeOfIssue'] ?? '');
+    travelDocumentNumberController = TextEditingController(
+        text: widget.initialDetails['documentNumber'] ?? '');
     travelIssueDateController =
         TextEditingController(text: widget.initialDetails['issueDate'] ?? '');
     travelExpiryDateController =
         TextEditingController(text: widget.initialDetails['expiryDate'] ?? '');
-    travelPrivateNoteController =
-        TextEditingController(text: widget.initialDetails['travelPrivateNote'] ?? '');
+    travelPrivateNoteController = TextEditingController(
+        text: widget.initialDetails['travelPrivateNote'] ?? '');
     frontImageUrl = widget.initialDetails['frontImageUrl'];
     backImageUrl = widget.initialDetails['backImageUrl'];
     documentType = widget.initialDetails['Title'] ?? 'Passport';
@@ -89,7 +94,8 @@ class _EditTravelPageState extends State<EditTravelPage> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Text("Document Type: ", style: TextStyle(fontSize: 16)),
+                    const Text("Document Type: ",
+                        style: TextStyle(fontSize: 16)),
                     Radio<String>(
                       value: "Passport",
                       groupValue: documentType,
@@ -207,8 +213,8 @@ class _EditTravelPageState extends State<EditTravelPage> {
                 const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () async {
-                    final XFile? pickedFile =
-                        await ImagePicker().pickImage(source: ImageSource.gallery);
+                    final XFile? pickedFile = await ImagePicker()
+                        .pickImage(source: ImageSource.gallery);
                     if (pickedFile != null) {
                       setState(() {
                         frontImageUrl = pickedFile.path;
@@ -256,8 +262,8 @@ class _EditTravelPageState extends State<EditTravelPage> {
                 const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () async {
-                    final XFile? pickedFile =
-                        await ImagePicker().pickImage(source: ImageSource.gallery);
+                    final XFile? pickedFile = await ImagePicker()
+                        .pickImage(source: ImageSource.gallery);
                     if (pickedFile != null) {
                       setState(() {
                         backImageUrl = pickedFile.path;
@@ -329,17 +335,21 @@ class _EditTravelPageState extends State<EditTravelPage> {
                         });
                         // Retrieve values from the TextEditingControllers
                         String frontImageURL = frontImageUrl != null
-                            ? await SaveDataService.uploadImageToStorage(frontImageUrl!)
+                            ? await SaveDataService.uploadImageToStorage(
+                                frontImageUrl!)
                             : '';
                         String backImageURL = backImageUrl != null
-                            ? await SaveDataService.uploadImageToStorage(backImageUrl!)
+                            ? await SaveDataService.uploadImageToStorage(
+                                backImageUrl!)
                             : '';
                         String travelCountry = travelCountryController.text;
                         String placeOfIssue = travelPlaceOfIssueController.text;
-                        String documentNumber = travelDocumentNumberController.text;
+                        String documentNumber =
+                            travelDocumentNumberController.text;
                         String issueDate = travelIssueDateController.text;
                         String expiryDate = travelExpiryDateController.text;
-                        String travelPrivateNote = travelPrivateNoteController.text;
+                        String travelPrivateNote =
+                            travelPrivateNoteController.text;
 
                         // Call the service function to update travel data
                         await TravelService.updateTravelData(
@@ -364,7 +374,8 @@ class _EditTravelPageState extends State<EditTravelPage> {
                         // Navigate back to the dashboard
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const BottomNavBar()),
+                          MaterialPageRoute(
+                              builder: (context) => const BottomNavBar()),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

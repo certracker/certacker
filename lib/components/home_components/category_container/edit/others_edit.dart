@@ -5,8 +5,13 @@ import 'package:image_picker/image_picker.dart';
 
 class EditOthersPage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
+  final String credentialsId; // Add this line
 
-  const EditOthersPage({super.key, required this.initialDetails});
+  const EditOthersPage({
+    super.key,
+    required this.initialDetails,
+    required this.credentialsId, // Add this line
+  });
 
   @override
   State<EditOthersPage> createState() => _EditOthersPageState();
@@ -59,7 +64,8 @@ class _EditOthersPageState extends State<EditOthersPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               buildTextField('Credential Name', _titleController),
-              buildTextField('Credential Record Number', _otherNumberController),
+              buildTextField(
+                  'Credential Record Number', _otherNumberController),
               const SizedBox(height: 16.0),
               buildTextField('First Reminder', _firstReminderController),
               buildTextField('Second Reminder', _secondReminderController),

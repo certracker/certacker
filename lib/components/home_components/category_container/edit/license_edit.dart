@@ -10,8 +10,13 @@ import 'package:image_picker/image_picker.dart';
 
 class EditLicensePage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
+  final String credentialsId; // Add this line
 
-  const EditLicensePage({super.key, required this.initialDetails});
+  const EditLicensePage({
+    super.key,
+    required this.initialDetails,
+    required this.credentialsId,
+  });
 
   @override
   State<EditLicensePage> createState() => _EditLicensePageState();
@@ -41,22 +46,22 @@ class _EditLicensePageState extends State<EditLicensePage> {
 
     licenseNameController =
         TextEditingController(text: widget.initialDetails['Title'] ?? '');
-    licenseNumberController =
-        TextEditingController(text: widget.initialDetails['licenseNumber'] ?? '');
-    licenseIssueDateController =
-        TextEditingController(text: widget.initialDetails['licenseIssueDate'] ?? '');
-    licenseExpiryDateController =
-        TextEditingController(text: widget.initialDetails['licenseExpiryDate'] ?? '');
-    licenseStateController =
-        TextEditingController(text: widget.initialDetails['licenseState'] ?? '');
-    licenseFirstReminderController =
-        TextEditingController(text: widget.initialDetails['licenseFirstReminder'] ?? '');
-    licenseSecondReminderController =
-        TextEditingController(text: widget.initialDetails['licenseSecondReminder'] ?? '');
-    licenseFinalReminderController =
-        TextEditingController(text: widget.initialDetails['licenseFinalReminder'] ?? '');
-    licensePrivateNoteController =
-        TextEditingController(text: widget.initialDetails['licensePrivateNote'] ?? '');
+    licenseNumberController = TextEditingController(
+        text: widget.initialDetails['licenseNumber'] ?? '');
+    licenseIssueDateController = TextEditingController(
+        text: widget.initialDetails['licenseIssueDate'] ?? '');
+    licenseExpiryDateController = TextEditingController(
+        text: widget.initialDetails['licenseExpiryDate'] ?? '');
+    licenseStateController = TextEditingController(
+        text: widget.initialDetails['licenseState'] ?? '');
+    licenseFirstReminderController = TextEditingController(
+        text: widget.initialDetails['licenseFirstReminder'] ?? '');
+    licenseSecondReminderController = TextEditingController(
+        text: widget.initialDetails['licenseSecondReminder'] ?? '');
+    licenseFinalReminderController = TextEditingController(
+        text: widget.initialDetails['licenseFinalReminder'] ?? '');
+    licensePrivateNoteController = TextEditingController(
+        text: widget.initialDetails['licensePrivateNote'] ?? '');
     frontImageUrl = widget.initialDetails['frontImageUrl'];
     backImageUrl = widget.initialDetails['backImageUrl'];
   }

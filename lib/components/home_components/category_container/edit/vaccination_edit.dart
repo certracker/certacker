@@ -10,8 +10,13 @@ import 'package:image_picker/image_picker.dart';
 
 class EditVaccinationPage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
+  final String credentialsId;
 
-  const EditVaccinationPage({super.key, required this.initialDetails});
+  const EditVaccinationPage({
+    super.key,
+    required this.initialDetails,
+    required this.credentialsId,
+  });
 
   @override
   State<EditVaccinationPage> createState() => _EditVaccinationPageState();
@@ -38,16 +43,16 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
 
     vaccineTypeController =
         TextEditingController(text: widget.initialDetails['vaccineType'] ?? '');
-    vaccineManufacturerController =
-        TextEditingController(text: widget.initialDetails['vaccineManufacturer'] ?? '');
-    vaccineLotNumberController =
-        TextEditingController(text: widget.initialDetails['vaccineLotNumber'] ?? '');
-    vaccineIssueDateController =
-        TextEditingController(text: widget.initialDetails['vaccineIssueDate'] ?? '');
-    vaccineExpiryDateController =
-        TextEditingController(text: widget.initialDetails['vaccineExpiryDate'] ?? '');
-    vaccinePrivateNoteController =
-        TextEditingController(text: widget.initialDetails['vaccinePrivateNote'] ?? '');
+    vaccineManufacturerController = TextEditingController(
+        text: widget.initialDetails['vaccineManufacturer'] ?? '');
+    vaccineLotNumberController = TextEditingController(
+        text: widget.initialDetails['vaccineLotNumber'] ?? '');
+    vaccineIssueDateController = TextEditingController(
+        text: widget.initialDetails['vaccineIssueDate'] ?? '');
+    vaccineExpiryDateController = TextEditingController(
+        text: widget.initialDetails['vaccineExpiryDate'] ?? '');
+    vaccinePrivateNoteController = TextEditingController(
+        text: widget.initialDetails['vaccinePrivateNote'] ?? '');
     frontImageUrl = widget.initialDetails['frontImageUrl'];
     backImageUrl = widget.initialDetails['backImageUrl'];
   }
@@ -169,8 +174,8 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                 const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () async {
-                    final XFile? pickedFile =
-                        await ImagePicker().pickImage(source: ImageSource.gallery);
+                    final XFile? pickedFile = await ImagePicker()
+                        .pickImage(source: ImageSource.gallery);
                     if (pickedFile != null) {
                       setState(() {
                         frontImageUrl = pickedFile.path;
@@ -218,8 +223,8 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                 const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () async {
-                    final XFile? pickedFile =
-                        await ImagePicker().pickImage(source: ImageSource.gallery);
+                    final XFile? pickedFile = await ImagePicker()
+                        .pickImage(source: ImageSource.gallery);
                     if (pickedFile != null) {
                       setState(() {
                         backImageUrl = pickedFile.path;
@@ -301,10 +306,14 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                             ? await SaveDataService.uploadImageToStorage(
                                 backImageUrl!)
                             : '';
-                        String vaccineLotNumber = vaccineLotNumberController.text;
-                        String vaccineIssueDate = vaccineIssueDateController.text;
-                        String vaccineExpiryDate = vaccineExpiryDateController.text;
-                        String vaccinePrivateNote = vaccinePrivateNoteController.text;
+                        String vaccineLotNumber =
+                            vaccineLotNumberController.text;
+                        String vaccineIssueDate =
+                            vaccineIssueDateController.text;
+                        String vaccineExpiryDate =
+                            vaccineExpiryDateController.text;
+                        String vaccinePrivateNote =
+                            vaccinePrivateNoteController.text;
 
                         // Call the service function to update vaccination data
                         await VaccinationService.updateVaccinationData(
@@ -319,7 +328,6 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                             'vaccineIssueDate': vaccineIssueDate,
                             'vaccineExpiryDate': vaccineExpiryDate,
                             'vaccinePrivateNote': vaccinePrivateNote,
-
                           },
                         );
                         setState(() {
@@ -329,7 +337,8 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                         // Navigate back to the dashboard
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const BottomNavBar()),
+                          MaterialPageRoute(
+                              builder: (context) => const BottomNavBar()),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
