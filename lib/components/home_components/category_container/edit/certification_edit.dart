@@ -425,7 +425,7 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                             SnackBar(
                               backgroundColor: Colors.red,
                               content: Text('Error updating certification: $e'),
-                              duration: Duration(seconds: 10),
+                              duration: const Duration(seconds: 10),
                             ),
                           );
                         }

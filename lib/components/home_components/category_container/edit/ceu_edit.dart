@@ -320,7 +320,7 @@ class _EditCEUPageState extends State<EditCEUPage> {
                             SnackBar(
                               backgroundColor: Colors.red,
                               content: Text('Error updating CEU data: $e'),
-                              duration: Duration(seconds: 2),
+                              duration: const Duration(seconds: 2),
                             ),
                           );
                         } finally {

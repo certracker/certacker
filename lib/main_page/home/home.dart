@@ -154,50 +154,54 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   height: 50,
                   color: Colors.white,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FilterItem(
-                        text: 'All',
-                        isSelected: selectedIndex == 0,
-                        onTap: () => selectItem(0),
-                      ),
-                      FilterItem(
-                        imagePath: "assets/images/icons/1.png",
-                        isSelected: selectedIndex == 1,
-                        onTap: () => selectItem(1),
-                      ),
-                      FilterItem(
-                        imagePath: "assets/images/icons/2.png",
-                        isSelected: selectedIndex == 2,
-                        onTap: () => selectItem(2),
-                      ),
-                      FilterItem(
-                        imagePath: "assets/images/icons/3.png",
-                        isSelected: selectedIndex == 3,
-                        onTap: () => selectItem(3),
-                      ),
-                      FilterItem(
-                        imagePath: "assets/images/icons/4.png",
-                        isSelected: selectedIndex == 4,
-                        onTap: () => selectItem(4),
-                      ),
-                      FilterItem(
-                        imagePath: "assets/images/icons/5.png",
-                        isSelected: selectedIndex == 5,
-                        onTap: () => selectItem(5),
-                      ),
-                      FilterItem(
-                        imagePath: "assets/images/icons/6.png",
-                        isSelected: selectedIndex == 6,
-                        onTap: () => selectItem(6),
-                      ),
-                      FilterItem(
-                        imagePath: "assets/images/icons/7.png",
-                        isSelected: selectedIndex == 7,
-                        onTap: () => selectItem(7),
-                      ),
-                    ],
+                  child: SingleChildScrollView(
+                    scrollDirection:
+                        Axis.horizontal, // Make the row scroll horizontally
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FilterItem(
+                          text: 'All',
+                          isSelected: selectedIndex == 0,
+                          onTap: () => selectItem(0),
+                        ),
+                        FilterItem(
+                          imagePath: "assets/images/icons/1.png",
+                          isSelected: selectedIndex == 1,
+                          onTap: () => selectItem(1),
+                        ),
+                        FilterItem(
+                          imagePath: "assets/images/icons/2.png",
+                          isSelected: selectedIndex == 2,
+                          onTap: () => selectItem(2),
+                        ),
+                        FilterItem(
+                          imagePath: "assets/images/icons/3.png",
+                          isSelected: selectedIndex == 3,
+                          onTap: () => selectItem(3),
+                        ),
+                        FilterItem(
+                          imagePath: "assets/images/icons/4.png",
+                          isSelected: selectedIndex == 4,
+                          onTap: () => selectItem(4),
+                        ),
+                        FilterItem(
+                          imagePath: "assets/images/icons/5.png",
+                          isSelected: selectedIndex == 5,
+                          onTap: () => selectItem(5),
+                        ),
+                        FilterItem(
+                          imagePath: "assets/images/icons/6.png",
+                          isSelected: selectedIndex == 6,
+                          onTap: () => selectItem(6),
+                        ),
+                        FilterItem(
+                          imagePath: "assets/images/icons/7.png",
+                          isSelected: selectedIndex == 7,
+                          onTap: () => selectItem(7),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -254,7 +258,7 @@ class FilterItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

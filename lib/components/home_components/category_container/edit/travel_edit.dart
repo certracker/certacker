@@ -11,8 +11,7 @@ import 'package:image_picker/image_picker.dart';
 class EditTravelPage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
 
-  const EditTravelPage({Key? key, required this.initialDetails})
-      : super(key: key);
+  const EditTravelPage({super.key, required this.initialDetails});
 
   @override
   State<EditTravelPage> createState() => _EditTravelPageState();

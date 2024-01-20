@@ -11,8 +11,7 @@ import 'package:image_picker/image_picker.dart';
 class EditLicensePage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
 
-  const EditLicensePage({Key? key, required this.initialDetails})
-      : super(key: key);
+  const EditLicensePage({super.key, required this.initialDetails});
 
   @override
   State<EditLicensePage> createState() => _EditLicensePageState();
