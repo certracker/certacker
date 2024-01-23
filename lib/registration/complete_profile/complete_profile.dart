@@ -103,7 +103,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
               'Skip',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 18,
               ),
             ),
           ),
@@ -152,7 +152,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 labelText: 'Phone Number',
-                labelStyle: TextStyle(color: Colors.white),
+                // prefixIcon: Icon(Icons.phone, color: Colors.white),
+                labelStyle: TextStyle(color: Colors.white, fontSize: 18),
                 border: UnderlineInputBorder(),
               ),
               keyboardType: TextInputType.phone,
@@ -163,7 +164,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Date of Birth',
-                labelStyle: const TextStyle(color: Colors.white),
+                labelStyle: const TextStyle(color: Colors.white, fontSize: 18),
                 border: const UnderlineInputBorder(),
                 suffixIcon: IconButton(
                   onPressed: () async {
@@ -193,7 +194,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 labelText: 'State',
-                labelStyle: TextStyle(color: Colors.white),
+                labelStyle: TextStyle(color: Colors.white, fontSize: 18),
                 border: UnderlineInputBorder(),
               ),
             ),
@@ -203,7 +204,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 labelText: 'City',
-                labelStyle: TextStyle(color: Colors.white),
+                labelStyle: TextStyle(color: Colors.white, fontSize: 18),
                 border: UnderlineInputBorder(),
               ),
             ),
@@ -213,7 +214,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 labelText: 'Zip Code',
-                labelStyle: TextStyle(color: Colors.white),
+                labelStyle: TextStyle(color: Colors.white, fontSize: 18),
                 border: UnderlineInputBorder(),
               ),
               keyboardType: TextInputType.number,
@@ -255,17 +256,17 @@ class _CompleteProfileState extends State<CompleteProfile> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content:
-                          Text('Failed to update user data. Please try again.'),
+                          Text('Failed to update user data. Please try again.', style: TextStyle(fontSize: 18)),
                     ),
                   );
                 }
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(18),
                 )
                   ),
-              child: const Text('Finish'),
+              child: const Text('Finish', style: TextStyle(fontSize: 18)),
             ),
             const SizedBox(height: 20),
           ],

@@ -9,6 +9,7 @@ import 'package:certracker/components/home_components/pages/Vaccination.dart';
 import 'package:certracker/components/home_components/pages/all.dart';
 import 'package:certracker/components/home_components/pages/ceu.dart';
 import 'package:certracker/components/home_components/pages/others.dart';
+import 'package:certracker/components/home_components/select_mutilple/selete_muiltple.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -55,22 +56,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.check_circle_outline,
                 text: 'Select Multiple',
                 onTap: () {
-                  // Handle "Select Multiple" action
-                  Navigator.pop(context); // Close the bottom sheet
+                  Navigator.pop(context);
+                  _navigateToDeletePage();
                 },
               ),
               _buildBottomSheetItem(
                 icon: Icons.delete_outline_outlined,
                 text: 'Recycle Bin',
-                onTap: () {
-                  // Handle "Recycle Bin" action
-                  Navigator.pop(context); // Close the bottom sheet
-                },
+                onTap: _navigateToDeletePage,
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  void _navigateToDeletePage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SeleteMuiltple(),
+      ),
     );
   }
 

@@ -31,6 +31,7 @@ class ResetPassword extends StatelessWidget {
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: 'Enter Password',
+                  labelStyle: TextStyle(fontSize: 18),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -39,6 +40,7 @@ class ResetPassword extends StatelessWidget {
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: 'Confirm Password',
+                  labelStyle: TextStyle(fontSize: 18),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -62,14 +64,14 @@ class ResetPassword extends StatelessWidget {
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(18),
                       child: const Text(
                         "Reset",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 18,
                         ),
                       ),
                     ),

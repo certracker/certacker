@@ -107,7 +107,7 @@ class _OnBoardState extends State<OnBoard> {
                         },
                         child: const Text(
                           'Skip',
-                          style: TextStyle(color: Colors.black, fontSize: 16),
+                          style: TextStyle(color: Colors.black, fontSize: 18),
                         ),
                       ),
                     ],
@@ -121,7 +121,7 @@ class _OnBoardState extends State<OnBoard> {
                         );
                       },
                       child: SizedBox(
-                        width: 150, // Set the desired width here
+                        width: 170, // Set the desired width here
                         child: Container(
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
@@ -134,14 +134,14 @@ class _OnBoardState extends State<OnBoard> {
                             ),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(18),
                           child: const Text(
                             "Finish",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 18,
                             ),
                           ),
                         ),
@@ -175,7 +175,7 @@ class _OnBoardState extends State<OnBoard> {
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Color(0xFF7E25CA),
-              fontSize: 24,
+              fontSize: 30,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -187,7 +187,7 @@ class _OnBoardState extends State<OnBoard> {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.black,
-                fontSize: 16,
+                fontSize: 18,
               ),
             ),
           ),

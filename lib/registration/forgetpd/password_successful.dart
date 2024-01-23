@@ -23,6 +23,7 @@ class PasswordChanged extends StatelessWidget {
             const SizedBox(height: 10),
             const Text(
               "You have just reset your password. Click on the button below to login.",
+              style: TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -45,14 +46,14 @@ class PasswordChanged extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(18),
                 child: const Text(
                   "Login",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 18,
                   ),
                 ),
               ),

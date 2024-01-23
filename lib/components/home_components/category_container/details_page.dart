@@ -105,7 +105,7 @@ class _DetailsPageState extends State<DetailsPage> {
         details['credentialsId'] = querySnapshot.docs.first.id;
 
         // Exclude 'timestamp' field
-        details.remove('timestamp');
+        // details.remove('timestamp');
 
         return details;
       } else {

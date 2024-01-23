@@ -114,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                       controller: emailController,
                       decoration: const InputDecoration(
                         labelText: "Email",
+                        labelStyle: TextStyle(fontSize: 18),
                         border: UnderlineInputBorder(),
                       ),
                       validator: (value) {
@@ -122,6 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                         }
                         return null;
                       },
+                      style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(height: 20),
                     Column(
@@ -132,6 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                           obscureText: _isObscured,
                           decoration: InputDecoration(
                             labelText: "Password",
+                            labelStyle: const TextStyle(fontSize: 18),
                             border: const UnderlineInputBorder(),
                             suffixIcon: GestureDetector(
                               onTap: _togglePasswordVisibility,
@@ -148,6 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                             }
                             return null;
                           },
+                          style: const TextStyle(fontSize: 18),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -164,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                               },
                               child: const Text(
                                 "Forgot Password?",
-                                style: TextStyle(color: Colors.red),
+                                style: TextStyle(color: Colors.red, fontSize: 16),
                               ),
                             ),
                           ],
@@ -187,14 +191,14 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(18),
                         child: const Text(
                           'Login',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 18,
                           ),
                         ),
                       ),
@@ -208,7 +212,7 @@ class _LoginPageState extends State<LoginPage> {
                               child:
                                   Divider(color: Colors.black, thickness: 1)),
                           SizedBox(width: 10),
-                          Text('OR'),
+                          Text('OR', style: TextStyle(fontSize: 16)),
                           SizedBox(width: 10),
                           Expanded(
                               child:
@@ -222,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
                         // Implement login with Google logic
                       },
                       icon: const Icon(Icons.g_translate),
-                      label: const Text('Login with Google'),
+                      label: const Text('Login with Google', style: TextStyle(fontSize: 18)),
                     ),
                     const SizedBox(height: 80),
 
@@ -230,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Don’t have an account?"),
+                        const Text("Don’t have an account?", style: TextStyle(fontSize: 18),),
                         const SizedBox(width: 5),
                         TextButton(
                           onPressed: () {
@@ -242,7 +246,7 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           child: const Text(
                             'SignUp',
-                            style: TextStyle(color: Colors.blue),
+                            style: TextStyle(color: Colors.blue, fontSize: 18),
                           ),
                         ),
                       ],

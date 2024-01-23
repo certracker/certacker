@@ -135,6 +135,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       controller: firstNameController,
                       decoration: const InputDecoration(
                         labelText: "First Name",
+                        labelStyle: TextStyle(fontSize: 18),
                         border: UnderlineInputBorder(
                           borderSide: BorderSide(
                             color: Colors.grey,
@@ -148,12 +149,14 @@ class _SignUpPageState extends State<SignUpPage> {
                         }
                         return null;
                       },
+                      style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: lastNameController,
                       decoration: const InputDecoration(
                         labelText: "Last Name",
+                        labelStyle: TextStyle(fontSize: 18),
                         border: UnderlineInputBorder(
                           borderSide: BorderSide(
                             color: Colors.grey,
@@ -167,12 +170,14 @@ class _SignUpPageState extends State<SignUpPage> {
                         }
                         return null;
                       },
+                      style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: emailController,
                       decoration: const InputDecoration(
                         labelText: "Email",
+                        labelStyle: TextStyle(fontSize: 18),
                         border: UnderlineInputBorder(
                           borderSide: BorderSide(
                             color: Colors.grey,
@@ -186,6 +191,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         }
                         return null;
                       },
+                      style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
@@ -193,6 +199,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       obscureText: true,
                       decoration: const InputDecoration(
                         labelText: "Password",
+                        labelStyle: TextStyle(fontSize: 18),
                         border: UnderlineInputBorder(
                           borderSide: BorderSide(
                             color: Colors.grey,
@@ -206,6 +213,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         }
                         return null;
                       },
+                      style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
@@ -213,6 +221,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       obscureText: true,
                       decoration: const InputDecoration(
                         labelText: "Confirm Password",
+                        labelStyle: TextStyle(fontSize: 18),
                         border: UnderlineInputBorder(
                           borderSide: BorderSide(
                             color: Colors.grey,
@@ -226,6 +235,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         }
                         return null;
                       },
+                      style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(height: 20),
                     Row(
@@ -238,7 +248,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             });
                           },
                         ),
-                        const Text('I agree to the terms and conditions'),
+                        const Text('I agree to the terms and conditions',
+                            style: TextStyle(fontSize: 16)),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -258,14 +269,14 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(18),
                         child: const Text(
                           'Sign Up',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 18,
                           ),
                         ),
                       ),
@@ -277,7 +288,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         Expanded(child: Divider()),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Text('OR'),
+                          child: Text('OR', style: TextStyle(fontSize: 16)),
                         ),
                         Expanded(child: Divider()),
                       ],
@@ -292,7 +303,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         // );
                       },
                       icon: const Icon(Icons.g_translate),
-                      label: const Text('Sign Up with Google'),
+                      label: const Text('Sign Up with Google',
+                          style: TextStyle(fontSize: 18)),
                     ),
                   ],
                 ),
@@ -302,7 +314,8 @@ class _SignUpPageState extends State<SignUpPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Already have an account?"),
+                const Text("Already have an account?",
+                    style: TextStyle(fontSize: 18)),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
@@ -316,14 +329,14 @@ class _SignUpPageState extends State<SignUpPage> {
                     style: TextStyle(
                       color:
                           Colors.blue, // Change the color to your desired color
-                      fontWeight:
-                          FontWeight.bold, // Apply different styles if needed
-                      // Add other style properties as needed
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
                     ),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 50),
           ],
         ),
       ),

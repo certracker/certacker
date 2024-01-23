@@ -79,14 +79,14 @@ class EnterOTP extends StatelessWidget {
                 children: [
                   const Text(
                     "Didn't receive the OTP?",
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
                   ),
                   TextButton(
                     onPressed: () {
                       // Logic to resend OTP
                     },
                     child: const Text("Resend OTP",
-                        style: TextStyle(color: Colors.blue)),
+                        style: TextStyle(color: Colors.blue, fontSize: 16)),
                   ),
                 ],
               ),
@@ -110,14 +110,14 @@ class EnterOTP extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(18),
                   child: const Text(
                     "Verify",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 18,
                     ),
                   ),
                 ),

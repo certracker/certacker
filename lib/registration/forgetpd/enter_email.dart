@@ -31,6 +31,7 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Enter Email Address',
+                  labelStyle: TextStyle(fontSize: 18),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -54,14 +55,14 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(18),
                       child: const Text(
                         "Send OTP",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 18,
                         ),
                       ),
                     ),
