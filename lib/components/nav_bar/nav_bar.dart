@@ -15,7 +15,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
-    ProfileScreen(),
+    const ProfileScreen(),
     const SettingsScreen(),
   ];
 

@@ -1,14 +1,17 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'package:timezone/timezone.dart' as tz;
 
 import 'package:certracker/auth/save_data_service.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
+import 'package:certracker/main.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
 class CertificationForm extends StatefulWidget {
-  const CertificationForm({super.key});
+  const CertificationForm({Key? key});
 
   @override
   State<CertificationForm> createState() => _CertificationFormState();
@@ -45,6 +48,45 @@ class _CertificationFormState extends State<CertificationForm> {
   String? backImageUrl;
 
   bool isLoading = false;
+
+  Future<void> scheduleNotification(
+      String reminderType, DateTime selectedDate) async {
+    String reminderMessage = '';
+    switch (reminderType) {
+      case 'First Reminder':
+        reminderMessage = 'First Reminder: Time to be reminded!';
+        break;
+      case 'Second Reminder':
+        reminderMessage = 'Second Reminder: Time to be reminded!';
+        break;
+      case 'Final Reminder':
+        reminderMessage = 'Final Reminder: Time to be reminded!';
+        break;
+    }
+
+    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+      'your_channel_id',
+      'Reminder Channel',
+      channelDescription: 'Channel for reminders',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    var platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      0,
+      'Reminder',
+      reminderMessage, // Notification body
+      tz.TZDateTime.from(selectedDate, tz.local),
+      platformChannelSpecifics,
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,16 +178,8 @@ class _CertificationFormState extends State<CertificationForm> {
             ),
             readOnly: true,
             onTap: () async {
-              final DateTime? selectedDate = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-              );
-              if (selectedDate != null) {
-                certificationFirstReminderController.text =
-                    selectedDate.toLocal().toString().split(' ')[0];
-              }
+              await selectDateAndSetReminder(
+                  'First Reminder', certificationFirstReminderController);
             },
           ),
           const SizedBox(height: 16),
@@ -158,16 +192,8 @@ class _CertificationFormState extends State<CertificationForm> {
             ),
             readOnly: true,
             onTap: () async {
-              final DateTime? selectedDate = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-              );
-              if (selectedDate != null) {
-                certificationSecondReminderController.text =
-                    selectedDate.toLocal().toString().split(' ')[0];
-              }
+              await selectDateAndSetReminder(
+                  'Second Reminder', certificationSecondReminderController);
             },
           ),
           const SizedBox(height: 16),
@@ -180,16 +206,8 @@ class _CertificationFormState extends State<CertificationForm> {
             ),
             readOnly: true,
             onTap: () async {
-              final DateTime? selectedDate = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-              );
-              if (selectedDate != null) {
-                certificationFinalReminderController.text =
-                    selectedDate.toLocal().toString().split(' ')[0];
-              }
+              await selectDateAndSetReminder(
+                  'Final Reminder', certificationFinalReminderController);
             },
           ),
           const SizedBox(height: 42),
@@ -212,13 +230,7 @@ class _CertificationFormState extends State<CertificationForm> {
           // Image upload for Front
           GestureDetector(
             onTap: () async {
-              final XFile? pickedFile =
-                  await ImagePicker().pickImage(source: ImageSource.gallery);
-              if (pickedFile != null) {
-                setState(() {
-                  frontImageUrl = pickedFile.path;
-                });
-              }
+              await pickImageAndSetUrl('front');
             },
             child: Container(
               width: 400,
@@ -263,13 +275,7 @@ class _CertificationFormState extends State<CertificationForm> {
           // Image upload for Back
           GestureDetector(
             onTap: () async {
-              final XFile? pickedFile =
-                  await ImagePicker().pickImage(source: ImageSource.gallery);
-              if (pickedFile != null) {
-                setState(() {
-                  backImageUrl = pickedFile.path;
-                });
-              }
+              await pickImageAndSetUrl('back');
             },
             child: Container(
               width: 400,
@@ -329,6 +335,9 @@ class _CertificationFormState extends State<CertificationForm> {
             alignment: Alignment.center,
             child: GestureDetector(
               onTap: () async {
+                await selectDateAndSetReminder(
+                    'First Reminder', certificationFirstReminderController);
+
                 if (_formKey.currentState?.validate() ?? false) {
                   setState(() {
                     isLoading = true;
@@ -378,7 +387,8 @@ class _CertificationFormState extends State<CertificationForm> {
                   // Navigate back to the dashboard
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const BottomNavBar()),
+                    MaterialPageRoute(
+                        builder: (context) => const BottomNavBar()),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -420,5 +430,33 @@ class _CertificationFormState extends State<CertificationForm> {
         ],
       ),
     );
+  }
+
+  Future<void> pickImageAndSetUrl(String type) async {
+    final XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        if (type == 'front') {
+          frontImageUrl = pickedFile.path;
+        } else {
+          backImageUrl = pickedFile.path;
+        }
+      });
+    }
+  }
+
+  Future<void> selectDateAndSetReminder(
+      String reminderType, TextEditingController controller) async {
+    final DateTime? selectedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (selectedDate != null) {
+      controller.text = selectedDate.toLocal().toString().split(' ')[0];
+      await scheduleNotification(reminderType, selectedDate);
+    }
   }
 }

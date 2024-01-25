@@ -9,6 +9,7 @@ import 'package:certracker/components/home_components/pages/Vaccination.dart';
 import 'package:certracker/components/home_components/pages/all.dart';
 import 'package:certracker/components/home_components/pages/ceu.dart';
 import 'package:certracker/components/home_components/pages/others.dart';
+import 'package:certracker/components/home_components/recyle_bin/recyclebin.dart';
 import 'package:certracker/components/home_components/select_mutilple/selete_muiltple.dart';
 import 'package:flutter/material.dart';
 
@@ -63,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildBottomSheetItem(
                 icon: Icons.delete_outline_outlined,
                 text: 'Recycle Bin',
-                onTap: _navigateToDeletePage,
+                onTap: _navigateToRecycleBinPage,
               ),
             ],
           ),
@@ -73,13 +74,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _navigateToDeletePage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const SeleteMuiltple(),
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => SeleteMuiltple(
+        profilePicture: userDetails?['profilePicture'] ?? '',
+        firstName: userDetails?['firstName'] ?? '',
       ),
-    );
-  }
+    ),
+  );
+}
+
+void _navigateToRecycleBinPage() {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => RecycleBinPage(
+      ),
+    ),
+  );
+}
+
 
   Widget _buildBottomSheetItem({
     required IconData icon,

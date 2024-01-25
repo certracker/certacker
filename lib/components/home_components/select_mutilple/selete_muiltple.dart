@@ -1,10 +1,18 @@
-import 'package:certracker/auth/auth_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:certracker/auth/auth_service.dart';
+import 'package:certracker/auth/save_data_service.dart';
 import 'package:certracker/components/home_components/category_container/category_container.dart';
 
 class SeleteMuiltple extends StatefulWidget {
-  const SeleteMuiltple({super.key});
+  final String profilePicture;
+  final String firstName;
+
+  const SeleteMuiltple({
+    Key? key,
+    required this.profilePicture,
+    required this.firstName,
+  }) : super(key: key);
 
   @override
   State<SeleteMuiltple> createState() => _SeleteMuiltpleState();
@@ -14,73 +22,34 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
   late List<Map<String, dynamic>> allCategories;
   late List<bool> selectedCategories;
   bool isLoading = true;
+  String? userId;
 
   @override
   void initState() {
     super.initState();
+    userId = AuthenticationService().getCurrentUserId();
     fetchUserData();
   }
 
   String getTableNameFromCredentialsId(String credentialsId) {
-    // Split the credentials ID by underscore
-    List<String> parts = credentialsId.split('_');
-
-    // Check if there are parts after splitting
-    if (parts.isNotEmpty) {
-      // The first part is the table name
-      return parts[0];
-    } else {
-      // Return a default table name or handle the case as needed
-      return 'UnknownTable';
-    }
+    // Your implementation to extract the table name from credentialsId
+    // Modify this method based on your logic
+    // Example implementation:
+    // return credentialsId.split('_')[0];
+    return 'UnknownTable';
   }
 
   List<String> getSelectedCategoryIds() {
   List<String> selectedIds = [];
   for (int i = 0; i < selectedCategories.length; i++) {
-    if (selectedCategories[i] && allCategories[i]['DocumentID'] != null) {
-      selectedIds.add(allCategories[i]['DocumentID']);
+    if (selectedCategories[i] &&
+        allCategories[i]['DocumentID'] != null) { // Check for null
+      selectedIds.add(allCategories[i]['DocumentID']!); // Use the non-null assertion operator (!)
     }
   }
   return selectedIds;
 }
 
-
-  Future<void> moveToRecycleBin(List<String> selectedCategoryIds) async {
-    try {
-      String? userId = AuthenticationService().getCurrentUserId();
-
-      if (userId != null) {
-        for (String credentialsId in selectedCategoryIds) {
-          // Iterate through each selected item and move it to the "Recycle Bin"
-          String tableName = getTableNameFromCredentialsId(credentialsId);
-          Map<String, dynamic> selectedItem = allCategories
-              .firstWhere((item) => item['DocumentID'] == credentialsId);
-
-          await FirebaseFirestore.instance
-              .collection('RecycleBin')
-              .doc(tableName)
-              .collection(tableName)
-              .doc(credentialsId)
-              .set(selectedItem);
-
-          // Delete the item from the current collection
-          await FirebaseFirestore.instance
-              .collection(tableName)
-              .doc(credentialsId)
-              .delete();
-        }
-
-        // Reload user data after moving items to the "Recycle Bin"
-        await fetchUserData();
-      } else {
-        throw Exception('User not authenticated!');
-      }
-    } catch (e) {
-      print('Error moving items to Recycle Bin: $e');
-      // Handle error as needed
-    }
-  }
 
   Future<void> fetchUserData() async {
     try {
@@ -88,38 +57,23 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
         isLoading = true; // Set loading to true when starting to fetch data
       });
 
-      String? userId = AuthenticationService().getCurrentUserId();
+      userId = AuthenticationService().getCurrentUserId();
 
       if (userId != null) {
         List<QuerySnapshot> snapshots = await Future.wait([
-          FirebaseFirestore.instance
-              .collection('Certification')
-              .where('userId', isEqualTo: userId)
-              .get(),
-          FirebaseFirestore.instance
-              .collection('License')
-              .where('userId', isEqualTo: userId)
-              .get(),
-          FirebaseFirestore.instance
-              .collection('Education')
-              .where('userId', isEqualTo: userId)
-              .get(),
-          FirebaseFirestore.instance
-              .collection('Vaccination')
-              .where('userId', isEqualTo: userId)
-              .get(),
-          FirebaseFirestore.instance
-              .collection('Travel')
-              .where('userId', isEqualTo: userId)
-              .get(),
-          FirebaseFirestore.instance
-              .collection('CEU')
-              .where('userId', isEqualTo: userId)
-              .get(),
-          FirebaseFirestore.instance
-              .collection('Others')
-              .where('userId', isEqualTo: userId)
-              .get(),
+          for (String collection in [
+            'Certification',
+            'License',
+            'Education',
+            'Vaccination',
+            'Travel',
+            'CEU',
+            'Others'
+          ])
+            FirebaseFirestore.instance
+                .collection(collection)
+                .where('userId', isEqualTo: userId)
+                .get(),
         ]);
 
         List<Map<String, dynamic>> userData = [];
@@ -137,7 +91,8 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
           allCategories = userData;
           selectedCategories =
               List.generate(allCategories.length, (index) => false);
-          isLoading = false; // Set loading to false after successfully fetching data
+          isLoading =
+              false; // Set loading to false after successfully fetching data
         });
       } else {
         throw Exception('User not authenticated!');
@@ -151,11 +106,78 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
     }
   }
 
+  Future<void> deleteSelectedItems() async {
+    List<String> selectedCategoryIds = getSelectedCategoryIds();
+
+    try {
+      // Move selected items to Recycle Bin
+      for (String credentialsId in selectedCategoryIds) {
+        await SaveDataService.moveItemToRecycleBin(
+          getTableNameFromCredentialsId(credentialsId),
+          userId!,
+          credentialsId,
+        );
+      }
+
+      // Remove selected items from the local list
+      setState(() {
+        allCategories.removeWhere(
+            (item) => selectedCategoryIds.contains(item['DocumentID']));
+        selectedCategories =
+            List.generate(allCategories.length, (index) => false);
+      });
+    } catch (e) {
+      print('Error deleting items: $e');
+      // Handle error as needed
+    }
+
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Multiple'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100.0),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          elevation: 4,
+          flexibleSpace: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Material(
+                elevation: 4,
+                child: Container(
+                  color: const Color(0XFF591A8F),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.grey[300],
+                        backgroundImage: NetworkImage(widget.profilePicture),
+                      ),
+                      const SizedBox(width: 20),
+                      Text(
+                        "Welcome, ${widget.firstName.length > 6 ? '${widget.firstName.substring(0, 6)}...' : widget.firstName}!",
+                        style:
+                            const TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.search, color: Colors.white),
+                        onPressed: () {
+                          // Add notification icon onPressed action
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -167,22 +189,17 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
                 Color categoryColor = getCategoryColor(tableName);
                 String categoryImagePath = getCategoryImagePath(tableName);
 
-                return ListTile(
-                  contentPadding: const EdgeInsets.all(16),
-                  leading: Checkbox(
-                    value: selectedCategories[index],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedCategories[index] = value!;
-                      });
-                    },
-                  ),
-                  title: CategoryContainer(
-                    title: credentialsId['Title'],
-                    category: tableName,
-                    imagePath: categoryImagePath,
-                    color: categoryColor,
-                  ),
+                return CategoryContainerWithCheckbox(
+                  selected: selectedCategories[index],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCategories[index] = value!;
+                    });
+                  },
+                  categoryColor: categoryColor,
+                  categoryImagePath: categoryImagePath,
+                  title: credentialsId['Title'],
+                  category: tableName,
                 );
               },
             ),
@@ -192,70 +209,34 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.cancel, color: Colors.white),
-                  onPressed: () {
-                    // Handle cancel action
-                    Navigator.pop(context);
-                  },
-                ),
-                const Text('Cancel', style: TextStyle(color: Colors.white)),
-              ],
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.share, color: Colors.green),
-                  onPressed: () {
-                    // Handle share action
-                  },
-                ),
-                const Text('Share', style: TextStyle(color: Colors.white)),
-              ],
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    // Handle delete action
-                    deleteSelectedItems();
-                  },
-                ),
-                const Text('Delete', style: TextStyle(color: Colors.white)),
-              ],
-            ),
+            _buildBottomAppBarColumn(Icons.cancel, 'Cancel', () {
+              Navigator.pop(context);
+            }),
+            _buildBottomAppBarColumn(Icons.share, 'Share', () {
+              // Handle share action
+            }),
+            _buildBottomAppBarColumn(Icons.delete, 'Delete', () {
+              deleteSelectedItems();
+            }),
           ],
         ),
       ),
     );
   }
 
-  void deleteSelectedItems() async {
-    List<String> selectedCategoryIds = getSelectedCategoryIds();
-
-    try {
-      // Move selected items to Recycle Bin
-      await moveToRecycleBin(selectedCategoryIds);
-
-      // Remove selected items from the local list
-      setState(() {
-        allCategories.removeWhere((item) =>
-            selectedCategoryIds.contains(item['DocumentID']));
-        selectedCategories =
-            List.generate(allCategories.length, (index) => false);
-      });
-    } catch (e) {
-      print('Error deleting items: $e');
-      // Handle error as needed
-    }
-
-    Navigator.pop(context);
+  Column _buildBottomAppBarColumn(
+      IconData icon, String label, VoidCallback onTap) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: Icon(icon,
+              color: icon == Icons.delete ? Colors.red : Colors.white),
+          onPressed: onTap,
+        ),
+        Text(label, style: TextStyle(color: Colors.white)),
+      ],
+    );
   }
 
   Color getCategoryColor(String tableName) {
@@ -298,5 +279,41 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
       default:
         return "assets/images/icons/default.png";
     }
+  }
+}
+
+class CategoryContainerWithCheckbox extends StatelessWidget {
+  const CategoryContainerWithCheckbox({
+    Key? key,
+    required this.selected,
+    required this.onChanged,
+    required this.categoryColor,
+    required this.categoryImagePath,
+    required this.title,
+    required this.category,
+  }) : super(key: key);
+
+  final bool selected;
+  final ValueChanged<bool?> onChanged;
+  final Color categoryColor;
+  final String categoryImagePath;
+  final String title;
+  final String category;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      tileColor: selected ? Colors.grey[200] : null,
+      leading: Checkbox(
+        value: selected,
+        onChanged: onChanged,
+      ),
+      title: CategoryContainer(
+        title: title,
+        category: category,
+        imagePath: categoryImagePath,
+        color: categoryColor,
+      ),
+    );
   }
 }
