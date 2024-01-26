@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/components/home_components/category_container/details_pages/cert_details.dart';
 import 'package:certracker/components/home_components/category_container/details_pages/ceu_details.dart';
@@ -17,6 +19,10 @@ import 'package:certracker/components/home_components/category_container/edit/tr
 import 'package:certracker/components/home_components/category_container/edit/vaccination_edit.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:pdf/widgets.dart' as pw;
+// import 'pdf_utils.dart';
 
 class DetailsPage extends StatefulWidget {
   final String title;
@@ -59,31 +65,88 @@ class _DetailsPageState extends State<DetailsPage> {
                 credentialsId: details['credentialsId'],
               );
             case 'License':
-              return EditLicensePage(initialDetails: details,
-                credentialsId: details['credentialsId'],);
+              return EditLicensePage(
+                initialDetails: details,
+                credentialsId: details['credentialsId'],
+              );
             case 'Education':
-              return EditEducationPage(initialDetails: details,
-                credentialsId: details['credentialsId'],);
+              return EditEducationPage(
+                initialDetails: details,
+                credentialsId: details['credentialsId'],
+              );
             case 'Vaccination':
-              return EditVaccinationPage(initialDetails: details,
-                credentialsId: details['credentialsId'],);
+              return EditVaccinationPage(
+                initialDetails: details,
+                credentialsId: details['credentialsId'],
+              );
             case 'Travel':
-              return EditTravelPage(initialDetails: details,
-                credentialsId: details['credentialsId'],);
+              return EditTravelPage(
+                initialDetails: details,
+                credentialsId: details['credentialsId'],
+              );
             case 'CEU':
               return EditCEUPage(
                 initialDetails: details,
                 credentialsId: details['credentialsId'],
               );
             case 'Others':
-              return EditOthersPage(initialDetails: details,
-                credentialsId: details['credentialsId'],);
+              return EditOthersPage(
+                initialDetails: details,
+                credentialsId: details['credentialsId'],
+              );
             default:
               return const Text('Edit form not available for this category.');
           }
         },
       ),
     );
+  }
+
+ Future<void> _handleShare(Map<String, dynamic> details) async {
+    try {
+      // Create PDF document
+      final pdf = pw.Document();
+
+      // Use a switch statement or a map to determine which details page to use
+      pw.Widget pdfContent;
+      switch (widget.category) {
+        case 'Certification':
+          pdfContent = CertificationDetails(details: details).buildPdfContent();
+          break;
+        case 'License':
+          pdfContent = LicenseDetails(details: details).buildPdfContent();
+          break;
+        case 'Education':
+          pdfContent = EducationDetails(details: details).buildPdfContent();
+          break;
+        case 'Vaccination':
+          pdfContent = VaccinationDetails(details: details).buildPdfContent();
+          break;
+        case 'Travel':
+          pdfContent = TravelDetails(details: details).buildPdfContent();
+          break;
+        case 'CEU':
+          pdfContent = CEUDetails(details: details).buildPdfContent();
+          break;
+        case 'Others':
+          pdfContent = OthersDetails(details: details).buildPdfContent();
+          break;
+        default:
+          throw Exception('PDF content not available for this category.');
+      }
+
+      pdf.addPage(pw.Page(build: (pw.Context context) => pdfContent));
+
+      // Save PDF to a temporary file
+      final tempPath = (await getTemporaryDirectory()).path;
+      final pdfFile = File('$tempPath/${widget.category.toLowerCase()}_details.pdf');
+      await pdfFile.writeAsBytes(await pdf.save());
+
+      // Share the PDF file
+      await Share.shareFiles([pdfFile.path], text: '${widget.category} Details PDF');
+    } catch (e) {
+      print('Error sharing details: $e');
+    }
   }
 
   Future<Map<String, dynamic>> fetchDetails() async {
@@ -195,8 +258,10 @@ class _DetailsPageState extends State<DetailsPage> {
                           ),
                           IconButton(
                             icon: const Icon(Icons.share),
-                            onPressed: () {
-                              // Handle share action
+                            onPressed: () async {
+                              // Use fetchData to get the details
+                              Map<String, dynamic> details = await fetchData;
+                              _handleShare(details);
                             },
                             color:
                                 Colors.white, // Set share icon color to white
