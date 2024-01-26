@@ -125,7 +125,7 @@ void _navigateToRecycleBinPage() {
     String firstName = userDetails?['firstName'] ?? '';
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(150.0),
+        preferredSize: const Size.fromHeight(170.0),
         child: AppBar(
           automaticallyImplyLeading: false,
           elevation: 4,
@@ -174,7 +174,7 @@ void _navigateToRecycleBinPage() {
                 elevation: 4,
                 shadowColor: Colors.grey,
                 child: Container(
-                  height: 50,
+                  height: 70,
                   color: Colors.white,
                   child: SingleChildScrollView(
                     scrollDirection:
@@ -280,13 +280,15 @@ class FilterItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (imagePath != null)
               Image.asset(
                 imagePath!,
+                width: 30,
+                height: 30,
               ),
             if (text != null)
               Text(
@@ -298,7 +300,7 @@ class FilterItem extends StatelessWidget {
             if (isSelected)
               Container(
                 height: 2,
-                width: 25,
+                width: 30,
                 color: const Color(0xFF591A8F),
                 margin: const EdgeInsets.only(top: 7),
               ),

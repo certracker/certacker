@@ -11,7 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
 class CertificationForm extends StatefulWidget {
-  const CertificationForm({Key? key});
+  const CertificationForm({super.key});
 
   @override
   State<CertificationForm> createState() => _CertificationFormState();
@@ -65,9 +65,9 @@ class _CertificationFormState extends State<CertificationForm> {
     }
 
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      'your_channel_id',
-      'Reminder Channel',
-      channelDescription: 'Channel for reminders',
+      "ReminderID",
+      "Reminder",
+      channelDescription: "This is to remind you about your credentials expiration.",
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -76,8 +76,25 @@ class _CertificationFormState extends State<CertificationForm> {
       android: androidPlatformChannelSpecifics,
     );
 
+    int notificationId;
+
+    // Assign unique notification ID based on reminder type
+    switch (reminderType) {
+      case 'First Reminder':
+        notificationId = 1;
+        break;
+      case 'Second Reminder':
+        notificationId = 2;
+        break;
+      case 'Final Reminder':
+        notificationId = 3;
+        break;
+      default:
+        notificationId = 0; // Default ID
+    }
+
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
+      notificationId, // Use unique ID for each reminder type
       'Reminder',
       reminderMessage, // Notification body
       tz.TZDateTime.from(selectedDate, tz.local),
@@ -178,8 +195,7 @@ class _CertificationFormState extends State<CertificationForm> {
             ),
             readOnly: true,
             onTap: () async {
-              await selectDateAndSetReminder(
-                  'First Reminder', certificationFirstReminderController);
+              await selectFirstReminderDate();
             },
           ),
           const SizedBox(height: 16),
@@ -192,8 +208,7 @@ class _CertificationFormState extends State<CertificationForm> {
             ),
             readOnly: true,
             onTap: () async {
-              await selectDateAndSetReminder(
-                  'Second Reminder', certificationSecondReminderController);
+              await selectSecondReminderDate();
             },
           ),
           const SizedBox(height: 16),
@@ -206,8 +221,7 @@ class _CertificationFormState extends State<CertificationForm> {
             ),
             readOnly: true,
             onTap: () async {
-              await selectDateAndSetReminder(
-                  'Final Reminder', certificationFinalReminderController);
+              await selectFinalReminderDate();
             },
           ),
           const SizedBox(height: 42),
@@ -335,9 +349,6 @@ class _CertificationFormState extends State<CertificationForm> {
             alignment: Alignment.center,
             child: GestureDetector(
               onTap: () async {
-                await selectDateAndSetReminder(
-                    'First Reminder', certificationFirstReminderController);
-
                 if (_formKey.currentState?.validate() ?? false) {
                   setState(() {
                     isLoading = true;
@@ -444,6 +455,21 @@ class _CertificationFormState extends State<CertificationForm> {
         }
       });
     }
+  }
+
+  Future<void> selectFirstReminderDate() async {
+    await selectDateAndSetReminder(
+        'First Reminder', certificationFirstReminderController);
+  }
+
+  Future<void> selectSecondReminderDate() async {
+    await selectDateAndSetReminder(
+        'Second Reminder', certificationSecondReminderController);
+  }
+
+  Future<void> selectFinalReminderDate() async {
+    await selectDateAndSetReminder(
+        'Final Reminder', certificationFinalReminderController);
   }
 
   Future<void> selectDateAndSetReminder(

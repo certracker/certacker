@@ -247,13 +247,7 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                 // Image upload for Front
                 GestureDetector(
                   onTap: () async {
-                    final XFile? pickedFile = await ImagePicker()
-                        .pickImage(source: ImageSource.gallery);
-                    if (pickedFile != null) {
-                      setState(() {
-                        frontImageUrl = pickedFile.path;
-                      });
-                    }
+                    await pickImageAndSetUrl('front');
                   },
                   child: Container(
                     width: 400,
@@ -285,6 +279,7 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                           ),
                   ),
                 ),
+
                 const SizedBox(height: 16),
                 const Text(
                   "Back",
@@ -294,15 +289,10 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Image upload for Back
                 GestureDetector(
                   onTap: () async {
-                    final XFile? pickedFile = await ImagePicker()
-                        .pickImage(source: ImageSource.gallery);
-                    if (pickedFile != null) {
-                      setState(() {
-                        backImageUrl = pickedFile.path;
-                      });
-                    }
+                    await pickImageAndSetUrl('back');
                   },
                   child: Container(
                     width: 400,
@@ -334,6 +324,7 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                           ),
                   ),
                 ),
+                const SizedBox(height: 42),
                 const Text(
                   "Private Note",
                   style: TextStyle(
@@ -390,9 +381,9 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                         try {
                           // Call the service to update the existing data
                           await CertificationService.updateCertificationData(
-                             credentialsId:
+                            credentialsId:
                                 widget.initialDetails['credentialsId'],
-                                userId: AuthenticationService().getCurrentUserId()!, 
+                            userId: AuthenticationService().getCurrentUserId()!,
                             updatedData: {
                               'Title': certificationName,
                               'certificationNumber': certificationNumber,
@@ -464,83 +455,17 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
     );
   }
 
-  Widget buildImagePicker(String labelText, TextEditingController controller) {
-    return GestureDetector(
-      onTap: () async {
-        final XFile? pickedFile =
-            await ImagePicker().pickImage(source: ImageSource.gallery);
-        if (pickedFile != null) {
-          setState(() {
-            controller.text = pickedFile.path;
-          });
+  Future<void> pickImageAndSetUrl(String type) async {
+    final XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        if (type == 'front') {
+          frontImageUrl = pickedFile.path;
+        } else {
+          backImageUrl = pickedFile.path;
         }
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            labelText,
-            style: const TextStyle(
-              fontSize: 14.0,
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          Container(
-            width: 400,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (controller.text.isNotEmpty)
-                  Image.file(
-                    File(controller.text),
-                    width: 400,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-                if (_isNetworkUrl(controller.text))
-                  Image.network(
-                    controller.text,
-                    width: 400,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-                if (controller.text.isEmpty && !_isNetworkUrl(controller.text))
-                  const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.camera_alt, size: 40),
-                        SizedBox(height: 8),
-                        Text(
-                          "Add image",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "Supported formats: JPEG, PNG, JPG",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16.0),
-        ],
-      ),
-    );
-  }
-
-  bool _isNetworkUrl(String url) {
-    return url.startsWith('http://') || url.startsWith('https://');
+      });
+    }
   }
 }

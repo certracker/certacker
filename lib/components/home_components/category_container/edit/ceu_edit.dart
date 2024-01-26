@@ -153,15 +153,10 @@ class _EditCEUPageState extends State<EditCEUPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Image upload for Front
                 GestureDetector(
                   onTap: () async {
-                    final XFile? pickedFile = await ImagePicker()
-                        .pickImage(source: ImageSource.gallery);
-                    if (pickedFile != null) {
-                      setState(() {
-                        frontImageUrl = pickedFile.path;
-                      });
-                    }
+                    await pickImageAndSetUrl('front');
                   },
                   child: Container(
                     width: 400,
@@ -193,6 +188,7 @@ class _EditCEUPageState extends State<EditCEUPage> {
                           ),
                   ),
                 ),
+
                 const SizedBox(height: 16),
                 const Text(
                   "Back",
@@ -202,15 +198,10 @@ class _EditCEUPageState extends State<EditCEUPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Image upload for Back
                 GestureDetector(
                   onTap: () async {
-                    final XFile? pickedFile = await ImagePicker()
-                        .pickImage(source: ImageSource.gallery);
-                    if (pickedFile != null) {
-                      setState(() {
-                        backImageUrl = pickedFile.path;
-                      });
-                    }
+                    await pickImageAndSetUrl('back');
                   },
                   child: Container(
                     width: 400,
@@ -384,5 +375,19 @@ class _EditCEUPageState extends State<EditCEUPage> {
         ),
       ),
     );
+  }
+
+  Future<void> pickImageAndSetUrl(String type) async {
+    final XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        if (type == 'front') {
+          frontImageUrl = pickedFile.path;
+        } else {
+          backImageUrl = pickedFile.path;
+        }
+      });
+    }
   }
 }

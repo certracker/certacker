@@ -157,14 +157,6 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                 ),
                 const SizedBox(height: 42),
                 const Text(
-                  "Upload Photo",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
                   "Front",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -172,15 +164,10 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Image upload for Front
                 GestureDetector(
                   onTap: () async {
-                    final XFile? pickedFile = await ImagePicker()
-                        .pickImage(source: ImageSource.gallery);
-                    if (pickedFile != null) {
-                      setState(() {
-                        frontImageUrl = pickedFile.path;
-                      });
-                    }
+                    await pickImageAndSetUrl('front');
                   },
                   child: Container(
                     width: 400,
@@ -191,6 +178,51 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                     ),
                     child: frontImageUrl != null
                         ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                        : const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.camera_alt, size: 40),
+                              SizedBox(height: 8),
+                              Text(
+                                "Add image",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                "Supported formats: JPEG, PNG, JPG",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+                const Text(
+                  "Back",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Image upload for Back
+                GestureDetector(
+                  onTap: () async {
+                    await pickImageAndSetUrl('back');
+                  },
+                  child: Container(
+                    width: 400,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: backImageUrl != null
+                        ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
                         : const Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -383,5 +415,19 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
         ),
       ),
     );
+  }
+
+  Future<void> pickImageAndSetUrl(String type) async {
+    final XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        if (type == 'front') {
+          frontImageUrl = pickedFile.path;
+        } else {
+          backImageUrl = pickedFile.path;
+        }
+      });
+    }
   }
 }

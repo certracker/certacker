@@ -19,8 +19,8 @@ class Noti {
       required FlutterLocalNotificationsPlugin fln}) async {
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         const AndroidNotificationDetails(
-      "big text channel id",
-      "big text channel name",
+      "ReminderID",
+      "Reminder",
       playSound: true,
       // sound: RawResourceAndroidNotificationSound("notification"),
       importance: Importance.max,
@@ -28,6 +28,8 @@ class Noti {
     );
 
     var not = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await fln.show(0, title, body, not, payload: payload);
+    await fln.show(
+        DateTime.now().millisecondsSinceEpoch % (1 << 31), title, body, not,
+        payload: payload);
   }
 }

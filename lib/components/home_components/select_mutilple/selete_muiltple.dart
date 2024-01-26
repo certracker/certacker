@@ -9,10 +9,10 @@ class SeleteMuiltple extends StatefulWidget {
   final String firstName;
 
   const SeleteMuiltple({
-    Key? key,
+    super.key,
     required this.profilePicture,
     required this.firstName,
-  }) : super(key: key);
+  });
 
   @override
   State<SeleteMuiltple> createState() => _SeleteMuiltpleState();
