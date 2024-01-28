@@ -23,7 +23,6 @@ class EducationDetails extends StatelessWidget {
             _buildRow(
               ['Field', details['educationField']],
               ['Graduation Date', details['graduationDate']],
-              ['Final Reminder', details['certificationFinalReminder']],
             ),
             const SizedBox(height: 16.0),
             _buildImageColumn('Front Image', details['frontImageUrl']),
@@ -132,7 +131,6 @@ class EducationDetails extends StatelessWidget {
         _buildPdfRow(
           ['Field', details['educationField']],
           ['Graduation Date', details['graduationDate']],
-          ['Final Reminder', details['certificationFinalReminder']],
         ),
         pw.SizedBox(height: 16.0),
         _buildPdfImageColumn('Front Image', details['frontImageUrl']),

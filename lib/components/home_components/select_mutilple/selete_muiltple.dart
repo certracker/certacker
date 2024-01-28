@@ -234,7 +234,7 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
               color: icon == Icons.delete ? Colors.red : Colors.white),
           onPressed: onTap,
         ),
-        Text(label, style: TextStyle(color: Colors.white)),
+        Text(label, style: const TextStyle(color: Colors.white)),
       ],
     );
   }
@@ -284,14 +284,14 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
 
 class CategoryContainerWithCheckbox extends StatelessWidget {
   const CategoryContainerWithCheckbox({
-    Key? key,
+    super.key,
     required this.selected,
     required this.onChanged,
     required this.categoryColor,
     required this.categoryImagePath,
     required this.title,
     required this.category,
-  }) : super(key: key);
+  });
 
   final bool selected;
   final ValueChanged<bool?> onChanged;

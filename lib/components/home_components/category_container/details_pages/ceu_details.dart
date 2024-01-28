@@ -23,7 +23,6 @@ class CEUDetails extends StatelessWidget {
             _buildRow(
               ['Number Of Contact Hour', details['ceuNumberOfContactHour']],
               ['Completion Date', details['ceuCompletionDate']],
-              ['Final Reminder', details['certificationFinalReminder']],
             ),
             const SizedBox(height: 16.0),
             _buildImageColumn('Front Image', details['frontImageUrl']),
@@ -132,7 +131,6 @@ class CEUDetails extends StatelessWidget {
         _buildPdfRow(
           ['Number Of Contact Hour', details['ceuNumberOfContactHour']],
           ['Completion Date', details['ceuCompletionDate']],
-          ['Final Reminder', details['certificationFinalReminder']],
         ),
         pw.SizedBox(height: 16.0),
         _buildPdfImageColumn('Front Image', details['frontImageUrl']),
