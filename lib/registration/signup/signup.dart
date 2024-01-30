@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:certracker/components/buttons/google_button.dart';
 import 'package:certracker/components/colors/app_colors.dart';
 import 'package:certracker/model/user/user_model.dart';
 import 'package:certracker/registration/complete_profile/complete_profile.dart';
 import 'package:certracker/registration/login/login.dart';
+import 'package:certracker/services/auth_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -294,18 +296,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    TextButton.icon(
-                      onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const VerificationPage()),
-                        // );
-                      },
-                      icon: const Icon(Icons.g_translate),
-                      label: const Text('Sign Up with Google',
-                          style: TextStyle(fontSize: 18)),
-                    ),
+                    GoogleButton(
+                        imagepath: "assets/images/signup/google-icon.png",
+                        onTap: () => AuthService().signInWithGoogle(context)),
                   ],
                 ),
               ),

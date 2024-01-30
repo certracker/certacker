@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:certracker/components/buttons/google_button.dart';
 import 'package:certracker/components/colors/app_colors.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:certracker/registration/forgetpd/enter_email.dart';
 import 'package:certracker/registration/signup/signup.dart';
+import 'package:certracker/services/auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -221,13 +223,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // Implement login with Google logic
-                      },
-                      icon: const Icon(Icons.g_translate),
-                      label: const Text('Login with Google', style: TextStyle(fontSize: 18)),
-                    ),
+                    GoogleButton(
+                        imagepath: "assets/images/signup/google-icon.png",
+                        onTap: () => AuthService().signInWithGoogle(context)),
                     const SizedBox(height: 80),
 
                     // Footer Section
