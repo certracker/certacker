@@ -242,9 +242,9 @@ class _CertificationFormState extends State<CertificationForm> {
           ),
           const SizedBox(height: 16),
           // Image upload for Front
-          GestureDetector(
+         GestureDetector(
             onTap: () async {
-              await pickImageAndSetUrl('front');
+              await showImageSourceDialog('front');
             },
             child: Container(
               width: 400,
@@ -289,7 +289,7 @@ class _CertificationFormState extends State<CertificationForm> {
           // Image upload for Back
           GestureDetector(
             onTap: () async {
-              await pickImageAndSetUrl('back');
+              await showImageSourceDialog('back');
             },
             child: Container(
               width: 400,
@@ -321,6 +321,7 @@ class _CertificationFormState extends State<CertificationForm> {
                     ),
             ),
           ),
+          const SizedBox(height: 42),
           const Text(
             "Private Note",
             style: TextStyle(
@@ -443,9 +444,43 @@ class _CertificationFormState extends State<CertificationForm> {
     );
   }
 
-  Future<void> pickImageAndSetUrl(String type) async {
-    final XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future<void> showImageSourceDialog(String type) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Image Source'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                  pickImageAndSetUrl(type, 'camera');
+                },
+                child: const Text('Camera'),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                  pickImageAndSetUrl(type, 'gallery');
+                },
+                child: const Text('Gallery'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> pickImageAndSetUrl(String type, String source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: source == 'camera' ? ImageSource.camera : ImageSource.gallery,
+    );
+
     if (pickedFile != null) {
       setState(() {
         if (type == 'front') {

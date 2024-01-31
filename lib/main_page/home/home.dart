@@ -10,6 +10,7 @@ import 'package:certracker/components/home_components/pages/all.dart';
 import 'package:certracker/components/home_components/pages/ceu.dart';
 import 'package:certracker/components/home_components/pages/others.dart';
 import 'package:certracker/components/home_components/recyle_bin/recyclebin.dart';
+import 'package:certracker/components/home_components/search/search_page.dart';
 import 'package:certracker/components/home_components/select_mutilple/selete_muiltple.dart';
 import 'package:flutter/material.dart';
 
@@ -74,27 +75,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _navigateToDeletePage() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => SeleteMuiltple(
-        profilePicture: userDetails?['profilePicture'] ?? '',
-        firstName: userDetails?['firstName'] ?? '',
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SeleteMuiltple(
+          profilePicture: userDetails?['profilePicture'] ?? '',
+          firstName: userDetails?['firstName'] ?? '',
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-void _navigateToRecycleBinPage() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => RecycleBinPage(
+  void _searchPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SearchPage(),
       ),
-    ),
-  );
-}
+    );
+  }
 
+  void _navigateToRecycleBinPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecycleBinPage(),
+      ),
+    );
+  }
 
   Widget _buildBottomSheetItem({
     required IconData icon,
@@ -155,9 +163,7 @@ void _navigateToRecycleBinPage() {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.search, color: Colors.white),
-                            onPressed: () {
-                              // Add notification icon onPressed action
-                            },
+                            onPressed: _searchPage,
                           ),
                           IconButton(
                             icon: const Icon(Icons.more_vert,

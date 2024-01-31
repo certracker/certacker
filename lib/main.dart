@@ -18,7 +18,7 @@ void main() async {
 
   tzdata.initializeTimeZones();
   tz.setLocalLocation(
-      tz.getLocation('Africa/Lagos'));
+      tz.getLocation("Africa/Lagos"));
 
   // Initialize Firebase
   await Firebase.initializeApp(
