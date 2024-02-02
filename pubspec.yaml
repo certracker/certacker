@@ -1,6 +1,6 @@
 name: certracker
 description: "CerTracker is your all-in-one platform designed to simplify and streamline the management of your healthcare certifications and credentials. Our platform is packed with features that enable healthcare workers to easily manage, monitor, and safeguard essential records, providing a seamless way to stay compliant and maintain peace of mind."
-version: 1.0.0+9
+version: 1.0.0+10
 homepage: https://www.certracker.com
 
 environment:
@@ -21,6 +21,7 @@ dependencies:
   firebase_storage: ^11.6.0
   flutter_svg: ^2.0.9
   pdf: ^3.10.7
+  printing: ^5.11.1
   share_plus: ^7.2.1
   path_provider: ^2.1.2
   http: ^1.2.0
