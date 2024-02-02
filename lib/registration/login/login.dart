@@ -104,7 +104,9 @@ class _LoginPageState extends State<LoginPage> {
               alignment: Alignment.topLeft,
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ).add(const EdgeInsets.symmetric(horizontal: 20)),
               child: Form(
                 key: _formKey, // Assign the form key to the Form widget
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -170,7 +172,8 @@ class _LoginPageState extends State<LoginPage> {
                               },
                               child: const Text(
                                 "Forgot Password?",
-                                style: TextStyle(color: Colors.red, fontSize: 16),
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 16),
                               ),
                             ),
                           ],
@@ -232,7 +235,10 @@ class _LoginPageState extends State<LoginPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Don’t have an account?", style: TextStyle(fontSize: 18),),
+                        const Text(
+                          "Don’t have an account?",
+                          style: TextStyle(fontSize: 18),
+                        ),
                         const SizedBox(width: 5),
                         TextButton(
                           onPressed: () {
@@ -249,7 +255,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),

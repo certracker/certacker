@@ -125,7 +125,11 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ).add(
+                const EdgeInsets.all(16.0),
+              ),
               child: Form(
                 key: _formKey, // Assign the form key to the Form widget
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -299,37 +303,36 @@ class _SignUpPageState extends State<SignUpPage> {
                     GoogleButton(
                         imagepath: "assets/images/signup/google-icon.png",
                         onTap: () => AuthService().signInWithGoogle(context)),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Already have an account?",
+                            style: TextStyle(fontSize: 18)),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginPage()),
+                            );
+                          },
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                              color: Colors
+                                  .blue, // Change the color to your desired color
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Already have an account?",
-                    style: TextStyle(fontSize: 18)),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginPage()),
-                    );
-                  },
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(
-                      color:
-                          Colors.blue, // Change the color to your desired color
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 50),
           ],
         ),
       ),
