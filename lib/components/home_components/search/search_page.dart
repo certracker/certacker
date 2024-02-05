@@ -36,13 +36,11 @@ class _SearchPageState extends State<SearchPage> {
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(
-                        color: Colors.grey),
+                    borderSide: const BorderSide(color: Colors.grey),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(
-                        color: Color(0XFF591A8F)),
+                    borderSide: const BorderSide(color: Color(0XFF591A8F)),
                   ),
                 ),
                 onChanged: _performSearch,
@@ -86,7 +84,7 @@ class _SearchPageState extends State<SearchPage> {
       return;
     }
 
-    fetchSearchData(query);
+    fetchSearchData(query.toLowerCase());
   }
 
   Future<void> fetchSearchData(String query) async {
@@ -102,45 +100,38 @@ class _SearchPageState extends State<SearchPage> {
           FirebaseFirestore.instance
               .collection('Certification')
               .where('userId', isEqualTo: userId)
-              .where('Title', isGreaterThanOrEqualTo: query)
-              .where('Title', isLessThan: '${query}z')
-              .get(),
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
           FirebaseFirestore.instance
               .collection('License')
               .where('userId', isEqualTo: userId)
-              .where('Title', isGreaterThanOrEqualTo: query)
-              .where('Title', isLessThan: '${query}z')
-              .get(),
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
           FirebaseFirestore.instance
               .collection('Education')
               .where('userId', isEqualTo: userId)
-              .where('Title', isGreaterThanOrEqualTo: query)
-              .where('Title', isLessThan: '${query}z')
-              .get(),
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
           FirebaseFirestore.instance
               .collection('Vaccination')
               .where('userId', isEqualTo: userId)
-              .where('Title', isGreaterThanOrEqualTo: query)
-              .where('Title', isLessThan: '${query}z')
-              .get(),
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
           FirebaseFirestore.instance
               .collection('Travel')
               .where('userId', isEqualTo: userId)
-              .where('Title', isGreaterThanOrEqualTo: query)
-              .where('Title', isLessThan: '${query}z')
-              .get(),
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
           FirebaseFirestore.instance
               .collection('CEU')
               .where('userId', isEqualTo: userId)
-              .where('Title', isGreaterThanOrEqualTo: query)
-              .where('Title', isLessThan: '${query}z')
-              .get(),
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
           FirebaseFirestore.instance
               .collection('Others')
               .where('userId', isEqualTo: userId)
-              .where('Title', isGreaterThanOrEqualTo: query)
-              .where('Title', isLessThan: '${query}z')
-              .get(),
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
         ]);
 
         List<Map<String, dynamic>> userData = [];

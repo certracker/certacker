@@ -229,7 +229,7 @@ class CertificationService {
     String tableName = 'Certification';
     String credentialsId = SaveDataService.generateUniqueCredentialsId();
     Map<String, dynamic> data = {
-      'Title': certificationName,
+      'Title': certificationName.toLowerCase(),
       'certificationNumber': certificationNumber,
       'frontImageUrl': frontImageUrl,
       'backImageUrl': backImageUrl,
@@ -299,7 +299,7 @@ class LicenseService {
 
     if (userId != null) {
       Map<String, dynamic> data = {
-        'Title': licenseName,
+        'Title': licenseName.toLowerCase(),
         'licenseNumber': licenseNumber,
         'frontImageUrl': frontImageUrl,
         'backImageUrl': backImageUrl,
@@ -365,7 +365,7 @@ class EducationService {
 
     if (userId != null) {
       Map<String, dynamic> data = {
-        'Title': educationName,
+        'Title': educationName.toLowerCase(),
         'educationDegree': educationDegree,
         'startDate': startDate,
         'educationField': educationField,
@@ -429,7 +429,7 @@ class CEUCMEService {
       Map<String, dynamic> data = {
         'frontImageUrl': frontImageUrl,
         'backImageUrl': backImageUrl,
-        'Title': ceuProgramTitle,
+        'Title': ceuProgramTitle.toLowerCase(),
         'ceuProviderName': ceuProviderName,
         'ceuNumberOfContactHour': ceuNumberOfContactHour,
         'ceuCompletionDate': ceuCompletionDate,
@@ -492,7 +492,7 @@ class OthersService {
 
     if (userId != null) {
       Map<String, dynamic> data = {
-        'Title': othersName,
+        'Title': othersName.toLowerCase(),
         // 'othersDetails': othersDetails,
         'frontImageUrl': frontImageUrl,
         'backImageUrl': backImageUrl,
@@ -567,7 +567,7 @@ class TravelService {
         'issueDate': issueDate,
         'expiryDate': expiryDate,
         'travelPrivateNote': travelPrivateNote,
-        'Title': documentType,
+        'Title': documentType.toLowerCase(),
         // Add other fields for Travel
       };
 
@@ -625,7 +625,7 @@ class VaccinationService {
 
     if (userId != null) {
       Map<String, dynamic> data = {
-        'Title': vaccinationType,
+        'Title': vaccinationType.toLowerCase(),
         'vaccinationManufacturer': vaccinationManufacturer,
         'frontImageUrl': frontImageUrl,
         'backImageUrl': backImageUrl,
