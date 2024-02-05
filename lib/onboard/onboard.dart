@@ -106,7 +106,7 @@ class _OnBoardState extends State<OnBoard> {
                           );
                         },
                         child: const Text(
-                          'Skip',
+                          'Next',
                           style: TextStyle(color: Colors.black, fontSize: 18),
                         ),
                       ),

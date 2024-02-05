@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/save_data_service.dart';
 import 'package:certracker/components/home_components/category_container/category_container.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class SeleteMuiltple extends StatefulWidget {
   final String profilePicture;
@@ -40,16 +45,16 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
   }
 
   List<String> getSelectedCategoryIds() {
-  List<String> selectedIds = [];
-  for (int i = 0; i < selectedCategories.length; i++) {
-    if (selectedCategories[i] &&
-        allCategories[i]['DocumentID'] != null) { // Check for null
-      selectedIds.add(allCategories[i]['DocumentID']!); // Use the non-null assertion operator (!)
+    List<String> selectedIds = [];
+    for (int i = 0; i < selectedCategories.length; i++) {
+      if (selectedCategories[i] && allCategories[i]['DocumentID'] != null) {
+        // Check for null
+        selectedIds.add(allCategories[i]
+            ['DocumentID']!); // Use the non-null assertion operator (!)
+      }
     }
+    return selectedIds;
   }
-  return selectedIds;
-}
-
 
   Future<void> fetchUserData() async {
     try {
@@ -134,6 +139,95 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
     Navigator.pop(context);
   }
 
+  Future<void> _sharePdf(BuildContext context) async {
+    List<Map<String, dynamic>> selectedItems = [];
+    for (int i = 0; i < selectedCategories.length; i++) {
+      if (selectedCategories[i] && allCategories[i]['DocumentID'] != null) {
+        selectedItems.add(allCategories[i]);
+      }
+    }
+
+    if (selectedItems.isNotEmpty) {
+      await _generatePdfFromSelectedItems(selectedItems);
+    } else {
+      // Handle case where no items are selected
+      // You can show a snackbar or alert to notify the user
+    }
+  }
+
+  Future<void> _generatePdfFromSelectedItems(
+      List<Map<String, dynamic>> selectedItems) async {
+    // Create PDF document
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) =>
+            _buildPdfContentFromSelectedItems(selectedItems),
+      ),
+    );
+
+    // Save PDF to a temporary file
+    final tempPath = (await getTemporaryDirectory()).path;
+    final pdfFile = File('$tempPath/selected_items.pdf');
+    await pdfFile.writeAsBytes(await pdf.save());
+
+    // Share the PDF file
+    await Share.shareFiles([pdfFile.path], text: 'Selected Items PDF');
+  }
+
+  pw.Widget _buildPdfContentFromSelectedItems(
+      List<Map<String, dynamic>> selectedItems) {
+    return pw.Column(
+      children: [
+        for (var selectedItem in selectedItems)
+          _buildPdfRow(
+            ['Credential Name', selectedItem['Title']],
+            ['Credential Record Number', selectedItem['otherNumber']],
+            ['Issue Date', selectedItem['otherIssueDate']],
+          ),
+      ],
+    );
+  }
+
+  pw.Widget _buildPdfRow(List<String> leftFields, List<dynamic> leftValues,
+      [List<String>? rightFields, List<dynamic>? rightValues]) {
+    return pw.Row(
+      children: [
+        pw.Expanded(child: _buildPdfFieldColumn(leftFields, leftValues)),
+        if (rightFields != null && rightValues != null)
+          pw.Expanded(child: _buildPdfFieldColumn(rightFields, rightValues)),
+      ],
+    );
+  }
+
+  pw.Widget _buildPdfFieldColumn(List<String> fields, List<dynamic> values) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: List.generate(fields.length, (index) {
+        return pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              fields[index], // Field name
+              style: const pw.TextStyle(
+                fontSize: 14.0,
+              ),
+            ),
+            pw.SizedBox(height: 8.0),
+            pw.Text(
+              values[index].toString(), // Field value
+              style: pw.TextStyle(
+                fontSize: 16.0,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            pw.SizedBox(height: 16.0),
+          ],
+        );
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -213,7 +307,9 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
               Navigator.pop(context);
             }),
             _buildBottomAppBarColumn(Icons.share, 'Share', () {
-              // Handle share action
+              _sharePdf(
+                context,
+              );
             }),
             _buildBottomAppBarColumn(Icons.delete, 'Delete', () {
               deleteSelectedItems();
