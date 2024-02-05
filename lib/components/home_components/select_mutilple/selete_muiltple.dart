@@ -140,18 +140,21 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
   }
 
   Future<void> _sharePdf(BuildContext context) async {
+    print('Sharing PDF...:$selectedCategories');
+    print('All categories: $allCategories');
+
     List<Map<String, dynamic>> selectedItems = [];
     for (int i = 0; i < selectedCategories.length; i++) {
-      if (selectedCategories[i] && allCategories[i]['DocumentID'] != null) {
+      if (selectedCategories[i]) {
         selectedItems.add(allCategories[i]);
       }
     }
 
     if (selectedItems.isNotEmpty) {
+      print('Selected items: $selectedItems');
       await _generatePdfFromSelectedItems(selectedItems);
     } else {
-      // Handle case where no items are selected
-      // You can show a snackbar or alert to notify the user
+      print('No selected items.');
     }
   }
 
@@ -182,8 +185,8 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
         for (var selectedItem in selectedItems)
           _buildPdfRow(
             ['Credential Name', selectedItem['Title']],
-            ['Credential Record Number', selectedItem['otherNumber']],
-            ['Issue Date', selectedItem['otherIssueDate']],
+            ['Front Image', ['frontImageUrl']],
+            ['Back Image', selectedItem['backImageUrl']],
           ),
       ],
     );
