@@ -23,15 +23,15 @@ class VaccinationDetails extends StatelessWidget {
             _buildRow(['Lot Number', details['vaccineLotNumber']],
                 ['Issue Date', details['vaccineIssueDate']],
                 ['Expiry Date', details['vaccineExpiryDate']]),
+             const SizedBox(height: 16.0),
+            _buildFrontImageColumn('Front Image', details['frontImageUrl']),
             const SizedBox(height: 16.0),
-            _buildImageColumn('Front Image', details['frontImageUrl']),
+            _buildBackImageColumn('Back Image', details['backImageUrl']),
             const SizedBox(height: 16.0),
-            _buildImageColumn('Back Image', details['backImageUrl']),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () => _sharePdf(context),
-              child: const Text('Share as PDF'),
-            ),
+            // ElevatedButton(
+            //   onPressed: () => _sharePdf(context),
+            //   child: const Text('Share as PDF'),
+            // ),
           ],
         ),
       ),
@@ -77,12 +77,36 @@ class VaccinationDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildImageColumn(String title, String imageUrl) {
+   Widget _buildFrontImageColumn(String title, String imageUrl) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Front Image',
+          style: TextStyle(
+            fontSize: 14.0,
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        SizedBox(
+          width: 400,
+          height: 200,
+          child: Image.network(
+            imageUrl,
+            width: 150, // Set the width as per your design
+            height: 150, // Set the height as per your design
+            fit: BoxFit.cover,
+          ),
+        ),
+      ],
+    );
+  }
+ Widget _buildBackImageColumn(String title, String imageUrl) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Back Image',
           style: TextStyle(
             fontSize: 14.0,
           ),
@@ -130,10 +154,10 @@ class VaccinationDetails extends StatelessWidget {
         _buildPdfRow(['Lot Number', details['vaccineLotNumber']],
             ['Issue Date', details['vaccineIssueDate']],
             ['Expiry Date', details['vaccineExpiryDate']]),
+         pw.SizedBox(height: 16.0),
+        _buildPdfFrontImageColumn('Front Image', details['frontImageUrl']),
         pw.SizedBox(height: 16.0),
-        _buildPdfImageColumn('Front Image', details['frontImageUrl']),
-        pw.SizedBox(height: 16.0),
-        _buildPdfImageColumn('Back Image', details['backImageUrl']),
+        _buildPdfBackImageColumn('Back Image', details['backImageUrl']),
       ],
     );
   }
@@ -177,7 +201,27 @@ class VaccinationDetails extends StatelessWidget {
     );
   }
 
-  pw.Widget _buildPdfImageColumn(String title, String imageUrl) {
+  pw.Widget _buildPdfFrontImageColumn(String title, String imageUrl) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          title,
+          style: const pw.TextStyle(
+            fontSize: 14.0,
+          ),
+        ),
+        pw.SizedBox(height: 8.0),
+        // pw.Container(
+        //   width: 150,
+        //   height: 150,
+        //   child: pw.Image(pw.NetworkImage(imageUrl)),
+        // ),
+      ],
+    );
+  }
+
+   pw.Widget _buildPdfBackImageColumn(String title, String imageUrl) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [

@@ -186,7 +186,7 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
           _buildPdfRow(
             ['Credential Name', selectedItem['Title']],
             ['Front Image', ['frontImageUrl']],
-            ['Back Image', selectedItem['backImageUrl']],
+            ['Back Imagec', selectedItem['backImageUrl']],
           ),
       ],
     );

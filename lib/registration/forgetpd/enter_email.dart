@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordEmailScreen extends StatefulWidget {
-  ForgotPasswordEmailScreen({super.key});
+  const ForgotPasswordEmailScreen({super.key});
 
   @override
   _ForgotPasswordEmailScreenState createState() => _ForgotPasswordEmailScreenState();

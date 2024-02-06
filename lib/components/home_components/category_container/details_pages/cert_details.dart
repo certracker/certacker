@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
 
 class CertificationDetails extends StatelessWidget {
   final Map<String, dynamic> details;
@@ -30,14 +31,14 @@ class CertificationDetails extends StatelessWidget {
             _buildRow(['Issue Date', details['certificationIssueDate']],
                 ['Expiry Date', details['certificationExpiryDate']]),
             const SizedBox(height: 16.0),
-            _buildImageColumn('Front Image', details['frontImageUrl']),
+            _buildFrontImageColumn('Front Image', details['frontImageUrl']),
             const SizedBox(height: 16.0),
-            _buildImageColumn('Back Image', details['backImageUrl']),
+            _buildBackImageColumn('Back Image', details['backImageUrl']),
             const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () => _sharePdf(context),
-              child: const Text('Share as PDF'),
-            ),
+            // ElevatedButton(
+            //   onPressed: () => _sharePdf(context),
+            //   child: const Text('Share as PDF'),
+            // ),
           ],
         ),
       ),
@@ -83,7 +84,7 @@ class CertificationDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildImageColumn(String title, String imageUrl) {
+  Widget _buildFrontImageColumn(String title, String imageUrl) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -106,6 +107,50 @@ class CertificationDetails extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _buildBackImageColumn(String title, String imageUrl) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Back Image',
+          style: TextStyle(
+            fontSize: 14.0,
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        SizedBox(
+          width: 400,
+          height: 200,
+          child: Image.network(
+            imageUrl,
+            width: 150, // Set the width as per your design
+            height: 150, // Set the height as per your design
+            fit: BoxFit.cover,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _downloadAndSaveImage(String imageUrl, String fileName) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    final bytes = response.bodyBytes;
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/$fileName');
+    await file.writeAsBytes(bytes);
+  }
+
+  Future<String> _getLocalImagePath(String imageUrl) async {
+    final fileName = imageUrl.split('/').last;
+    final localPath = '${(await getTemporaryDirectory()).path}/$fileName';
+
+    if (!File(localPath).existsSync()) {
+      await _downloadAndSaveImage(imageUrl, fileName);
+    }
+
+    return localPath;
   }
 
   Future<void> _sharePdf(BuildContext context) async {
@@ -142,9 +187,9 @@ class CertificationDetails extends StatelessWidget {
         _buildPdfRow(['Issue Date', details['certificationIssueDate']],
             ['Expiry Date', details['certificationExpiryDate']]),
         pw.SizedBox(height: 16.0),
-        _buildPdfImageColumn('Front Image', details['frontImageUrl']),
+        _buildPdfFontImageColumn('Front Image', details['frontImageUrl']),
         pw.SizedBox(height: 16.0),
-        _buildPdfImageColumn('Back Image', details['backImageUrl']),
+        _buildPdfBackImageColumn('Back Image', details['backImageUrl']),
       ],
     );
   }
@@ -188,7 +233,27 @@ class CertificationDetails extends StatelessWidget {
     );
   }
 
-  pw.Widget _buildPdfImageColumn(String title, String imageUrl) {
+  pw.Widget _buildPdfFontImageColumn(String title, String imageUrl) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          title,
+          style: const pw.TextStyle(
+            fontSize: 14.0,
+          ),
+        ),
+        pw.SizedBox(height: 8.0),
+        // pw.Container(
+        //   width: 150,
+        //   height: 150,
+        //   child: pw.Image(pw.NetworkImage(imageUrl)),
+        // ),
+      ],
+    );
+  }
+
+  pw.Widget _buildPdfBackImageColumn(String title, String imageUrl) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
