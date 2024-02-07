@@ -37,6 +37,13 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
   }
 
   String getTableNameFromCredentialsId(String credentialsId) {
+    for (var category in allCategories) {
+      if (category['DocumentID'] == credentialsId) {
+        print('Found $credentialsId in table ${category['tableName']}');
+        return category['tableName'];
+      }
+    }
+    print('Table name not found for $credentialsId');
     return 'UnknownTable';
   }
 
@@ -104,25 +111,81 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
   }
 
   Future<void> deleteSelectedItems() async {
+    List<Map<String, dynamic>> selectedItems = [];
+    for (int i = 0; i < selectedCategories.length; i++) {
+      if (selectedCategories[i]) {
+        selectedItems.add(allCategories[i]);
+      }
+    }
     try {
       List<String> selectedIds = getSelectedCategoryIds();
 
-      for (String credentialsId in selectedIds) {
-        String tableName = getTableNameFromCredentialsId(credentialsId);
-        await SaveDataService.deleteData(tableName, credentialsId);
+      if (selectedIds.isNotEmpty) {
+        // Show a confirmation dialog before deletion
+        bool confirmed = await _showDeleteConfirmationDialog();
+
+        if (confirmed) {
+          // Set isLoading to true to show a loading indicator
+          setState(() {
+            isLoading = true;
+          });
+
+          for (String credentialsId in selectedIds) {
+            String tableName = getTableNameFromCredentialsId(credentialsId);
+            print('Deleting $credentialsId from $tableName');
+            await SaveDataService.deleteData(tableName, credentialsId);
+          }
+
+          // Fetch user data again to update the UI
+          await fetchUserData();
+
+          // Reset the selected categories list and isLoading
+          setState(() {
+            selectedCategories =
+                List.generate(allCategories.length, (index) => false);
+            isLoading = false;
+          });
+        }
+      } else {
+        print('No selected items.');
       }
-
-      // Fetch user data again to update the UI
-      await fetchUserData();
-
-      // Reset the selected categories list
-      setState(() {
-        selectedCategories =
-            List.generate(allCategories.length, (index) => false);
-      });
     } catch (e) {
       print('Error deleting selected items: $e');
+      // Reset isLoading on error
+      setState(() {
+        isLoading = false;
+      });
     }
+  }
+
+  Future<bool> _showDeleteConfirmationDialog() async {
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Confirmation'),
+          content: const Text(
+            'Are you sure you want to delete selected files? Once deleted, you cannot recover them.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // Close the dialog with result 'false'
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); // Close the dialog with result 'true'
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _sharePdf(BuildContext context) async {

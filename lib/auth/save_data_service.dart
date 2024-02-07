@@ -33,23 +33,22 @@ class SaveDataService {
   }
 
   static Future<void> deleteData(String tableName, String credentialsId) async {
-    try {
-      await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp();
 
-      CollectionReference tableCollection =
-          FirebaseFirestore.instance.collection(tableName);
+    CollectionReference tableCollection = FirebaseFirestore.instance.collection(tableName);
 
-      DocumentReference documentReference = tableCollection.doc(credentialsId);
+    DocumentReference documentReference = tableCollection.doc(credentialsId);
 
-      // Delete the document
-      await documentReference.delete();
+    // Delete the document
+    await documentReference.delete();
 
-      print('Document deleted successfully!');
-    } catch (e) {
-      print('Error deleting document: $e');
-      throw Exception('Error deleting document');
-    }
+    print('Document deleted successfully!');
+  } catch (e) {
+    print('Error deleting document: $e');
+    throw Exception('Error deleting document: $e');
   }
+}
 
   static Future<void> updateData({
     required String tableName,
