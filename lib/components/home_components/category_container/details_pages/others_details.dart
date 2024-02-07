@@ -14,17 +14,47 @@ class OthersDetails extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRow(['Credential Name', details['Title']],
-                ['Credential Record Number', details['otherNumber']]),
+            _buildRow([
+              'Credential Name'
+            ], [
+              details['Title'],
+            ]),
             const SizedBox(height: 16.0),
-            _buildRow(
-              ['First Reminder', details['otherFirstReminder']],
-              ['Second Reminder', details['otherSecondReminder']],
-              ['Final Reminder', details['otherFinalReminder']],
-            ),
+            _buildRow([
+              'Credential Record Number'
+            ], [
+              details['otherNumber'],
+            ]),
             const SizedBox(height: 16.0),
-            _buildRow(['Issue Date', details['otherIssueDate']],
-                ['Expiry Date', details['otherExpiryDate']]),
+            _buildRow([
+              'First Reminder'
+            ], [
+              details['otherFirstReminder'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Second Reminder'
+            ], [
+              details['otherSecondReminder'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Final Reminder'
+            ], [
+              details['otherFinalReminder'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Issue Date'
+            ], [
+              details['otherIssueDate'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Expiry Date'
+            ], [
+              details['otherExpiryDate'],
+            ]),
             const SizedBox(height: 16.0),
             _buildFrontImageColumn('Front Image', details['frontImageUrl']),
             const SizedBox(height: 16.0),
@@ -75,70 +105,95 @@ class OthersDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildFrontImageColumn(String title, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Front Image',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
+ Widget _buildFrontImageColumn(String title, String imageUrl) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Front Image',
+        style: TextStyle(
+          fontSize: 14.0,
         ),
-        const SizedBox(height: 8.0),
-        SizedBox(
-          width: 400,
-          height: 200,
-          child: Image.network(
-            imageUrl,
-            width: 150, // Set the width as per your design
-            height: 150, // Set the height as per your design
-            fit: BoxFit.cover,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 8.0),
+      imageUrl.isNotEmpty
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                width: 150, // Set the width as per your design
+                height: 150, // Set the height as per your design
+                fit: BoxFit.cover,
+              ),
+            )
+          : Container(
+              width: 400,
+              height: 200,
+              color: Colors.grey, // Customize the color as needed
+              child: const Center(
+                child: Text(
+                  'No front image uploaded',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+    ],
+  );
+}
 
-  Widget _buildBackImageColumn(String title, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Back Image',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
+Widget _buildBackImageColumn(String title, String imageUrl) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Back Image',
+        style: TextStyle(
+          fontSize: 14.0,
         ),
-        const SizedBox(height: 8.0),
-        SizedBox(
-          width: 400,
-          height: 200,
-          child: Image.network(
-            imageUrl,
-            width: 150, // Set the width as per your design
-            height: 150, // Set the height as per your design
-            fit: BoxFit.cover,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 8.0),
+      imageUrl.isNotEmpty
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                width: 150, // Set the width as per your design
+                height: 150, // Set the height as per your design
+                fit: BoxFit.cover,
+              ),
+            )
+          : Container(
+              width: 400,
+              height: 200,
+              color: Colors.grey, // Customize the color as needed
+              child: const Center(
+                child: Text(
+                  'No back image uploaded',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+    ],
+  );
+}
+
 
   pw.Widget buildPdfContent(frontImage, backImage) {
     return pw.Column(
       children: [
-        _buildPdfRow(['Credential Name', details['Title']],
-            ['Credential Record Number', details['otherNumber']]),
-        pw.SizedBox(height: 16.0),
-        _buildPdfRow(
-          ['First Reminder', details['otherFirstReminder']],
-          ['Second Reminder', details['otherSecondReminder']],
-          ['Final Reminder', details['otherFinalReminder']],
-        ),
-        pw.SizedBox(height: 16.0),
-        _buildPdfRow(['Issue Date', details['otherIssueDate']],
-            ['Expiry Date', details['otherExpiryDate']]),
+        _buildPdfRow([
+          'Credential Name'
+        ], [
+          details['Title'],
+        ]),
         pw.SizedBox(height: 16.0),
         _buildPdfFrontImageColumn('Front Image', frontImage),
         pw.SizedBox(height: 16.0),

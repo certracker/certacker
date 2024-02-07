@@ -103,58 +103,128 @@ class _DetailsPageState extends State<DetailsPage> {
     );
   }
 
-  Future<void> _handleShare(Map<String, dynamic> details) async {
+ Future<void> _handleShare(Map<String, dynamic> details) async {
+  if (details['frontImageUrl'].isEmpty || details['backImageUrl'].isEmpty) {
+    // Display an error dialog since there are no images
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: const Text('No image found. Unable to share.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+    return;
+  }
+
+  // Show loading indicator
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 16.0),
+            Text("Creating PDF and sharing..."),
+          ],
+        ),
+      );
+    },
+    barrierDismissible: false, // Prevent user from dismissing the dialog
+  );
+
+  try {
     final frontImage = await networkImage(details['frontImageUrl']);
     final backImage = await networkImage(details['backImageUrl']);
 
-    try {
-      // Create PDF document
-      final pdf = pw.Document();
+    // Create PDF document
+    final pdf = pw.Document();
 
-      // Use a switch statement or a map to determine which details page to use
-      pw.Widget pdfContent;
-      switch (widget.category) {
-        case 'Certification':
-          pdfContent = CertificationDetails(details: details)
-              .buildPdfContent(frontImage, backImage);
-          break;
-        case 'License':
-          pdfContent = LicenseDetails(details: details).buildPdfContent(frontImage, backImage);
-          break;
-        case 'Education':
-          pdfContent = EducationDetails(details: details).buildPdfContent(frontImage, backImage);
-          break;
-        case 'Vaccination':
-          pdfContent = VaccinationDetails(details: details).buildPdfContent(frontImage, backImage);
-          break;
-        case 'Travel':
-          pdfContent = TravelDetails(details: details).buildPdfContent(frontImage, backImage);
-          break;
-        case 'CEU':
-          pdfContent = CEUDetails(details: details).buildPdfContent(frontImage, backImage);
-          break;
-        case 'Others':
-          pdfContent = OthersDetails(details: details).buildPdfContent(frontImage, backImage);
-          break;
-        default:
-          throw Exception('PDF content not available for this category.');
-      }
-
-      pdf.addPage(pw.Page(build: (pw.Context context) => pdfContent));
-
-      // Save PDF to a temporary file
-      final tempPath = (await getTemporaryDirectory()).path;
-      final pdfFile =
-          File('$tempPath/${widget.category.toLowerCase()}_details.pdf');
-      await pdfFile.writeAsBytes(await pdf.save());
-
-      // Share the PDF file
-      await Share.shareXFiles([XFile(pdfFile.path)],
-    text: '${widget.category} Details PDF');
-    } catch (e) {
-      print('Error sharing details: $e');
+    // Use a switch statement or a map to determine which details page to use
+    pw.Widget pdfContent;
+    switch (widget.category) {
+      case 'Certification':
+        pdfContent = CertificationDetails(details: details)
+            .buildPdfContent(frontImage, backImage);
+        break;
+      case 'License':
+        pdfContent = LicenseDetails(details: details)
+            .buildPdfContent(frontImage, backImage);
+        break;
+      case 'Education':
+        pdfContent = EducationDetails(details: details)
+            .buildPdfContent(frontImage, backImage);
+        break;
+      case 'Vaccination':
+        pdfContent = VaccinationDetails(details: details)
+            .buildPdfContent(frontImage, backImage);
+        break;
+      case 'Travel':
+        pdfContent = TravelDetails(details: details)
+            .buildPdfContent(frontImage, backImage);
+        break;
+      case 'CEU':
+        pdfContent = CEUDetails(details: details)
+            .buildPdfContent(frontImage, backImage);
+        break;
+      case 'Others':
+        pdfContent = OthersDetails(details: details)
+            .buildPdfContent(frontImage, backImage);
+        break;
+      default:
+        throw Exception('PDF content not available for this category.');
     }
+
+    pdf.addPage(pw.Page(build: (pw.Context context) => pdfContent));
+
+    // Save PDF to a temporary file
+    final tempPath = (await getTemporaryDirectory()).path;
+    final pdfFile =
+        File('$tempPath/${widget.category.toLowerCase()}_details.pdf');
+    await pdfFile.writeAsBytes(await pdf.save());
+
+    // Dismiss loading indicator
+    Navigator.of(context).pop();
+
+    // Share the PDF file
+    await Share.shareXFiles([XFile(pdfFile.path)],
+        text: '${widget.category} Details PDF');
+  } catch (e) {
+    print('Error sharing details: $e');
+    // Dismiss loading indicator
+    Navigator.of(context).pop();
+
+    // Display an error dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text('An error occurred while sharing details: $e'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
+}
+
 
   Future<Map<String, dynamic>> fetchDetails() async {
     try {

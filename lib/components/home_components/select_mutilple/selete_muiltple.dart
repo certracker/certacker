@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:certracker/auth/auth_service.dart';
-import 'package:certracker/auth/save_data_service.dart';
 import 'package:certracker/components/home_components/category_container/category_container.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
@@ -37,10 +37,6 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
   }
 
   String getTableNameFromCredentialsId(String credentialsId) {
-    // Your implementation to extract the table name from credentialsId
-    // Modify this method based on your logic
-    // Example implementation:
-    // return credentialsId.split('_')[0];
     return 'UnknownTable';
   }
 
@@ -48,9 +44,7 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
     List<String> selectedIds = [];
     for (int i = 0; i < selectedCategories.length; i++) {
       if (selectedCategories[i] && allCategories[i]['DocumentID'] != null) {
-        // Check for null
-        selectedIds.add(allCategories[i]
-            ['DocumentID']!); // Use the non-null assertion operator (!)
+        selectedIds.add(allCategories[i]['DocumentID']!);
       }
     }
     return selectedIds;
@@ -59,7 +53,7 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
   Future<void> fetchUserData() async {
     try {
       setState(() {
-        isLoading = true; // Set loading to true when starting to fetch data
+        isLoading = true;
       });
 
       userId = AuthenticationService().getCurrentUserId();
@@ -96,53 +90,42 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
           allCategories = userData;
           selectedCategories =
               List.generate(allCategories.length, (index) => false);
-          isLoading =
-              false; // Set loading to false after successfully fetching data
+          isLoading = false;
         });
       } else {
         throw Exception('User not authenticated!');
       }
     } catch (e) {
       print('Error fetching user data: $e');
-      // Handle error as needed
       setState(() {
-        isLoading = false; // Set loading to false in case of error
+        isLoading = false;
       });
     }
   }
 
   Future<void> deleteSelectedItems() async {
-    List<String> selectedCategoryIds = getSelectedCategoryIds();
-
     try {
-      // Move selected items to Recycle Bin
-      for (String credentialsId in selectedCategoryIds) {
-        await SaveDataService.moveItemToRecycleBin(
-          getTableNameFromCredentialsId(credentialsId),
-          userId!,
-          credentialsId,
-        );
+      List<String> selectedIds = getSelectedCategoryIds();
+
+      for (String credentialsId in selectedIds) {
+        String tableName = getTableNameFromCredentialsId(credentialsId);
+        await SaveDataService.deleteData(tableName, credentialsId);
       }
 
-      // Remove selected items from the local list
+      // Fetch user data again to update the UI
+      await fetchUserData();
+
+      // Reset the selected categories list
       setState(() {
-        allCategories.removeWhere(
-            (item) => selectedCategoryIds.contains(item['DocumentID']));
         selectedCategories =
             List.generate(allCategories.length, (index) => false);
       });
     } catch (e) {
-      print('Error deleting items: $e');
-      // Handle error as needed
+      print('Error deleting selected items: $e');
     }
-
-    Navigator.pop(context);
   }
 
   Future<void> _sharePdf(BuildContext context) async {
-    print('Sharing PDF...:$selectedCategories');
-    print('All categories: $allCategories');
-
     List<Map<String, dynamic>> selectedItems = [];
     for (int i = 0; i < selectedCategories.length; i++) {
       if (selectedCategories[i]) {
@@ -151,7 +134,6 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
     }
 
     if (selectedItems.isNotEmpty) {
-      print('Selected items: $selectedItems');
       await _generatePdfFromSelectedItems(selectedItems);
     } else {
       print('No selected items.');
@@ -160,7 +142,6 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
 
   Future<void> _generatePdfFromSelectedItems(
       List<Map<String, dynamic>> selectedItems) async {
-    // Create PDF document
     final pdf = pw.Document();
     pdf.addPage(
       pw.Page(
@@ -169,12 +150,10 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
       ),
     );
 
-    // Save PDF to a temporary file
     final tempPath = (await getTemporaryDirectory()).path;
     final pdfFile = File('$tempPath/selected_items.pdf');
     await pdfFile.writeAsBytes(await pdf.save());
 
-    // Share the PDF file
     await Share.shareFiles([pdfFile.path], text: 'Selected Items PDF');
   }
 
@@ -185,7 +164,10 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
         for (var selectedItem in selectedItems)
           _buildPdfRow(
             ['Credential Name', selectedItem['Title']],
-            ['Front Image', ['frontImageUrl']],
+            [
+              'Front Image',
+              ['frontImageUrl']
+            ],
             ['Back Imagec', selectedItem['backImageUrl']],
           ),
       ],

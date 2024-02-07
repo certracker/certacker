@@ -14,13 +14,28 @@ class CEUDetails extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRow(['Credential Name', details['Title']],
-                ['Provider Name', details['ceuProviderName']]),
+            _buildRow([
+              'Credential Name'
+            ], [
+              details['Title'],
+            ]),
             const SizedBox(height: 16.0),
-            _buildRow(
-              ['Number Of Contact Hour', details['ceuNumberOfContactHour']],
-              ['Completion Date', details['ceuCompletionDate']],
-            ),
+            _buildRow([
+              'Provider Name'
+            ], [
+              details['ceuProviderName'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Number Of Contact Hour'
+            ], [
+              details['ceuNumberOfContactHour'],
+            ]),
+            _buildRow([
+              'Completion Date'
+            ], [
+              details['ceuCompletionDate'],
+            ]),
             const SizedBox(height: 16.0),
             _buildFrontImageColumn('Front Image', details['frontImageUrl']),
             const SizedBox(height: 16.0),
@@ -72,65 +87,94 @@ class CEUDetails extends StatelessWidget {
   }
 
   Widget _buildFrontImageColumn(String title, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Front Image',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Front Image',
+        style: TextStyle(
+          fontSize: 14.0,
         ),
-        const SizedBox(height: 8.0),
-        SizedBox(
-          width: 400,
-          height: 200,
-          child: Image.network(
-            imageUrl,
-            width: 150,
-            height: 150, // Set the height as per your design
-            fit: BoxFit.cover,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 8.0),
+      imageUrl.isNotEmpty
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                width: 150, // Set the width as per your design
+                height: 150, // Set the height as per your design
+                fit: BoxFit.cover,
+              ),
+            )
+          : Container(
+              width: 400,
+              height: 200,
+              color: Colors.grey, // Customize the color as needed
+              child: const Center(
+                child: Text(
+                  'No front image uploaded',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+    ],
+  );
+}
 
-  Widget _buildBackImageColumn(String title, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Back Image',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
+Widget _buildBackImageColumn(String title, String imageUrl) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Back Image',
+        style: TextStyle(
+          fontSize: 14.0,
         ),
-        const SizedBox(height: 8.0),
-        SizedBox(
-          width: 400,
-          height: 200,
-          child: Image.network(
-            imageUrl,
-            width: 150, // Set the width as per your design
-            height: 150, // Set the height as per your design
-            fit: BoxFit.cover,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 8.0),
+      imageUrl.isNotEmpty
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                width: 150, // Set the width as per your design
+                height: 150, // Set the height as per your design
+                fit: BoxFit.cover,
+              ),
+            )
+          : Container(
+              width: 400,
+              height: 200,
+              color: Colors.grey, // Customize the color as needed
+              child: const Center(
+                child: Text(
+                  'No back image uploaded',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+    ],
+  );
+}
+
 
   pw.Widget buildPdfContent(frontImage, backImage) {
     return pw.Column(
       children: [
-        _buildPdfRow(['Credential Name', details['Title']],
-            ['Provider Name', details['ceuProviderName']]),
-        pw.SizedBox(height: 16.0),
-        _buildPdfRow(
-          ['Number Of Contact Hour', details['ceuNumberOfContactHour']],
-          ['Completion Date', details['ceuCompletionDate']],
-        ),
+        _buildPdfRow([
+          'Credential Name',
+        ], [
+          details['Title'],
+        ]),
         pw.SizedBox(height: 16.0),
         _buildPdfFrontImageColumn('Front Image', frontImage),
         pw.SizedBox(height: 16.0),

@@ -14,16 +14,41 @@ class TravelDetails extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRow(['Credential Name', details['Title']],
-                ['Document Number', details['documentNumber']]),
+            _buildRow([
+              'Credential Name'
+            ], [
+              details['Title'],
+            ]),
             const SizedBox(height: 16.0),
-            _buildRow(['Country', details['travelCountry']],
-                ['Place of Issue', details['placeOfIssue']]),
+            _buildRow([
+              'Document Number'
+            ], [
+              details['documentNumber'],
+            ]),
             const SizedBox(height: 16.0),
-            _buildRow(
-              ['Issue Date', details['issueDate']],
-              ['Expiry Date', details['expiryDate']],
-            ),
+            _buildRow([
+              'Country'
+            ], [
+              details['travelCountry'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Place of Issue'
+            ], [
+              details['placeOfIssue'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Issue Date'
+            ], [
+              details['issueDate'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Expiry Date'
+            ], [
+              details['expiryDate'],
+            ]),
             const SizedBox(height: 16.0),
             _buildFrontImageColumn('Front Image', details['frontImageUrl']),
             const SizedBox(height: 16.0),
@@ -74,69 +99,95 @@ class TravelDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildFrontImageColumn(String title, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Front Image',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
+ Widget _buildFrontImageColumn(String title, String imageUrl) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Front Image',
+        style: TextStyle(
+          fontSize: 14.0,
         ),
-        const SizedBox(height: 8.0),
-        SizedBox(
-          width: 400,
-          height: 200,
-          child: Image.network(
-            imageUrl,
-            width: 150, // Set the width as per your design
-            height: 150, // Set the height as per your design
-            fit: BoxFit.cover,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 8.0),
+      imageUrl.isNotEmpty
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                width: 150, // Set the width as per your design
+                height: 150, // Set the height as per your design
+                fit: BoxFit.cover,
+              ),
+            )
+          : Container(
+              width: 400,
+              height: 200,
+              color: Colors.grey, // Customize the color as needed
+              child: const Center(
+                child: Text(
+                  'No front image uploaded',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+    ],
+  );
+}
 
-  Widget _buildBackImageColumn(String title, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Back Image',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
+Widget _buildBackImageColumn(String title, String imageUrl) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Back Image',
+        style: TextStyle(
+          fontSize: 14.0,
         ),
-        const SizedBox(height: 8.0),
-        SizedBox(
-          width: 400,
-          height: 200,
-          child: Image.network(
-            imageUrl,
-            width: 150, // Set the width as per your design
-            height: 150, // Set the height as per your design
-            fit: BoxFit.cover,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 8.0),
+      imageUrl.isNotEmpty
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                width: 150, // Set the width as per your design
+                height: 150, // Set the height as per your design
+                fit: BoxFit.cover,
+              ),
+            )
+          : Container(
+              width: 400,
+              height: 200,
+              color: Colors.grey, // Customize the color as needed
+              child: const Center(
+                child: Text(
+                  'No back image uploaded',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+    ],
+  );
+}
+
 
   pw.Widget buildPdfContent(frontImage, backImage) {
     return pw.Column(
       children: [
-        _buildPdfRow(['Credential Name', details['Title']],
-            ['Document Number', details['documentNumber']]),
-        pw.SizedBox(height: 16.0),
-        _buildPdfRow(['Country', details['travelCountry']],
-            ['Place of Issue', details['placeOfIssue']]),
-        pw.SizedBox(height: 16.0),
-        _buildPdfRow(
-          ['Issue Date', details['issueDate']],
-          ['Expiry Date', details['expiryDate']],
-        ),
+        _buildPdfRow([
+          'Credential Name'
+        ], [
+          details['Title'],
+        ]),
         pw.SizedBox(height: 16.0),
         _buildPdfFrontImageColumn('Front Image', frontImage),
         pw.SizedBox(height: 16.0),

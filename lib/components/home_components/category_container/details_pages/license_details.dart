@@ -14,20 +14,53 @@ class LicenseDetails extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRow(['Credential Name', details['Title']],
-                ['License Number', details['licenseNumber']]),
+            _buildRow([
+              'Credential Name',
+            ], [
+              details['Title'],
+            ]),
             const SizedBox(height: 16.0),
-            _buildRow(
-              ['First Reminder', details['licenseFirstReminder']],
-              ['Second Reminder', details['licenseSecondReminder']],
-              ['Final Reminder', details['licenseFinalReminder']],
-            ),
+            _buildRow([
+              'License Number'
+            ], [
+              details['licenseNumber'],
+            ]),
             const SizedBox(height: 16.0),
-            _buildRow(
-              ['State', details['licenseState']],
-              ['Issue Date', details['licenseIssueDate']],
-              ['Expiry Date', details['licenseExpiryDate']],
-            ),
+            _buildRow([
+              'First Reminder'
+            ], [
+              details['licenseFirstReminder'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Second Reminder'
+            ], [
+              details['licenseSecondReminder'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Final Reminder'
+            ], [
+              details['licenseFinalReminder'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'State',
+            ], [
+              details['licenseState'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Issue Date'
+            ], [
+              details['licenseIssueDate'],
+            ]),
+            const SizedBox(height: 16.0),
+            _buildRow([
+              'Expiry Date'
+            ], [
+              details['licenseExpiryDate'],
+            ]),
             const SizedBox(height: 16.0),
             _buildFrontImageColumn('Front Image', details['frontImageUrl']),
             const SizedBox(height: 16.0),
@@ -78,73 +111,95 @@ class LicenseDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildFrontImageColumn(String title, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Front Image',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
+ Widget _buildFrontImageColumn(String title, String imageUrl) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Front Image',
+        style: TextStyle(
+          fontSize: 14.0,
         ),
-        const SizedBox(height: 8.0),
-        SizedBox(
-          width: 400,
-          height: 200,
-          child: Image.network(
-            imageUrl,
-            width: 150, // Set the width as per your design
-            height: 150, // Set the height as per your design
-            fit: BoxFit.cover,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 8.0),
+      imageUrl.isNotEmpty
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                width: 150, // Set the width as per your design
+                height: 150, // Set the height as per your design
+                fit: BoxFit.cover,
+              ),
+            )
+          : Container(
+              width: 400,
+              height: 200,
+              color: Colors.grey, // Customize the color as needed
+              child: const Center(
+                child: Text(
+                  'No front image uploaded',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+    ],
+  );
+}
 
-  Widget _buildBackImageColumn(String title, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Back Image',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
+Widget _buildBackImageColumn(String title, String imageUrl) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Back Image',
+        style: TextStyle(
+          fontSize: 14.0,
         ),
-        const SizedBox(height: 8.0),
-        SizedBox(
-          width: 400,
-          height: 200,
-          child: Image.network(
-            imageUrl,
-            width: 150, // Set the width as per your design
-            height: 150, // Set the height as per your design
-            fit: BoxFit.cover,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 8.0),
+      imageUrl.isNotEmpty
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                width: 150, // Set the width as per your design
+                height: 150, // Set the height as per your design
+                fit: BoxFit.cover,
+              ),
+            )
+          : Container(
+              width: 400,
+              height: 200,
+              color: Colors.grey, // Customize the color as needed
+              child: const Center(
+                child: Text(
+                  'No back image uploaded',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+    ],
+  );
+}
+
 
   pw.Widget buildPdfContent(frontImage, backImage) {
     return pw.Column(
       children: [
-        _buildPdfRow(['Credential Name', details['Title']],
-            ['License Number', details['licenseNumber']]),
-        pw.SizedBox(height: 16.0),
-        _buildPdfRow(
-          ['First Reminder', details['licenseFirstReminder']],
-          ['Second Reminder', details['licenseSecondReminder']],
-          ['Final Reminder', details['licenseFinalReminder']],
-        ),
-        pw.SizedBox(height: 16.0),
-        _buildPdfRow(
-          ['State', details['licenseState']],
-          ['Issue Date', details['licenseIssueDate']],
-          ['Expiry Date', details['licenseExpiryDate']],
-        ),
+        _buildPdfRow([
+          'Credential Name'
+        ], [
+          details['Title'],
+        ]),
         pw.SizedBox(height: 16.0),
         _buildPdfFrontImageColumn('Front Image', frontImage),
         pw.SizedBox(height: 16.0),

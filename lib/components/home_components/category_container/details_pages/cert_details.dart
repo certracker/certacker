@@ -14,18 +14,54 @@ class CertificationDetails extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRow(['Credential Name', details['Title']],
-                ['Credential Record Number', details['certificationNumber']]),
-            const SizedBox(height: 16.0),
             _buildRow(
-              ['First Reminder', details['certificationFirstReminder']],
-              ['Second Reminder', details['certificationSecondReminder']],
-              ['Final Reminder', details['certificationFinalReminder']],
+              [
+                'Credential Name',
+              ],
+              [details['Title']],
             ),
             const SizedBox(height: 16.0),
-            _buildRow(['Issue Date', details['certificationIssueDate']],
-                ['Expiry Date', details['certificationExpiryDate']]),
+            _buildRow(
+              [
+                'Credential Record Number',
+              ],
+              [details['certificationNumber']],
+            ),
             const SizedBox(height: 16.0),
+            _buildRow(
+              [
+                'First Reminder',
+              ],
+              [details['certificationFirstReminder']],
+            ),
+            const SizedBox(height: 16.0),
+            _buildRow(
+              [
+                'Second Reminder',
+              ],
+              [details['certificationSecondReminder']],
+            ),
+            const SizedBox(height: 16.0),
+            _buildRow(
+              [
+                'Final Reminder',
+              ],
+              [details['certificationFinalReminder']],
+            ),
+            const SizedBox(height: 16.0),
+            _buildRow(
+              [
+                'Issue Date',
+              ],
+              [details['certificationIssueDate']],
+            ),
+            const SizedBox(height: 16.0),
+            _buildRow(
+              [
+                'Expiry Date',
+              ],
+              [details['certificationExpiryDate']],
+            ),
             _buildFrontImageColumn('Front Image', details['frontImageUrl']),
             const SizedBox(height: 16.0),
             _buildBackImageColumn('Back Image', details['backImageUrl']),
@@ -76,69 +112,93 @@ class CertificationDetails extends StatelessWidget {
   }
 
   Widget _buildFrontImageColumn(String title, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Front Image',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Front Image',
+        style: TextStyle(
+          fontSize: 14.0,
         ),
-        const SizedBox(height: 8.0),
-        SizedBox(
-          width: 400,
-          height: 200,
-          child: Image.network(
-            imageUrl,
-            width: 150, // Set the width as per your design
-            height: 150, // Set the height as per your design
-            fit: BoxFit.cover,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 8.0),
+      imageUrl.isNotEmpty
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                width: 400, 
+                height: 200,
+                fit: BoxFit.cover,
+              ),
+            )
+          : Container(
+              width: 400,
+              height: 200,
+              color: Colors.grey,
+              child: const Center(
+                child: Text(
+                  'No front image uploaded',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+    ],
+  );
+}
 
-  Widget _buildBackImageColumn(String title, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Back Image',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
+Widget _buildBackImageColumn(String title, String imageUrl) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Back Image',
+        style: TextStyle(
+          fontSize: 14.0,
         ),
-        const SizedBox(height: 8.0),
-        SizedBox(
-          width: 400,
-          height: 200,
-          child: Image.network(
-            imageUrl,
-            width: 150, // Set the width as per your design
-            height: 150, // Set the height as per your design
-            fit: BoxFit.cover,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 8.0),
+      imageUrl.isNotEmpty
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: Image.network(
+                imageUrl,
+                width: 150, // Set the width as per your design
+                height: 150, // Set the height as per your design
+                fit: BoxFit.cover,
+              ),
+            )
+          : Container(
+              width: 400,
+              height: 200,
+              color: Colors.grey, 
+              child: const Center(
+                child: Text(
+                  'No back image uploaded',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+    ],
+  );
+}
+
 
   pw.Widget buildPdfContent(frontImage, backImage) {
     return pw.Column(
       children: [
-        _buildPdfRow(['Credential Name', details['Title']],
-            ['Credential Record Number', details['certificationNumber']]),
-        pw.SizedBox(height: 16.0),
         _buildPdfRow(
-          ['First Reminder', details['certificationFirstReminder']],
-          ['Second Reminder', details['certificationSecondReminder']],
-          ['Final Reminder', details['certificationFinalReminder']],
+          ['Credential Name'],
+          [details['Title']],
         ),
-        pw.SizedBox(height: 16.0),
-        _buildPdfRow(['Issue Date', details['certificationIssueDate']],
-            ['Expiry Date', details['certificationExpiryDate']]),
         pw.SizedBox(height: 16.0),
         _buildPdfFontImageColumn('Front Image', frontImage),
         pw.SizedBox(height: 16.0),
@@ -198,8 +258,8 @@ class CertificationDetails extends StatelessWidget {
         ),
         pw.SizedBox(height: 8.0),
         pw.Container(
-          width: 150,
-          height: 150,
+          width: 400,
+          height: 200,
           child: pw.Image(frontImage),
         ),
       ],
@@ -218,8 +278,8 @@ class CertificationDetails extends StatelessWidget {
         ),
         pw.SizedBox(height: 8.0),
         pw.Container(
-          width: 150,
-          height: 150,
+          width: 400,
+          height: 200,
           child: pw.Image(backImage),
         ),
       ],

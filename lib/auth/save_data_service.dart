@@ -7,12 +7,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 
 class SaveDataService {
-    static Future<void> saveData({
+  static Future<void> saveData({
     required String tableName,
     required Map<String, dynamic> data,
     required String userId,
     required String credentialsId,
-    bool moveToRecycleBin = false, // New parameter for moving to the recycle bin
   }) async {
     await Firebase.initializeApp();
 
@@ -21,62 +20,38 @@ class SaveDataService {
       tableName,
     );
 
-    if (moveToRecycleBin) {
-      // Move item to the "Recycle Bin" collection
-      CollectionReference recycleBinCollection =
-          FirebaseFirestore.instance.collection('RecycleBin');
-      await recycleBinCollection.doc(credentialsId).set(data);
-    } else {
-      // Create a new document under the collection with the unique credentials ID
+    // Create a new document under the collection with the unique credentials ID
+    DocumentReference documentReference = tableCollection.doc(credentialsId);
+
+    // Add the user ID as a field inside the document
+    data['userId'] = userId;
+
+    // Add a timestamp field with the current server timestamp
+    data['timestamp'] = FieldValue.serverTimestamp();
+
+    await documentReference.set(data);
+  }
+
+  static Future<void> deleteData(String tableName, String credentialsId) async {
+    try {
+      await Firebase.initializeApp();
+
+      CollectionReference tableCollection =
+          FirebaseFirestore.instance.collection(tableName);
+
       DocumentReference documentReference = tableCollection.doc(credentialsId);
 
-      // Add the user ID as a field inside the document
-      data['userId'] = userId;
+      // Delete the document
+      await documentReference.delete();
 
-      // Add a timestamp field with the current server timestamp
-      data['timestamp'] = FieldValue.serverTimestamp();
-
-      await documentReference.set(data);
-    }
-  }
-
-  // New method to move item to Recycle Bin
-  static Future<void> moveItemToRecycleBin(
-    String tableName,
-    String userId,
-    String credentialsId,
-  ) async {
-    try {
-      // Get the item data before moving to the recycle bin
-      DocumentReference documentReference =
-          FirebaseFirestore.instance.collection(tableName).doc(credentialsId);
-      DocumentSnapshot documentSnapshot = await documentReference.get();
-
-      if (documentSnapshot.exists) {
-        Map<String, dynamic> itemData =
-            documentSnapshot.data() as Map<String, dynamic>;
-
-        // Move the item to the recycle bin
-        await saveData(
-          tableName: 'RecycleBin',
-          data: itemData,
-          userId: userId,
-          credentialsId: credentialsId,
-        );
-
-        // Delete the item from the original collection
-        await documentReference.delete();
-      } else {
-        print('Document with ID $credentialsId not found.');
-        throw Exception('Document not found.');
-      }
+      print('Document deleted successfully!');
     } catch (e) {
-      print('Error moving item to Recycle Bin: $e');
-      throw Exception('Error moving item to Recycle Bin');
+      print('Error deleting document: $e');
+      throw Exception('Error deleting document');
     }
   }
 
- static Future<void> updateData({
+  static Future<void> updateData({
     required String tableName,
     required String userId,
     required String credentialsId,
@@ -126,8 +101,6 @@ class SaveDataService {
     }
   }
 
-
-
   static String generateUniqueCredentialsId() {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
@@ -158,6 +131,7 @@ class SaveDataService {
     }
   }
 }
+
 
 class DynamicTableService {
   static Future<void> saveDataToTable({

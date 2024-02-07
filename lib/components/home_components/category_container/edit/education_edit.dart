@@ -282,11 +282,11 @@ class _EditEducationPageState extends State<EditEducationPage> {
                           updatedData: {
                             'frontImageUrl': frontImageURL,
                             'backImageUrl': backImageURL,
-                            'Name of institution': educationName,
-                            'Degree': educationDegree,
-                            'Field of study': educationField,
-                            'Graduation Date': graduationDate,
-                            'Private Note': educationPrivateNote,
+                            'Title': educationName,
+                            'educationDegree': educationDegree,
+                            'educationField': educationField,
+                            'graduationDate': graduationDate,
+                            'educationPrivateNote': educationPrivateNote,
                           },
                         );
                         setState(() {
