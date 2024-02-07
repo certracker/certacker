@@ -78,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SeleteMuiltple(
+        builder: (context,) => SeleteMuiltple(
           profilePicture: userDetails?['profilePicture'] ?? '',
           firstName: userDetails?['firstName'] ?? '',
         ),

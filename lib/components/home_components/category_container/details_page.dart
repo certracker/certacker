@@ -20,6 +20,7 @@ import 'package:certracker/components/home_components/category_container/edit/va
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:pdf/widgets.dart' as pw;
 // import 'pdf_utils.dart';
@@ -102,7 +103,10 @@ class _DetailsPageState extends State<DetailsPage> {
     );
   }
 
- Future<void> _handleShare(Map<String, dynamic> details) async {
+  Future<void> _handleShare(Map<String, dynamic> details) async {
+    final frontImage = await networkImage(details['frontImageUrl']);
+    final backImage = await networkImage(details['backImageUrl']);
+
     try {
       // Create PDF document
       final pdf = pw.Document();
@@ -111,25 +115,26 @@ class _DetailsPageState extends State<DetailsPage> {
       pw.Widget pdfContent;
       switch (widget.category) {
         case 'Certification':
-          pdfContent = CertificationDetails(details: details).buildPdfContent();
+          pdfContent = CertificationDetails(details: details)
+              .buildPdfContent(frontImage, backImage);
           break;
         case 'License':
-          pdfContent = LicenseDetails(details: details).buildPdfContent();
+          pdfContent = LicenseDetails(details: details).buildPdfContent(frontImage, backImage);
           break;
         case 'Education':
-          pdfContent = EducationDetails(details: details).buildPdfContent();
+          pdfContent = EducationDetails(details: details).buildPdfContent(frontImage, backImage);
           break;
         case 'Vaccination':
-          pdfContent = VaccinationDetails(details: details).buildPdfContent();
+          pdfContent = VaccinationDetails(details: details).buildPdfContent(frontImage, backImage);
           break;
         case 'Travel':
-          pdfContent = TravelDetails(details: details).buildPdfContent();
+          pdfContent = TravelDetails(details: details).buildPdfContent(frontImage, backImage);
           break;
         case 'CEU':
-          pdfContent = CEUDetails(details: details).buildPdfContent();
+          pdfContent = CEUDetails(details: details).buildPdfContent(frontImage, backImage);
           break;
         case 'Others':
-          pdfContent = OthersDetails(details: details).buildPdfContent();
+          pdfContent = OthersDetails(details: details).buildPdfContent(frontImage, backImage);
           break;
         default:
           throw Exception('PDF content not available for this category.');
@@ -139,11 +144,13 @@ class _DetailsPageState extends State<DetailsPage> {
 
       // Save PDF to a temporary file
       final tempPath = (await getTemporaryDirectory()).path;
-      final pdfFile = File('$tempPath/${widget.category.toLowerCase()}_details.pdf');
+      final pdfFile =
+          File('$tempPath/${widget.category.toLowerCase()}_details.pdf');
       await pdfFile.writeAsBytes(await pdf.save());
 
       // Share the PDF file
-      await Share.shareFiles([pdfFile.path], text: '${widget.category} Details PDF');
+      await Share.shareXFiles([XFile(pdfFile.path)],
+    text: '${widget.category} Details PDF');
     } catch (e) {
       print('Error sharing details: $e');
     }

@@ -1,8 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 class OthersDetails extends StatelessWidget {
   final Map<String, dynamic> details;
@@ -28,15 +25,11 @@ class OthersDetails extends StatelessWidget {
             const SizedBox(height: 16.0),
             _buildRow(['Issue Date', details['otherIssueDate']],
                 ['Expiry Date', details['otherExpiryDate']]),
-             const SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildFrontImageColumn('Front Image', details['frontImageUrl']),
             const SizedBox(height: 16.0),
             _buildBackImageColumn('Back Image', details['backImageUrl']),
             const SizedBox(height: 16.0),
-            // ElevatedButton(
-            //   onPressed: () => _sharePdf(context),
-            //   child: const Text('Share as PDF'),
-            // ),
           ],
         ),
       ),
@@ -82,7 +75,7 @@ class OthersDetails extends StatelessWidget {
     );
   }
 
-   Widget _buildFrontImageColumn(String title, String imageUrl) {
+  Widget _buildFrontImageColumn(String title, String imageUrl) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -106,7 +99,8 @@ class OthersDetails extends StatelessWidget {
       ],
     );
   }
- Widget _buildBackImageColumn(String title, String imageUrl) {
+
+  Widget _buildBackImageColumn(String title, String imageUrl) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -131,26 +125,7 @@ class OthersDetails extends StatelessWidget {
     );
   }
 
-  Future<void> _sharePdf(BuildContext context) async {
-    // Create PDF document
-    final pdf = pw.Document();
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) => buildPdfContent(),
-      ),
-    );
-
-    // Save PDF to a temporary file
-    final tempPath = (await getTemporaryDirectory()).path;
-    final pdfFile = File('$tempPath/others_details.pdf');
-    await pdfFile.writeAsBytes(await pdf.save());
-
-    // Share the PDF file
-    await Share.shareFiles(['$tempPath/others_details.pdf'],
-        text: 'Others Details PDF');
-  }
-
-  pw.Widget buildPdfContent() {
+  pw.Widget buildPdfContent(frontImage, backImage) {
     return pw.Column(
       children: [
         _buildPdfRow(['Credential Name', details['Title']],
@@ -164,10 +139,10 @@ class OthersDetails extends StatelessWidget {
         pw.SizedBox(height: 16.0),
         _buildPdfRow(['Issue Date', details['otherIssueDate']],
             ['Expiry Date', details['otherExpiryDate']]),
-         pw.SizedBox(height: 16.0),
-        _buildPdfFrontImageColumn('Front Image', details['frontImageUrl']),
         pw.SizedBox(height: 16.0),
-        _buildPdfBackImageColumn('Back Image', details['backImageUrl']),
+        _buildPdfFrontImageColumn('Front Image', frontImage),
+        pw.SizedBox(height: 16.0),
+        _buildPdfBackImageColumn('Back Image', backImage),
       ],
     );
   }
@@ -211,7 +186,7 @@ class OthersDetails extends StatelessWidget {
     );
   }
 
-  pw.Widget _buildPdfFrontImageColumn(String title, String imageUrl) {
+  pw.Widget _buildPdfFrontImageColumn(String title, frontImage) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -222,16 +197,16 @@ class OthersDetails extends StatelessWidget {
           ),
         ),
         pw.SizedBox(height: 8.0),
-        // pw.Container(
-        //   width: 150,
-        //   height: 150,
-        //   child: pw.Image(pw.NetworkImage(imageUrl)),
-        // ),
+        pw.Container(
+          width: 150,
+          height: 150,
+          child: pw.Image(frontImage),
+        ),
       ],
     );
   }
 
-   pw.Widget _buildPdfBackImageColumn(String title, String imageUrl) {
+  pw.Widget _buildPdfBackImageColumn(String title, backImage) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -242,11 +217,11 @@ class OthersDetails extends StatelessWidget {
           ),
         ),
         pw.SizedBox(height: 8.0),
-        // pw.Container(
-        //   width: 150,
-        //   height: 150,
-        //   child: pw.Image(pw.NetworkImage(imageUrl)),
-        // ),
+        pw.Container(
+          width: 150,
+          height: 150,
+          child: pw.Image(backImage),
+        ),
       ],
     );
   }

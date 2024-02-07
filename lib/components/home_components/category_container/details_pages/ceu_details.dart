@@ -1,8 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 class CEUDetails extends StatelessWidget {
   final Map<String, dynamic> details;
@@ -29,10 +26,6 @@ class CEUDetails extends StatelessWidget {
             const SizedBox(height: 16.0),
             _buildBackImageColumn('Back Image', details['backImageUrl']),
             const SizedBox(height: 16.0),
-            // ElevatedButton(
-            //   onPressed: () => _sharePdf(context),
-            //   child: const Text('Share as PDF'),
-            // ),
           ],
         ),
       ),
@@ -94,7 +87,7 @@ class CEUDetails extends StatelessWidget {
           height: 200,
           child: Image.network(
             imageUrl,
-            width: 150, // Set the width as per your design
+            width: 150,
             height: 150, // Set the height as per your design
             fit: BoxFit.cover,
           ),
@@ -102,7 +95,8 @@ class CEUDetails extends StatelessWidget {
       ],
     );
   }
- Widget _buildBackImageColumn(String title, String imageUrl) {
+
+  Widget _buildBackImageColumn(String title, String imageUrl) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -127,26 +121,7 @@ class CEUDetails extends StatelessWidget {
     );
   }
 
-  Future<void> _sharePdf(BuildContext context) async {
-    // Create PDF document
-    final pdf = pw.Document();
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) => buildPdfContent(),
-      ),
-    );
-
-    // Save PDF to a temporary file
-    final tempPath = (await getTemporaryDirectory()).path;
-    final pdfFile = File('$tempPath/ceu_details.pdf');
-    await pdfFile.writeAsBytes(await pdf.save());
-
-    // Share the PDF file
-    await Share.shareFiles(['$tempPath/ceu_details.pdf'],
-        text: 'CEU Details PDF');
-  }
-
-  pw.Widget buildPdfContent() {
+  pw.Widget buildPdfContent(frontImage, backImage) {
     return pw.Column(
       children: [
         _buildPdfRow(['Credential Name', details['Title']],
@@ -157,9 +132,9 @@ class CEUDetails extends StatelessWidget {
           ['Completion Date', details['ceuCompletionDate']],
         ),
         pw.SizedBox(height: 16.0),
-        _buildPdfFrontImageColumn('Front Image', details['frontImageUrl']),
+        _buildPdfFrontImageColumn('Front Image', frontImage),
         pw.SizedBox(height: 16.0),
-        _buildPdfBackImageColumn('Back Image', details['backImageUrl']),
+        _buildPdfBackImageColumn('Back Image', backImage),
       ],
     );
   }
@@ -203,7 +178,7 @@ class CEUDetails extends StatelessWidget {
     );
   }
 
-  pw.Widget _buildPdfFrontImageColumn(String title, String imageUrl) {
+  pw.Widget _buildPdfFrontImageColumn(String title, frontImage) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -214,16 +189,16 @@ class CEUDetails extends StatelessWidget {
           ),
         ),
         pw.SizedBox(height: 8.0),
-        // pw.Container(
-        //   width: 150,
-        //   height: 150,
-        //   child: pw.Image(pw.NetworkImage(imageUrl)),
-        // ),
+        pw.Container(
+          width: 150,
+          height: 150,
+          child: pw.Image(frontImage),
+        ),
       ],
     );
   }
 
-   pw.Widget _buildPdfBackImageColumn(String title, String imageUrl) {
+  pw.Widget _buildPdfBackImageColumn(String title, backImage) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -234,11 +209,11 @@ class CEUDetails extends StatelessWidget {
           ),
         ),
         pw.SizedBox(height: 8.0),
-        // pw.Container(
-        //   width: 150,
-        //   height: 150,
-        //   child: pw.Image(pw.NetworkImage(imageUrl)),
-        // ),
+        pw.Container(
+          width: 150,
+          height: 150,
+          child: pw.Image(backImage),
+        ),
       ],
     );
   }

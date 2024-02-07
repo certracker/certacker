@@ -1,8 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 class VaccinationDetails extends StatelessWidget {
   final Map<String, dynamic> details;
@@ -20,18 +17,15 @@ class VaccinationDetails extends StatelessWidget {
             _buildRow(['Credential Name', details['Title']],
                 ['Vaccination Manufacturer', details['vaccineManufacturer']]),
             const SizedBox(height: 16.0),
-            _buildRow(['Lot Number', details['vaccineLotNumber']],
+            _buildRow(
+                ['Lot Number', details['vaccineLotNumber']],
                 ['Issue Date', details['vaccineIssueDate']],
                 ['Expiry Date', details['vaccineExpiryDate']]),
-             const SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildFrontImageColumn('Front Image', details['frontImageUrl']),
             const SizedBox(height: 16.0),
             _buildBackImageColumn('Back Image', details['backImageUrl']),
             const SizedBox(height: 16.0),
-            // ElevatedButton(
-            //   onPressed: () => _sharePdf(context),
-            //   child: const Text('Share as PDF'),
-            // ),
           ],
         ),
       ),
@@ -77,7 +71,7 @@ class VaccinationDetails extends StatelessWidget {
     );
   }
 
-   Widget _buildFrontImageColumn(String title, String imageUrl) {
+  Widget _buildFrontImageColumn(String title, String imageUrl) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -101,7 +95,8 @@ class VaccinationDetails extends StatelessWidget {
       ],
     );
   }
- Widget _buildBackImageColumn(String title, String imageUrl) {
+
+  Widget _buildBackImageColumn(String title, String imageUrl) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -126,38 +121,20 @@ class VaccinationDetails extends StatelessWidget {
     );
   }
 
-  Future<void> _sharePdf(BuildContext context) async {
-    // Create PDF document
-    final pdf = pw.Document();
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) => buildPdfContent(),
-      ),
-    );
-
-    // Save PDF to a temporary file
-    final tempPath = (await getTemporaryDirectory()).path;
-    final pdfFile = File('$tempPath/vaccination_details.pdf');
-    await pdfFile.writeAsBytes(await pdf.save());
-
-    // Share the PDF file
-    await Share.shareFiles(['$tempPath/vaccination_details.pdf'],
-        text: 'Vaccination Details PDF');
-  }
-
-  pw.Widget buildPdfContent() {
+  pw.Widget buildPdfContent(frontImage, backImage) {
     return pw.Column(
       children: [
         _buildPdfRow(['Credential Name', details['Title']],
             ['Vaccination Manufacturer', details['vaccineManufacturer']]),
         pw.SizedBox(height: 16.0),
-        _buildPdfRow(['Lot Number', details['vaccineLotNumber']],
+        _buildPdfRow(
+            ['Lot Number', details['vaccineLotNumber']],
             ['Issue Date', details['vaccineIssueDate']],
             ['Expiry Date', details['vaccineExpiryDate']]),
-         pw.SizedBox(height: 16.0),
-        _buildPdfFrontImageColumn('Front Image', details['frontImageUrl']),
         pw.SizedBox(height: 16.0),
-        _buildPdfBackImageColumn('Back Image', details['backImageUrl']),
+        _buildPdfFrontImageColumn('Front Image', frontImage),
+        pw.SizedBox(height: 16.0),
+        _buildPdfBackImageColumn('Back Image', backImage),
       ],
     );
   }
@@ -201,7 +178,7 @@ class VaccinationDetails extends StatelessWidget {
     );
   }
 
-  pw.Widget _buildPdfFrontImageColumn(String title, String imageUrl) {
+  pw.Widget _buildPdfFrontImageColumn(String title, frontImage) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -212,16 +189,16 @@ class VaccinationDetails extends StatelessWidget {
           ),
         ),
         pw.SizedBox(height: 8.0),
-        // pw.Container(
-        //   width: 150,
-        //   height: 150,
-        //   child: pw.Image(pw.NetworkImage(imageUrl)),
-        // ),
+        pw.Container(
+          width: 150,
+          height: 150,
+          child: pw.Image(frontImage),
+        ),
       ],
     );
   }
 
-   pw.Widget _buildPdfBackImageColumn(String title, String imageUrl) {
+  pw.Widget _buildPdfBackImageColumn(String title, backImage) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -232,11 +209,11 @@ class VaccinationDetails extends StatelessWidget {
           ),
         ),
         pw.SizedBox(height: 8.0),
-        // pw.Container(
-        //   width: 150,
-        //   height: 150,
-        //   child: pw.Image(pw.NetworkImage(imageUrl)),
-        // ),
+        pw.Container(
+          width: 150,
+          height: 150,
+          child: pw.Image(backImage),
+        ),
       ],
     );
   }
