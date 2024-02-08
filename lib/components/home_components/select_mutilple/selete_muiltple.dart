@@ -1,6 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
-import 'package:certracker/auth/save_data_service.dart';
+// import 'package:certracker/auth/save_data_service.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:certracker/auth/auth_service.dart';
@@ -14,10 +16,10 @@ class SeleteMuiltple extends StatefulWidget {
   final String firstName;
 
   const SeleteMuiltple({
-    super.key,
+    Key? key,
     required this.profilePicture,
     required this.firstName,
-  });
+  }) : super(key: key);
 
   @override
   State<SeleteMuiltple> createState() => _SeleteMuiltpleState();
@@ -47,14 +49,18 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
     return 'UnknownTable';
   }
 
-  List<String> getSelectedCategoryIds() {
-    List<String> selectedIds = [];
-    for (int i = 0; i < selectedCategories.length; i++) {
-      if (selectedCategories[i] && allCategories[i]['DocumentID'] != null) {
-        selectedIds.add(allCategories[i]['DocumentID']!);
-      }
-    }
-    return selectedIds;
+  String getCategoryCollectionName(String category) {
+    Map<String, String> categoryCollectionMap = {
+      'Certification': 'Certification',
+      'License': 'License',
+      'Education': 'Education',
+      'Vaccination': 'Vaccination',
+      'Travel': 'Travel',
+      'CEU': 'CEU',
+      'Others': 'Others',
+    };
+
+    return categoryCollectionMap[category] ?? '';
   }
 
   Future<void> fetchUserData() async {
@@ -111,14 +117,13 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
   }
 
   Future<void> deleteSelectedItems() async {
-    List<Map<String, dynamic>> selectedItems = [];
-    for (int i = 0; i < selectedCategories.length; i++) {
-      if (selectedCategories[i]) {
-        selectedItems.add(allCategories[i]);
-      }
-    }
     try {
-      List<String> selectedIds = getSelectedCategoryIds();
+      List<Map<String, dynamic>> selectedIds = [];
+      for (int i = 0; i < selectedCategories.length; i++) {
+        if (selectedCategories[i]) {
+          selectedIds.add(allCategories[i]);
+        }
+      }
 
       if (selectedIds.isNotEmpty) {
         // Show a confirmation dialog before deletion
@@ -130,10 +135,11 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
             isLoading = true;
           });
 
-          for (String credentialsId in selectedIds) {
+          for (Map<String, dynamic> selectedId in selectedIds) {
+            String credentialsId = selectedId['credentialsId'];
             String tableName = getTableNameFromCredentialsId(credentialsId);
             print('Deleting $credentialsId from $tableName');
-            await SaveDataService.deleteData(tableName, credentialsId);
+            await _handleDelete(credentialsId, tableName);
           }
 
           // Fetch user data again to update the UI
@@ -151,10 +157,46 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
       }
     } catch (e) {
       print('Error deleting selected items: $e');
+      print('Error deleting selected items: $e, $selectedCategories');
       // Reset isLoading on error
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> _handleDelete(String credentialsId, String tableName) async {
+    try {
+      String collectionName = getCategoryCollectionName(tableName);
+
+      await FirebaseFirestore.instance
+          .collection(collectionName)
+          .doc(credentialsId)
+          .delete();
+
+      // Show a success message or navigate back after deletion
+      // For example, you can navigate back to the previous screen:
+      Navigator.pop(context);
+    } catch (e) {
+      print('Error deleting details: $e');
+      // Show an error message if deletion fails
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text('An error occurred while deleting details: $e'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -177,8 +219,7 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context)
-                    .pop(true); // Close the dialog with result 'true'
+                Navigator.of(context).pop(true);
               },
               child: const Text('Delete'),
             ),
@@ -428,14 +469,14 @@ class _SeleteMuiltpleState extends State<SeleteMuiltple> {
 
 class CategoryContainerWithCheckbox extends StatelessWidget {
   const CategoryContainerWithCheckbox({
-    super.key,
+    Key? key,
     required this.selected,
     required this.onChanged,
     required this.categoryColor,
     required this.categoryImagePath,
     required this.title,
     required this.category,
-  });
+  }) : super(key: key);
 
   final bool selected;
   final ValueChanged<bool?> onChanged;
