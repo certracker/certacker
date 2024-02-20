@@ -8,6 +8,7 @@ import 'package:certracker/registration/login/login.dart';
 import 'package:certracker/services/auth_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -28,28 +29,56 @@ class _SignUpPageState extends State<SignUpPage> {
   final confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  String? _passwordMatchValidator(String? value) {
+    if (value != passwordController.text) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
   bool _isChecked = false;
+
+  // ...
 
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return const Dialog(
-            child: Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(width: 20),
-                  Text("Signing Up..."),
-                ],
-              ),
-            ),
-          );
-        },
+      if (firstNameController.text.isEmpty || lastNameController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Please enter your first and last name."),
+        ));
+      }
+      // Check if passwords match
+      if (passwordController.text != confirmPasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Passwords do not match."),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return; // Stop the sign-up process if passwords don't match
+      }
+
+      if (!_isChecked) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please agree to the terms and conditions."),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return; // Stop the sign-up process if checkbox is not checked
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text("Signing Up..."),
+            ],
+          ),
+          duration: Duration(seconds: 1), // Adjust the duration as needed
+        ),
       );
       try {
         UserCredential userCredential =
@@ -73,35 +102,52 @@ class _SignUpPageState extends State<SignUpPage> {
         // Send email verification
         await userCredential.user!.sendEmailVerification();
 
-        Navigator.of(context).pop(); // Dismiss the loading dialog
+        ScaffoldMessenger.of(context)
+            .hideCurrentSnackBar(); // Dismiss the loading SnackBar
 
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const CompleteProfile()),
         );
+      } on FirebaseAuthException catch (e) {
+        ScaffoldMessenger.of(context)
+            .hideCurrentSnackBar(); // Dismiss the loading SnackBar
+
+        String errorMessage = "Failed to sign up. Please try again.";
+
+        if (e.code == 'weak-password') {
+          errorMessage = 'The password provided is too weak.';
+        } else if (e.code == 'email-already-in-use') {
+          errorMessage = 'The account already exists for that email.';
+        } else if (e.code == 'invalid-email') {
+          errorMessage = 'The email address is invalid.';
+        } else if (e.code == 'operation-not-allowed') {
+          errorMessage = 'Account creation is not allowed.';
+        } else if (e.code == 'network-request-failed') {
+          errorMessage =
+              'Network error. Please check your internet connection.';
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            duration: const Duration(seconds: 3),
+          ),
+        );
       } catch (e) {
-        // Handle signup errors
-        print('Error during sign-up: $e');
-        // Show a snackbar or other UI to inform the user about the error
+        // Handle other errors
+        if (kDebugMode) {
+          print('Error during sign-up: $e');
+        }
 
-        Navigator.of(context).pop(); // Dismiss the loading dialog
+        ScaffoldMessenger.of(context)
+            .hideCurrentSnackBar(); // Dismiss the loading SnackBar
 
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Sign Up Error"),
-              content: const Text("Failed to sign up. Please try again."),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("OK"),
-                ),
-              ],
-            );
-          },
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to sign up. Please try again."),
+            duration: Duration(seconds: 3),
+          ),
         );
       }
     }
@@ -151,7 +197,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your first name';
+                          return 'Please enter your password';
                         }
                         return null;
                       },
@@ -172,7 +218,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your last name';
+                          return 'Please enter your password';
                         }
                         return null;
                       },
@@ -193,7 +239,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
+                          return 'Please enter your password';
                         }
                         return null;
                       },
@@ -235,12 +281,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please confirm your password';
-                        }
-                        return null;
-                      },
+                      validator: _passwordMatchValidator,
                       style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(height: 20),
@@ -302,7 +343,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(height: 20),
                     GoogleButton(
                         imagepath: "assets/images/signup/google-icon.png",
-                        onTap: () => AuthService().signInWithGoogle(context)),
+                        onTap: () => GogleAuthService().signInWithGoogle(context)),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

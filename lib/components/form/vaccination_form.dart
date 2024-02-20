@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/save_data_service.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
@@ -252,6 +253,8 @@ class _VaccinationFormState extends State<VaccinationForm> {
             alignment: Alignment.center,
             child: GestureDetector(
               onTap: () async {
+                 AuthenticationService authService = AuthenticationService();
+                String? userId = authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
                   setState(() {
                     isLoading = true;
@@ -260,13 +263,13 @@ class _VaccinationFormState extends State<VaccinationForm> {
                   String vaccinationType = vaccineTypeController.text;
                   String vaccinationManufacturer =
                       vaccineManufacturerController.text;
-                  String frontImageURL = frontImageUrl != null
+                   String frontImageURL = frontImageUrl != null
                       ? await SaveDataService.uploadImageToStorage(
-                          frontImageUrl!)
+                          userId!, frontImageUrl!)
                       : '';
                   String backImageURL = backImageUrl != null
                       ? await SaveDataService.uploadImageToStorage(
-                          backImageUrl!)
+                          userId!, backImageUrl!)
                       : '';
                   String vaccineType = vaccineTypeController.text;
                   String vaccineManufacturer =

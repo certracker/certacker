@@ -255,6 +255,9 @@ class _EditEducationPageState extends State<EditEducationPage> {
                   alignment: Alignment.center,
                   child: GestureDetector(
                     onTap: () async {
+                      AuthenticationService authService =
+                          AuthenticationService();
+                      String? userId = authService.getCurrentUserId();
                       if (_formKey.currentState?.validate() ?? false) {
                         setState(() {
                           isLoading = true;
@@ -269,11 +272,11 @@ class _EditEducationPageState extends State<EditEducationPage> {
                             educationprivateNoteController.text;
                         String frontImageURL = frontImageUrl != null
                             ? await SaveDataService.uploadImageToStorage(
-                                frontImageUrl!)
+                                userId!, frontImageUrl!)
                             : '';
                         String backImageURL = backImageUrl != null
                             ? await SaveDataService.uploadImageToStorage(
-                                backImageUrl!)
+                                userId!, backImageUrl!)
                             : '';
                         // Call the service function to update education data
                         await EducationService.updateEducationData(

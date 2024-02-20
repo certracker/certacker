@@ -75,18 +75,27 @@ class _EditProfileState extends State<EditProfile> {
 
   Future<void> _getImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
+
     if (pickedFile != null) {
-      final imageFile = pickedFile.path;
+      final imageFile = File(pickedFile.path);
       final imageFileName = pickedFile.path.split('/').last;
 
+      // Get the current user's UID
+      final String userId = _user?.uid ?? '';
+
+      // Create a reference to the user's folder in "profile_images"
       firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
           .ref()
           .child('profile_images')
+          .child(userId)
           .child(imageFileName);
 
-      await ref.putFile(File(imageFile));
+      // Use putData to upload the image data
+      await ref.putData(await imageFile.readAsBytes());
 
+      // Get the download URL after uploading
       final imageUrl = await ref.getDownloadURL();
+
       setState(() {
         _imageUrl = imageUrl;
       });
@@ -117,15 +126,13 @@ class _EditProfileState extends State<EditProfile> {
                   );
                 },
               );
-
               try {
                 await updateUserData();
 
                 Navigator.of(context).pop();
 
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                      builder: (context) => const BottomNavBar()),
+                  MaterialPageRoute(builder: (context) => const BottomNavBar()),
                 );
               } catch (e) {
                 Navigator.of(context).pop();
@@ -141,12 +148,12 @@ class _EditProfileState extends State<EditProfile> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF39115B),
-
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text('Save', style: TextStyle(fontSize: 16, color: Colors.white)),
+            child: const Text('Save',
+                style: TextStyle(fontSize: 16, color: Colors.white)),
           ),
           const SizedBox(width: 16),
         ],

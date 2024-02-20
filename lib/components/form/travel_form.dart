@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/save_data_service.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
@@ -273,17 +274,21 @@ class _TravelFormState extends State<TravelForm> {
           alignment: Alignment.center,
           child: GestureDetector(
             onTap: () async {
+               AuthenticationService authService = AuthenticationService();
+                String? userId = authService.getCurrentUserId();
               if (_validateForm()) {
                 setState(() {
                   isLoading = true;
                 });
                 // Retrieve values from the TextEditingControllers
-                String frontImageURL = frontImageUrl != null
-                    ? await SaveDataService.uploadImageToStorage(frontImageUrl!)
-                    : '';
-                String backImageURL = backImageUrl != null
-                    ? await SaveDataService.uploadImageToStorage(backImageUrl!)
-                    : '';
+                 String frontImageURL = frontImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          userId!, frontImageUrl!)
+                      : '';
+                  String backImageURL = backImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          userId!, backImageUrl!)
+                      : '';
                 String travelCountry = travelCountryController.text;
                 String placeOfIssue = travelPlaceOfIssueController.text;
                 String documentNumber = travelDocumentNumberController.text;

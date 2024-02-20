@@ -46,18 +46,18 @@ class _EditOthersPageState extends State<EditOthersPage> {
         TextEditingController(text: widget.initialDetails['Title']);
     _otherNumberController =
         TextEditingController(text: widget.initialDetails['otherNumber']);
-    _otherIssueDateController = TextEditingController(
-        text: widget.initialDetails['otherIssueDate']);
-    _otherExpiryDateController = TextEditingController(
-        text: widget.initialDetails['otherExpiryDate']);
+    _otherIssueDateController =
+        TextEditingController(text: widget.initialDetails['otherIssueDate']);
+    _otherExpiryDateController =
+        TextEditingController(text: widget.initialDetails['otherExpiryDate']);
     _otherFirstReminderController = TextEditingController(
         text: widget.initialDetails['otherFirstReminder']);
     _otherSecondReminderController = TextEditingController(
         text: widget.initialDetails['otherSecondReminder']);
     _otherFinalReminderController = TextEditingController(
         text: widget.initialDetails['otherFinalReminder']);
-    _otherPrivateNoteController = TextEditingController(
-        text: widget.initialDetails['otherPrivateNote']);
+    _otherPrivateNoteController =
+        TextEditingController(text: widget.initialDetails['otherPrivateNote']);
     frontImageUrl = widget.initialDetails['frontImageUrl'];
     backImageUrl = widget.initialDetails['backImageUrl'];
   }
@@ -350,6 +350,9 @@ class _EditOthersPageState extends State<EditOthersPage> {
                   alignment: Alignment.center,
                   child: GestureDetector(
                     onTap: () async {
+                      AuthenticationService authService =
+                          AuthenticationService();
+                      String? userId = authService.getCurrentUserId();
                       if (_formKey.currentState?.validate() ?? false) {
                         setState(() {
                           _isLoading = true;
@@ -371,11 +374,11 @@ class _EditOthersPageState extends State<EditOthersPage> {
                             _otherPrivateNoteController.text;
                         String frontImageURL = frontImageUrl != null
                             ? await SaveDataService.uploadImageToStorage(
-                                frontImageUrl!)
+                                userId!, frontImageUrl!)
                             : '';
                         String backImageURL = backImageUrl != null
                             ? await SaveDataService.uploadImageToStorage(
-                                backImageUrl!)
+                                userId!, backImageUrl!)
                             : '';
 
                         try {

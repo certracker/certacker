@@ -1,6 +1,7 @@
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/user_data_service.dart';
 import 'package:certracker/components/form/add_credential.dart';
+import 'package:certracker/components/form/remider_page/certificate_remider.dart';
 import 'package:certracker/components/home_components/pages/Certification.dart';
 import 'package:certracker/components/home_components/pages/Education.dart';
 import 'package:certracker/components/home_components/pages/License.dart';
@@ -9,7 +10,7 @@ import 'package:certracker/components/home_components/pages/Vaccination.dart';
 import 'package:certracker/components/home_components/pages/all.dart';
 import 'package:certracker/components/home_components/pages/ceu.dart';
 import 'package:certracker/components/home_components/pages/others.dart';
-import 'package:certracker/components/home_components/recyle_bin/recyclebin.dart';
+// import 'package:certracker/components/home_components/recyle_bin/recyclebin.dart';
 import 'package:certracker/components/home_components/search/search_page.dart';
 import 'package:certracker/components/home_components/select_mutilple/selete_muiltple.dart';
 import 'package:flutter/material.dart';
@@ -99,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RecycleBinPage(),
+        builder: (context) => const SetReminderPage(certificationName: '', certificationExpiryDate: '',),
       ),
     );
   }

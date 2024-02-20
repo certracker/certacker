@@ -1,6 +1,5 @@
 import 'package:certracker/api/firebase_api.dart';
 import 'package:certracker/auth/auth_page.dart';
-import 'package:certracker/components/notification/notif.dart';
 import 'package:certracker/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -15,10 +14,8 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   tzdata.initializeTimeZones();
-  tz.setLocalLocation(
-      tz.getLocation("Africa/Lagos"));
+  tz.setLocalLocation(tz.getLocation("Africa/Lagos"));
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -34,14 +31,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const AuthPage(),
+      home: AuthPage(),
       // home: const BottomNavBar(),
-      navigatorKey: navigatorKey,
-      routes: {
-        '/notifi':(context) => const NotifPage(),
-      },
+      // navigatorKey: navigatorKey,
+      // routes: {
+      //   '/notifi':(context) => const NotifPage(),
+      // },
     );
   }
 }

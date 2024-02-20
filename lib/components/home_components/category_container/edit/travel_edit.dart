@@ -312,6 +312,9 @@ class _EditTravelPageState extends State<EditTravelPage> {
                   alignment: Alignment.center,
                   child: GestureDetector(
                     onTap: () async {
+                      AuthenticationService authService =
+                          AuthenticationService();
+                      String? userId = authService.getCurrentUserId();
                       if (_formKey.currentState?.validate() ?? false) {
                         setState(() {
                           isLoading = true;
@@ -319,11 +322,11 @@ class _EditTravelPageState extends State<EditTravelPage> {
                         // Retrieve values from the TextEditingControllers
                         String frontImageURL = frontImageUrl != null
                             ? await SaveDataService.uploadImageToStorage(
-                                frontImageUrl!)
+                                userId!, frontImageUrl!)
                             : '';
                         String backImageURL = backImageUrl != null
                             ? await SaveDataService.uploadImageToStorage(
-                                backImageUrl!)
+                                userId!, backImageUrl!)
                             : '';
                         String travelCountry = travelCountryController.text;
                         String placeOfIssue = travelPlaceOfIssueController.text;

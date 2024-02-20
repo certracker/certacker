@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/save_data_service.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
@@ -315,6 +316,8 @@ class _OthersFormState extends State<OthersForm> {
             alignment: Alignment.center,
             child: GestureDetector(
               onTap: () async {
+                 AuthenticationService authService = AuthenticationService();
+                String? userId = authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
                   setState(() {
                     isLoading = true;
@@ -324,12 +327,12 @@ class _OthersFormState extends State<OthersForm> {
                   // String othersDetails = otherDetailsController.text;
                   String frontImageURL = frontImageUrl != null
                       ? await SaveDataService.uploadImageToStorage(
-                          frontImageUrl!)
+                          userId!, frontImageUrl!)
                       : '';
                   String backImageURL = backImageUrl != null
                       ? await SaveDataService.uploadImageToStorage(
-                          backImageUrl!)
-                      : ''; // Get the actual image URL
+                          userId!, backImageUrl!)
+                      : '';// Get the actual image URL
                   String otherNumber = otherNumberController.text;
                   String otherIssueDate = otherIssueDateController.text;
                   String otherExpiryDate = otherExpiryDateController.text;

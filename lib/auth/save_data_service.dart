@@ -33,22 +33,23 @@ class SaveDataService {
   }
 
   static Future<void> deleteData(String tableName, String credentialsId) async {
-  try {
-    await Firebase.initializeApp();
+    try {
+      await Firebase.initializeApp();
 
-    CollectionReference tableCollection = FirebaseFirestore.instance.collection(tableName);
+      CollectionReference tableCollection =
+          FirebaseFirestore.instance.collection(tableName);
 
-    DocumentReference documentReference = tableCollection.doc(credentialsId);
+      DocumentReference documentReference = tableCollection.doc(credentialsId);
 
-    // Delete the document
-    await documentReference.delete();
+      // Delete the document
+      await documentReference.delete();
 
-    print('Document deleted successfully!');
-  } catch (e) {
-    print('Error deleting document: $e');
-    throw Exception('Error deleting document: $e');
+      print('Document deleted successfully!');
+    } catch (e) {
+      print('Error deleting document: $e');
+      throw Exception('Error deleting document: $e');
+    }
   }
-}
 
   static Future<void> updateData({
     required String tableName,
@@ -85,7 +86,8 @@ class SaveDataService {
           print('Document updated successfully!');
         } else {
           // Throw an exception if the current user is not the owner
-          print('Current user does not have permission to edit this credential.');
+          print(
+              'Current user does not have permission to edit this credential.');
           throw Exception('Permission denied.');
         }
       } else {
@@ -104,13 +106,19 @@ class SaveDataService {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
 
-  static Future<String> uploadImageToStorage(String imagePath) async {
+  static Future<String> uploadImageToStorage(
+      String userId, String imagePath) async {
     if (imagePath.isEmpty) {
       return ''; // Return an empty string for empty image paths
     }
 
     try {
-      Reference ref = FirebaseStorage.instance.ref().child(imagePath);
+      // Create the path with "credentials_images/userId/"
+      String storagePath = 'credentials_images/$userId/';
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('$storagePath${DateTime.now().millisecondsSinceEpoch}');
+
       final File imageFile = File(imagePath);
 
       // Read the file as bytes
@@ -130,7 +138,6 @@ class SaveDataService {
     }
   }
 }
-
 
 class DynamicTableService {
   static Future<void> saveDataToTable({
@@ -193,9 +200,9 @@ class CertificationService {
     required String backImageUrl,
     required String certificationIssueDate,
     required String certificationExpiryDate,
-    required String certificationFirstReminder,
-    required String certificationSecondReminder,
-    required String certificationFinalReminder,
+    // required String certificationFirstReminder,
+    // required String certificationSecondReminder,
+    // required String certificationFinalReminder,
     required String certificationPrivateNote,
     // Add other necessary fields for Certification
   }) async {
@@ -208,9 +215,9 @@ class CertificationService {
       'backImageUrl': backImageUrl,
       'certificationIssueDate': certificationIssueDate,
       'certificationExpiryDate': certificationExpiryDate,
-      'certificationFirstReminder': certificationFirstReminder,
-      'certificationSecondReminder': certificationSecondReminder,
-      'certificationFinalReminder': certificationFinalReminder,
+      // 'certificationFirstReminder': certificationFirstReminder,
+      // 'certificationSecondReminder': certificationSecondReminder,
+      // 'certificationFinalReminder': certificationFinalReminder,
       'certificationPrivateNote': certificationPrivateNote,
       // Add other fields for Certification
     };
@@ -304,7 +311,6 @@ class LicenseService {
   }
 }
 
-
 class EducationService {
   static Future<void> updateEducationData({
     required String credentialsId,
@@ -367,7 +373,6 @@ class EducationService {
   }
 }
 
-
 class CEUCMEService {
   static Future<void> updateCEUData({
     required String credentialsId,
@@ -427,7 +432,6 @@ class CEUCMEService {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
 }
-
 
 class OthersService {
   static Future<void> updateOthersData({
@@ -497,22 +501,21 @@ class OthersService {
   }
 }
 
-
 class TravelService {
   static Future<void> updateTravelData({
-  required String userId,
-  required String credentialsId,
-  required Map<String, dynamic> updatedData,
-}) async {
-  String tableName = 'Travel';
+    required String userId,
+    required String credentialsId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    String tableName = 'Travel';
 
-  await SaveDataService.updateData(
-    tableName: tableName,
-    userId: userId,
-    credentialsId: credentialsId,
-    updatedData: updatedData,
-  );
-}
+    await SaveDataService.updateData(
+      tableName: tableName,
+      userId: userId,
+      credentialsId: credentialsId,
+      updatedData: updatedData,
+    );
+  }
 
   static Future<void> saveTravelData({
     required String frontImageUrl,
@@ -562,22 +565,21 @@ class TravelService {
   }
 }
 
-
 class VaccinationService {
   static Future<void> updateVaccinationData({
-   required String userId,
-  required String credentialsId,
-  required Map<String, dynamic> updatedData,
-}) async {
-  String tableName = 'Vaccination';
+    required String userId,
+    required String credentialsId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    String tableName = 'Vaccination';
 
-  await SaveDataService.updateData(
-    tableName: tableName,
-    userId: userId,
-    credentialsId: credentialsId,
-    updatedData: updatedData,
-  );
-}
+    await SaveDataService.updateData(
+      tableName: tableName,
+      userId: userId,
+      credentialsId: credentialsId,
+      updatedData: updatedData,
+    );
+  }
 
   static Future<void> saveVaccinationData({
     required String vaccinationType,

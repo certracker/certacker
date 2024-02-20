@@ -353,6 +353,8 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                   alignment: Alignment.center,
                   child: GestureDetector(
                     onTap: () async {
+                       AuthenticationService authService = AuthenticationService();
+                String? userId = authService.getCurrentUserId();
                       if (_formKey.currentState?.validate() ?? false) {
                         setState(() {
                           _isLoading = true;
@@ -369,14 +371,14 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                         String secondReminder = _secondReminderController.text;
                         String finalReminder = _finalReminderController.text;
                         String privateNote = _privateNoteController.text;
-                        String frontImageURL = frontImageUrl != null
-                            ? await SaveDataService.uploadImageToStorage(
-                                frontImageUrl!)
-                            : '';
-                        String backImageURL = backImageUrl != null
-                            ? await SaveDataService.uploadImageToStorage(
-                                backImageUrl!)
-                            : '';
+                         String frontImageURL = frontImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          userId!, frontImageUrl!)
+                      : '';
+                  String backImageURL = backImageUrl != null
+                      ? await SaveDataService.uploadImageToStorage(
+                          userId!, backImageUrl!)
+                      : '';
 
                         try {
                           // Call the service to update the existing data

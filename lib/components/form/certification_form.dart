@@ -1,10 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'package:certracker/auth/auth_service.dart';
+import 'package:certracker/components/form/remider_page/certificate_remider.dart';
+
 import 'package:timezone/timezone.dart' as tz;
 
 import 'package:certracker/auth/save_data_service.dart';
-import 'package:certracker/components/nav_bar/nav_bar.dart';
+// import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:certracker/main.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_picker/image_picker.dart';
@@ -32,14 +35,14 @@ class _CertificationFormState extends State<CertificationForm> {
   final TextEditingController certificationExpiryDateController =
       TextEditingController();
 
-  final TextEditingController certificationFirstReminderController =
-      TextEditingController();
+  // final TextEditingController certificationFirstReminderController =
+  //     TextEditingController();
 
-  final TextEditingController certificationSecondReminderController =
-      TextEditingController();
+  // final TextEditingController certificationSecondReminderController =
+  //     TextEditingController();
 
-  final TextEditingController certificationFinalReminderController =
-      TextEditingController();
+  // final TextEditingController certificationFinalReminderController =
+  //     TextEditingController();
 
   final TextEditingController certificationPrivateNoteController =
       TextEditingController();
@@ -67,7 +70,8 @@ class _CertificationFormState extends State<CertificationForm> {
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
       "ReminderID",
       "Reminder",
-      channelDescription: "This is to remind you about your credentials expiration.",
+      channelDescription:
+          "This is to remind you about your credentials expiration.",
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -185,45 +189,6 @@ class _CertificationFormState extends State<CertificationForm> {
               }
             },
           ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: certificationFirstReminderController,
-            decoration: const InputDecoration(
-              labelText: "First Reminder",
-              border: OutlineInputBorder(),
-              suffixIcon: Icon(Icons.calendar_today),
-            ),
-            readOnly: true,
-            onTap: () async {
-              await selectFirstReminderDate();
-            },
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: certificationSecondReminderController,
-            decoration: const InputDecoration(
-              labelText: "Second Reminder",
-              border: OutlineInputBorder(),
-              suffixIcon: Icon(Icons.calendar_today),
-            ),
-            readOnly: true,
-            onTap: () async {
-              await selectSecondReminderDate();
-            },
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: certificationFinalReminderController,
-            decoration: const InputDecoration(
-              labelText: "Final Reminder",
-              border: OutlineInputBorder(),
-              suffixIcon: Icon(Icons.calendar_today),
-            ),
-            readOnly: true,
-            onTap: () async {
-              await selectFinalReminderDate();
-            },
-          ),
           const SizedBox(height: 42),
           const Text(
             "Upload Photo",
@@ -242,7 +207,7 @@ class _CertificationFormState extends State<CertificationForm> {
           ),
           const SizedBox(height: 16),
           // Image upload for Front
-         GestureDetector(
+          GestureDetector(
             onTap: () async {
               await showImageSourceDialog('front');
             },
@@ -350,6 +315,8 @@ class _CertificationFormState extends State<CertificationForm> {
             alignment: Alignment.center,
             child: GestureDetector(
               onTap: () async {
+                AuthenticationService authService = AuthenticationService();
+                String? userId = authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
                   setState(() {
                     isLoading = true;
@@ -360,22 +327,17 @@ class _CertificationFormState extends State<CertificationForm> {
                       certificationNumberController.text;
                   String frontImageURL = frontImageUrl != null
                       ? await SaveDataService.uploadImageToStorage(
-                          frontImageUrl!)
+                          userId!, frontImageUrl!)
                       : '';
                   String backImageURL = backImageUrl != null
                       ? await SaveDataService.uploadImageToStorage(
-                          backImageUrl!)
+                          userId!, backImageUrl!)
                       : '';
+
                   String certificationIssueDate =
                       certificationIssueDateController.text;
                   String certificationExpiryDate =
                       certificationExpiryDateController.text;
-                  String certificationFirstReminder =
-                      certificationFirstReminderController.text;
-                  String certificationSecondReminder =
-                      certificationSecondReminderController.text;
-                  String certificationFinalReminder =
-                      certificationFinalReminderController.text;
                   String certificationPrivateNote =
                       certificationPrivateNoteController.text;
 
@@ -387,9 +349,6 @@ class _CertificationFormState extends State<CertificationForm> {
                     backImageUrl: backImageURL,
                     certificationIssueDate: certificationIssueDate,
                     certificationExpiryDate: certificationExpiryDate,
-                    certificationFirstReminder: certificationFirstReminder,
-                    certificationSecondReminder: certificationSecondReminder,
-                    certificationFinalReminder: certificationFinalReminder,
                     certificationPrivateNote: certificationPrivateNote,
                   );
                   setState(() {
@@ -397,10 +356,15 @@ class _CertificationFormState extends State<CertificationForm> {
                   });
 
                   // Navigate back to the dashboard
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const BottomNavBar()),
+                      builder: (context) => SetReminderPage(
+                        certificationName: certificationNameController.text,
+                        certificationExpiryDate:
+                            certificationExpiryDateController.text,
+                      ),
+                    ),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -489,35 +453,6 @@ class _CertificationFormState extends State<CertificationForm> {
           backImageUrl = pickedFile.path;
         }
       });
-    }
-  }
-
-  Future<void> selectFirstReminderDate() async {
-    await selectDateAndSetReminder(
-        'First Reminder', certificationFirstReminderController);
-  }
-
-  Future<void> selectSecondReminderDate() async {
-    await selectDateAndSetReminder(
-        'Second Reminder', certificationSecondReminderController);
-  }
-
-  Future<void> selectFinalReminderDate() async {
-    await selectDateAndSetReminder(
-        'Final Reminder', certificationFinalReminderController);
-  }
-
-  Future<void> selectDateAndSetReminder(
-      String reminderType, TextEditingController controller) async {
-    final DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (selectedDate != null) {
-      controller.text = selectedDate.toLocal().toString().split(' ')[0];
-      await scheduleNotification(reminderType, selectedDate);
     }
   }
 }
