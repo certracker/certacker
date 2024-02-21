@@ -1,7 +1,8 @@
-import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
-import 'package:flutter/material.dart';
 import 'package:certracker/services/notification_service.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class SetReminderPage extends StatefulWidget {
   final String certificationName;
@@ -75,44 +76,17 @@ class _SetReminderPageState extends State<SetReminderPage> {
 
       // Schedule reminder
       _scheduleReminder(title, note, scheduledDate);
-    }
-  }
 
-  void _scheduleReminder(String title, String note, DateTime scheduledDate) {
-    final int notificationId = DateTime.now().millisecondsSinceEpoch.hashCode;
+      // Show success message
+      _showSnackBar("Reminder set successfully", true);
 
-    final DateTime now = DateTime.now();
-    final Duration timeDifference = scheduledDate.difference(now);
-    final int seconds = timeDifference.inSeconds;
-
-    // Show success message immediately
-    _showSnackBar("Reminder set successfully", true);
-
-    // Navigate to the main page after a short delay
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const BottomNavBar()),
-      ); // Assuming the main page is the previous page
-    });
-    // Get the current user ID
-    String? userId = AuthenticationService().getCurrentUserId();
-    // Schedule the FCM message and local notification
-    if (seconds > 0 && userId != null) {
-      Future.delayed(Duration(seconds: seconds), () {
-        notificationService.sendTestFCMMessage(
-          title,
-          note,
-          scheduledDate,
-          notificationId,
-          userId,
-        );
+      // Navigate to the main page after a short delay
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const BottomNavBar()),
+        ); // Assuming the main page is the previous page
       });
-    } else {
-      _showSnackBar(
-        "Invalid scheduled date, please choose a future date and time.",
-        false,
-      );
     }
   }
 
@@ -123,6 +97,74 @@ class _SetReminderPageState extends State<SetReminderPage> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+
+  // Future<void> _scheduleReminder(
+  //     String title, String note, DateTime scheduledDate) async {
+  //   const int notificationId = 0;
+  //   final DateTime now = DateTime.now();
+  //   final Duration timeDifference = scheduledDate.difference(now);
+  //   final int seconds = timeDifference.inSeconds;
+
+  //   if (seconds > 0) {
+  //   const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  //     "NotificationChannel",
+  //     "NotificationChannelForandroid",
+  //     importance: Importance.max,
+  //     priority: Priority.high,
+  //     showWhen: false, // Do not show the timestamp in the notification
+  //   );
+
+  //    const NotificationDetails platformChannelSpecifics =
+  //       NotificationDetails(android: androidPlatformChannelSpecifics);
+
+  //   final String notificationBody = "$title\n$note"; // Combine title and note in the notification body
+
+  //   Future.delayed(Duration(seconds: seconds), () {
+  //     notificationService.showNotification(notificationId, title, notificationBody, platformChannelSpecifics);
+  //   });
+
+  //     if (kDebugMode) {
+  //       print('Reminder scheduled: $title, $note, $scheduledDate');
+  //       print('Setting up reminder: $title, $note, $scheduledDate');
+  //       print('Time difference: $timeDifference');
+  //       print('Seconds: $seconds');
+  //     }
+  //   } else {
+  //     if (kDebugMode) {
+  //       print('Invalid scheduled date, please choose a future date and time.');
+  //     }
+  //   }
+  // }
+
+  Future<void> _scheduleReminder(String title, String note, DateTime scheduledDate) async {
+  final int notificationId = DateTime.now().millisecondsSinceEpoch % (1 << 31); // Ensure the ID stays within the range
+  final DateTime now = DateTime.now();
+  final Duration timeDifference = scheduledDate.difference(now);
+  final int seconds = timeDifference.inSeconds;
+
+  if (seconds > 0) {
+    Future.delayed(Duration(seconds: seconds), () {
+      notificationService.showNotification(notificationId, title, "$title\n$note" , const NotificationDetails(
+        android: AndroidNotificationDetails(
+          "ReminderID",
+          "Reminder",
+        )
+      ));
+    });
+
+    if (kDebugMode) {
+      print('Reminder scheduled: $title, $note, $scheduledDate');
+      print('Setting up reminder: $title, $note, $scheduledDate');
+      print('Time difference: $timeDifference');
+      print('Seconds: $seconds');
+    }
+  } else {
+    if (kDebugMode) {
+      print('Invalid scheduled date, please choose a future date and time.');
+    }
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {

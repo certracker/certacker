@@ -200,9 +200,6 @@ class CertificationService {
     required String backImageUrl,
     required String certificationIssueDate,
     required String certificationExpiryDate,
-    // required String certificationFirstReminder,
-    // required String certificationSecondReminder,
-    // required String certificationFinalReminder,
     required String certificationPrivateNote,
     // Add other necessary fields for Certification
   }) async {
@@ -215,9 +212,6 @@ class CertificationService {
       'backImageUrl': backImageUrl,
       'certificationIssueDate': certificationIssueDate,
       'certificationExpiryDate': certificationExpiryDate,
-      // 'certificationFirstReminder': certificationFirstReminder,
-      // 'certificationSecondReminder': certificationSecondReminder,
-      // 'certificationFinalReminder': certificationFinalReminder,
       'certificationPrivateNote': certificationPrivateNote,
       // Add other fields for Certification
     };

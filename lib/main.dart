@@ -15,7 +15,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   tzdata.initializeTimeZones();
-  tz.setLocalLocation(tz.getLocation("Africa/Lagos"));
+  tz.setLocalLocation(tz.getLocation(tz.local.name));
 
   // Initialize Firebase
   await Firebase.initializeApp(
