@@ -3,10 +3,13 @@
 import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
-import 'package:certracker/auth/save_data_service.dart';
+import 'package:certracker/auth/cert_auth/cert_service.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 class EditCertificationPage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
@@ -28,15 +31,10 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
   late TextEditingController _certificationNumberController;
   late TextEditingController _issueDateController;
   late TextEditingController _expiryDateController;
-  late TextEditingController _firstReminderController;
-  late TextEditingController _secondReminderController;
-  late TextEditingController _finalReminderController;
   late TextEditingController _privateNoteController;
 
-  String? frontImageUrl;
-  String? backImageUrl;
-
   bool _isLoading = false;
+  String? selectedFileUrl;
 
   @override
   void initState() {
@@ -44,21 +42,14 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
     _certificationNameController =
         TextEditingController(text: widget.initialDetails['Title']);
     _certificationNumberController = TextEditingController(
-        text: widget.initialDetails['certificationNumber']);
+        text: widget.initialDetails['Number']);
     _issueDateController = TextEditingController(
-        text: widget.initialDetails['certificationIssueDate']);
+        text: widget.initialDetails['IssueDate']);
     _expiryDateController = TextEditingController(
-        text: widget.initialDetails['certificationExpiryDate']);
-    _firstReminderController = TextEditingController(
-        text: widget.initialDetails['certificationFirstReminder']);
-    _secondReminderController = TextEditingController(
-        text: widget.initialDetails['certificationSecondReminder']);
-    _finalReminderController = TextEditingController(
-        text: widget.initialDetails['certificationFinalReminder']);
+        text: widget.initialDetails['ExpiryDate']);
     _privateNoteController = TextEditingController(
-        text: widget.initialDetails['certificationPrivateNote']);
-    frontImageUrl = widget.initialDetails['frontImageUrl'];
-    backImageUrl = widget.initialDetails['backImageUrl'];
+        text: widget.initialDetails['PrivateNote']);
+        selectedFileUrl = widget.initialDetails['frontImageUrl'];
   }
 
   @override
@@ -67,9 +58,6 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
     _certificationNumberController.dispose();
     _issueDateController.dispose();
     _expiryDateController.dispose();
-    _firstReminderController.dispose();
-    _secondReminderController.dispose();
-    _finalReminderController.dispose();
     _privateNoteController.dispose();
     super.dispose();
   }
@@ -161,93 +149,19 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                     }
                   },
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _firstReminderController,
-                  decoration: const InputDecoration(
-                    labelText: "First Reminder (Optional)",
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
-                  readOnly: true,
-                  onTap: () async {
-                    final DateTime? selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (selectedDate != null) {
-                      _firstReminderController.text =
-                          selectedDate.toLocal().toString().split(' ')[0];
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _secondReminderController,
-                  decoration: const InputDecoration(
-                    labelText: "Second Reminder (Optional)",
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
-                  readOnly: true,
-                  onTap: () async {
-                    final DateTime? selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (selectedDate != null) {
-                      _secondReminderController.text =
-                          selectedDate.toLocal().toString().split(' ')[0];
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _finalReminderController,
-                  decoration: const InputDecoration(
-                    labelText: "Final Reminder (Optional)",
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
-                  readOnly: true,
-                  onTap: () async {
-                    final DateTime? selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (selectedDate != null) {
-                      _finalReminderController.text =
-                          selectedDate.toLocal().toString().split(' ')[0];
-                    }
-                  },
-                ),
                 const SizedBox(height: 42),
                 const Text(
-                  "Upload Photo",
+                  "Upload File",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  "Front",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Image upload for Front
+                // File upload section
                 GestureDetector(
                   onTap: () async {
-                    await pickImageAndSetUrl('front');
+                    await showFileSourceDialog();
                   },
                   child: Container(
                     width: 400,
@@ -256,69 +170,19 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: frontImageUrl != null
-                        ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                    child: selectedFileUrl != null
+                        ? getFileWidget(selectedFileUrl!)
                         : const Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.camera_alt, size: 40),
+                              Icon(Icons.file_upload, size: 40),
                               SizedBox(height: 8),
                               Text(
-                                "Add image",
+                                "Upload File",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "Supported formats: JPEG, PNG, JPG",
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-                const Text(
-                  "Back",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Image upload for Back
-                GestureDetector(
-                  onTap: () async {
-                    await pickImageAndSetUrl('back');
-                  },
-                  child: Container(
-                    width: 400,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: backImageUrl != null
-                        ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
-                        : const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.camera_alt, size: 40),
-                              SizedBox(height: 8),
-                              Text(
-                                "Add image",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "Supported formats: JPEG, PNG, JPG",
-                                style: TextStyle(fontSize: 12),
                               ),
                             ],
                           ),
@@ -353,8 +217,9 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                   alignment: Alignment.center,
                   child: GestureDetector(
                     onTap: () async {
-                       AuthenticationService authService = AuthenticationService();
-                String? userId = authService.getCurrentUserId();
+                      AuthenticationService authService =
+                          AuthenticationService();
+                      authService.getCurrentUserId();
                       if (_formKey.currentState?.validate() ?? false) {
                         setState(() {
                           _isLoading = true;
@@ -367,18 +232,7 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                             _certificationNumberController.text;
                         String issueDate = _issueDateController.text;
                         String expiryDate = _expiryDateController.text;
-                        String firstReminder = _firstReminderController.text;
-                        String secondReminder = _secondReminderController.text;
-                        String finalReminder = _finalReminderController.text;
                         String privateNote = _privateNoteController.text;
-                         String frontImageURL = frontImageUrl != null
-                      ? await SaveDataService.uploadImageToStorage(
-                          userId!, frontImageUrl!)
-                      : '';
-                  String backImageURL = backImageUrl != null
-                      ? await SaveDataService.uploadImageToStorage(
-                          userId!, backImageUrl!)
-                      : '';
 
                         try {
                           // Call the service to update the existing data
@@ -388,15 +242,10 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                             userId: AuthenticationService().getCurrentUserId()!,
                             updatedData: {
                               'Title': certificationName,
-                              'certificationNumber': certificationNumber,
-                              'frontImageUrl': frontImageURL,
-                              'backImageUrl': backImageURL,
-                              'certificationIssueDate': issueDate,
-                              'certificationExpiryDate': expiryDate,
-                              'certificationFirstReminder': firstReminder,
-                              'certificationSecondReminder': secondReminder,
-                              'certificationFinalReminder': finalReminder,
-                              'certificationPrivateNote': privateNote,
+                              'Number': certificationNumber,
+                              'IssueDate': issueDate,
+                              'ExpiryDate': expiryDate,
+                              'PrivateNote': privateNote,
                             },
                           );
 
@@ -457,17 +306,69 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
     );
   }
 
-  Future<void> pickImageAndSetUrl(String type) async {
-    final XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        if (type == 'front') {
-          frontImageUrl = pickedFile.path;
-        } else {
-          backImageUrl = pickedFile.path;
-        }
-      });
-    }
+  Future<void> showFileSourceDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select File Source'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context); // Close the dialog
+                  try {
+                    final FilePickerResult? result =
+                        await FilePicker.platform.pickFiles(
+                      type: FileType.any,
+                    );
+                    if (result != null) {
+                      final String? filePath = result.files.single.path;
+                      if (filePath != null) {
+                        pickFileAndSetUrl(filePath);
+                      }
+                    }
+                  } on PlatformException catch (e) {
+                    if (kDebugMode) {
+                      print("Unsupported operation$e");
+                    }
+                  }
+                },
+                child: const Text('Files'),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                  // For now, we're not handling image picking
+                },
+                child: const Text('Camera'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> pickFileAndSetUrl(String filePath) async {
+    setState(() {
+      selectedFileUrl = filePath;
+    });
+  }
+  
+}
+
+// Function to return appropriate widget based on file type
+Widget getFileWidget(String filePath) {
+  if (filePath.toLowerCase().endsWith('.pdf')) {
+    // Display PDF file using PDFViewer widget
+    return PDFView(
+      filePath: filePath,
+    );
+  } else {
+    // Display image file using Image.file widget
+    return Image.file(File(filePath), fit: BoxFit.cover);
   }
 }

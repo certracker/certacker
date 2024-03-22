@@ -1,17 +1,12 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:io';
 import 'package:certracker/auth/auth_service.dart';
+import 'package:certracker/auth/cert_auth/cert_service.dart';
 import 'package:certracker/components/form/remider_page/certificate_remider.dart';
-
-import 'package:timezone/timezone.dart' as tz;
-
-import 'package:certracker/auth/save_data_service.dart';
-// import 'package:certracker/components/nav_bar/nav_bar.dart';
-import 'package:certracker/main.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 class CertificationForm extends StatefulWidget {
   const CertificationForm({super.key});
@@ -35,79 +30,11 @@ class _CertificationFormState extends State<CertificationForm> {
   final TextEditingController certificationExpiryDateController =
       TextEditingController();
 
-  // final TextEditingController certificationFirstReminderController =
-  //     TextEditingController();
-
-  // final TextEditingController certificationSecondReminderController =
-  //     TextEditingController();
-
-  // final TextEditingController certificationFinalReminderController =
-  //     TextEditingController();
-
   final TextEditingController certificationPrivateNoteController =
       TextEditingController();
 
-  String? frontImageUrl;
-  String? backImageUrl;
-
   bool isLoading = false;
-
-  Future<void> scheduleNotification(
-      String reminderType, DateTime selectedDate) async {
-    String reminderMessage = '';
-    switch (reminderType) {
-      case 'First Reminder':
-        reminderMessage = 'First Reminder: Time to be reminded!';
-        break;
-      case 'Second Reminder':
-        reminderMessage = 'Second Reminder: Time to be reminded!';
-        break;
-      case 'Final Reminder':
-        reminderMessage = 'Final Reminder: Time to be reminded!';
-        break;
-    }
-
-    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      "ReminderID",
-      "Reminder",
-      channelDescription:
-          "This is to remind you about your credentials expiration.",
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    var platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-    );
-
-    int notificationId;
-
-    // Assign unique notification ID based on reminder type
-    switch (reminderType) {
-      case 'First Reminder':
-        notificationId = 1;
-        break;
-      case 'Second Reminder':
-        notificationId = 2;
-        break;
-      case 'Final Reminder':
-        notificationId = 3;
-        break;
-      default:
-        notificationId = 0; // Default ID
-    }
-
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      notificationId, // Use unique ID for each reminder type
-      'Reminder',
-      reminderMessage, // Notification body
-      tz.TZDateTime.from(selectedDate, tz.local),
-      platformChannelSpecifics,
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-    );
-  }
+  String? selectedFileUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -191,25 +118,17 @@ class _CertificationFormState extends State<CertificationForm> {
           ),
           const SizedBox(height: 42),
           const Text(
-            "Upload Photo",
+            "Upload File",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            "Front",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Image upload for Front
+          // File upload section
           GestureDetector(
             onTap: () async {
-              await showImageSourceDialog('front');
+              await showFileSourceDialog();
             },
             child: Container(
               width: 400,
@@ -218,69 +137,19 @@ class _CertificationFormState extends State<CertificationForm> {
                 color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: frontImageUrl != null
-                  ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+              child: selectedFileUrl != null
+                  ? getFileWidget(selectedFileUrl!)
                   : const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.camera_alt, size: 40),
+                        Icon(Icons.file_upload, size: 40),
                         SizedBox(height: 8),
                         Text(
-                          "Add image",
+                          "Upload File",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "Supported formats: JPEG, PNG, JPG",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-          const Text(
-            "Back",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Image upload for Back
-          GestureDetector(
-            onTap: () async {
-              await showImageSourceDialog('back');
-            },
-            child: Container(
-              width: 400,
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: backImageUrl != null
-                  ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
-                  : const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.camera_alt, size: 40),
-                        SizedBox(height: 8),
-                        Text(
-                          "Add image",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "Supported formats: JPEG, PNG, JPG",
-                          style: TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
@@ -316,7 +185,7 @@ class _CertificationFormState extends State<CertificationForm> {
             child: GestureDetector(
               onTap: () async {
                 AuthenticationService authService = AuthenticationService();
-                String? userId = authService.getCurrentUserId();
+                authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
                   setState(() {
                     isLoading = true;
@@ -325,15 +194,6 @@ class _CertificationFormState extends State<CertificationForm> {
                   String certificationName = certificationNameController.text;
                   String certificationNumber =
                       certificationNumberController.text;
-                  String frontImageURL = frontImageUrl != null
-                      ? await SaveDataService.uploadImageToStorage(
-                          userId!, frontImageUrl!)
-                      : '';
-                  String backImageURL = backImageUrl != null
-                      ? await SaveDataService.uploadImageToStorage(
-                          userId!, backImageUrl!)
-                      : '';
-
                   String certificationIssueDate =
                       certificationIssueDateController.text;
                   String certificationExpiryDate =
@@ -343,13 +203,12 @@ class _CertificationFormState extends State<CertificationForm> {
 
                   // Call the saveCertificationData method with the gathered data
                   await CertificationService.saveCertificationData(
-                    certificationName: certificationName,
-                    certificationNumber: certificationNumber,
-                    frontImageUrl: frontImageURL,
-                    backImageUrl: backImageURL,
-                    certificationIssueDate: certificationIssueDate,
-                    certificationExpiryDate: certificationExpiryDate,
-                    certificationPrivateNote: certificationPrivateNote,
+                    name: certificationName,
+                    number: certificationNumber,
+                    issueDate: certificationIssueDate,
+                    expiryDate: certificationExpiryDate,
+                    privateNote: certificationPrivateNote,
+                    filePath: selectedFileUrl ?? '', // Pass file path here
                   );
                   setState(() {
                     isLoading = false;
@@ -408,29 +267,44 @@ class _CertificationFormState extends State<CertificationForm> {
     );
   }
 
-  Future<void> showImageSourceDialog(String type) async {
+  Future<void> showFileSourceDialog() async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Select Image Source'),
+          title: const Text('Select File Source'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context); // Close the dialog
-                  pickImageAndSetUrl(type, 'camera');
+                  try {
+                    final FilePickerResult? result =
+                        await FilePicker.platform.pickFiles(
+                      type: FileType.any,
+                    );
+                    if (result != null) {
+                      final String? filePath = result.files.single.path;
+                      if (filePath != null) {
+                        pickFileAndSetUrl(filePath);
+                      }
+                    }
+                  } on PlatformException catch (e) {
+                    if (kDebugMode) {
+                      print("Unsupported operation$e");
+                    }
+                  }
                 },
-                child: const Text('Camera'),
+                child: const Text('Files'),
               ),
               const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context); // Close the dialog
-                  pickImageAndSetUrl(type, 'gallery');
+                  // For now, we're not handling image picking
                 },
-                child: const Text('Gallery'),
+                child: const Text('Camera'),
               ),
             ],
           ),
@@ -439,20 +313,22 @@ class _CertificationFormState extends State<CertificationForm> {
     );
   }
 
-  Future<void> pickImageAndSetUrl(String type, String source) async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(
-      source: source == 'camera' ? ImageSource.camera : ImageSource.gallery,
-    );
+  Future<void> pickFileAndSetUrl(String filePath) async {
+    setState(() {
+      selectedFileUrl = filePath;
+    });
+  }
+}
 
-    if (pickedFile != null) {
-      setState(() {
-        if (type == 'front') {
-          frontImageUrl = pickedFile.path;
-        } else {
-          backImageUrl = pickedFile.path;
-        }
-      });
-    }
+// Function to return appropriate widget based on file type
+Widget getFileWidget(String filePath) {
+  if (filePath.toLowerCase().endsWith('.pdf')) {
+    // Display PDF file using PDFViewer widget
+    return PDFView(
+      filePath: filePath,
+    );
+  } else {
+    // Display image file using Image.file widget
+    return Image.file(File(filePath), fit: BoxFit.cover);
   }
 }

@@ -1,6 +1,4 @@
 import 'package:certracker/components/nav_bar/nav_bar.dart';
-// import 'package:certracker/components/notification/notification.dart';
-// import 'package:certracker/main.dart';
 import 'package:certracker/onboard/onboard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +11,6 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-// @override
-//   void initState() {
-//     super.initState();
-//     Noti.initialize(flutterLocalNotificationsPlugin);
-//   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

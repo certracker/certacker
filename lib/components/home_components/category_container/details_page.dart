@@ -1,5 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
@@ -19,12 +18,10 @@ import 'package:certracker/components/home_components/category_container/edit/tr
 import 'package:certracker/components/home_components/category_container/edit/vaccination_edit.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:printing/printing.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:pdf/widgets.dart' as pw;
-// import 'pdf_utils.dart';
+import 'package:http/http.dart' as http;
 
 class DetailsPage extends StatefulWidget {
   final String title;
@@ -53,63 +50,144 @@ class _DetailsPageState extends State<DetailsPage> {
     fetchData = fetchDetails();
   }
 
-  void _showDeleteConfirmationDialog() {
-  bool isDeleting = false; // Track if deletion is in progress
+  Future<void> _handleShare() async {
+    try {
+      // Fetch the details data
+      Map<String, dynamic> details = await fetchData;
 
-  showDialog(
-    context: context,
-    barrierDismissible: false, // Prevent closing the dialog by tapping outside
-    builder: (BuildContext context) {
-      return WillPopScope(
-        onWillPop: () async => !isDeleting,
-        child: AlertDialog(
-          title: const Text('Delete Confirmation'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Are you sure you want to delete this file? Once deleted, you cannot recover it.',
+      // Check if the details contain the PDF path
+      if (details.containsKey('pdfPath')) {
+        // Get the PDF file path
+        String pdfPath = details['pdfPath'];
+
+        // Check if the PDF file exists
+        if (await File(pdfPath).exists()) {
+          // Share the PDF file using share_plus package
+          await Share.shareFiles([pdfPath], text: 'Sharing PDF file');
+        } else {
+          // Show a dialog if the PDF file doesn't exist
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Error'),
+                content: const Text('PDF file not found'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } else {
+        // Show a dialog if the PDF path is not available
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text('PDF file not available'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      print('Error sharing document: $e');
+      // Show an error dialog if sharing fails
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text('An error occurred while sharing document: $e'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
               ),
-              if (isDeleting) const SizedBox(height: 16.0), // Add some space for the loading indicator
-              if (isDeleting) const CircularProgressIndicator(), // Loading indicator
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _showDeleteConfirmationDialog() {
+    bool isDeleting = false; // Track if deletion is in progress
+
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, // Prevent closing the dialog by tapping outside
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => !isDeleting,
+          child: AlertDialog(
+            title: const Text('Delete Confirmation'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Are you sure you want to delete this file? Once deleted, you cannot recover it.',
+                ),
+                if (isDeleting)
+                  const SizedBox(
+                      height: 16.0), // Add some space for the loading indicator
+                if (isDeleting)
+                  const CircularProgressIndicator(), // Loading indicator
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: isDeleting
+                    ? null
+                    : () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: isDeleting
+                    ? null
+                    : () async {
+                        // Set the isDeleting flag to true to show the loading indicator
+                        setState(() {
+                          isDeleting = true;
+                        });
+
+                        // Call the method to delete the data from Firebase
+                        await _handleDelete();
+
+                        // Navigate to the replacement page after deletion
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const BottomNavBar()),
+                        );
+                      },
+                child: const Text('Delete'),
+              ),
             ],
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: isDeleting
-                  ? null
-                  : () {
-                      Navigator.of(context).pop(); // Close the dialog
-                    },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: isDeleting
-                  ? null
-                  : () async {
-                      // Set the isDeleting flag to true to show the loading indicator
-                      setState(() {
-                        isDeleting = true;
-                      });
-
-                      // Call the method to delete the data from Firebase
-                      await _handleDelete();
-
-                      // Navigate to the replacement page after deletion
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const BottomNavBar()),
-                      );
-                    },
-              child: const Text('Delete'),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-
+        );
+      },
+    );
+  }
 
   Future<void> _handleDelete() async {
     try {
@@ -198,128 +276,6 @@ class _DetailsPageState extends State<DetailsPage> {
     );
   }
 
-  Future<void> _handleShare(Map<String, dynamic> details) async {
-    if (details['frontImageUrl'].isEmpty || details['backImageUrl'].isEmpty) {
-      // Display an error dialog since there are no images
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('No image found. Unable to share.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    // Show loading indicator
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const AlertDialog(
-          content: Row(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 16.0),
-              Text("Creating PDF and sharing..."),
-            ],
-          ),
-        );
-      },
-      barrierDismissible: false, // Prevent user from dismissing the dialog
-    );
-
-    try {
-      final frontImage = await networkImage(details['frontImageUrl']);
-      final backImage = await networkImage(details['backImageUrl']);
-
-      // Create PDF document
-      final pdf = pw.Document();
-
-      // Use a switch statement or a map to determine which details page to use
-      pw.Widget pdfContent;
-      switch (widget.category) {
-        case 'Certification':
-          pdfContent = CertificationDetails(details: details)
-              .buildPdfContent(frontImage, backImage);
-          break;
-        case 'License':
-          pdfContent = LicenseDetails(details: details)
-              .buildPdfContent(frontImage, backImage);
-          break;
-        case 'Education':
-          pdfContent = EducationDetails(details: details)
-              .buildPdfContent(frontImage, backImage);
-          break;
-        case 'Vaccination':
-          pdfContent = VaccinationDetails(details: details)
-              .buildPdfContent(frontImage, backImage);
-          break;
-        case 'Travel':
-          pdfContent = TravelDetails(details: details)
-              .buildPdfContent(frontImage, backImage);
-          break;
-        case 'CEU':
-          pdfContent = CEUDetails(details: details)
-              .buildPdfContent(frontImage, backImage);
-          break;
-        case 'Others':
-          pdfContent = OthersDetails(details: details)
-              .buildPdfContent(frontImage, backImage);
-          break;
-        default:
-          throw Exception('PDF content not available for this category.');
-      }
-
-      pdf.addPage(pw.Page(build: (pw.Context context) => pdfContent));
-
-      // Save PDF to a temporary file
-      final tempPath = (await getTemporaryDirectory()).path;
-      final pdfFile =
-          File('$tempPath/${widget.category.toLowerCase()}_details.pdf');
-      await pdfFile.writeAsBytes(await pdf.save());
-
-      // Dismiss loading indicator
-      Navigator.of(context).pop();
-
-      // Share the PDF file
-      await Share.shareXFiles([XFile(pdfFile.path)],
-          text: '${widget.category} Details PDF');
-    } catch (e) {
-      print('Error sharing details: $e');
-      // Dismiss loading indicator
-      Navigator.of(context).pop();
-
-      // Display an error dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: Text('An error occurred while sharing details: $e'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
   Future<Map<String, dynamic>> fetchDetails() async {
     try {
       String collectionName = getCategoryCollectionName(widget.category);
@@ -340,6 +296,16 @@ class _DetailsPageState extends State<DetailsPage> {
 
         // Exclude 'timestamp' field
         // details.remove('timestamp');
+
+        // Download PDF and add its path to details
+        String pdfUrl = details['FileDownloadUrl'];
+        final response = await http.get(Uri.parse(pdfUrl));
+        final bytes = response.bodyBytes;
+        final appDir = await getApplicationDocumentsDirectory();
+        final pdfPath = '${appDir.path}/certification.pdf';
+        final pdfFile = File(pdfPath);
+        await pdfFile.writeAsBytes(bytes);
+        details['pdfPath'] = pdfPath;
 
         return details;
       } else {
@@ -368,7 +334,9 @@ class _DetailsPageState extends State<DetailsPage> {
   Widget buildDetailsUI(Map<String, dynamic> details) {
     switch (widget.category) {
       case 'Certification':
-        return CertificationDetails(details: details);
+        return CertificationDetails(
+          details: details,
+        );
       case 'License':
         return LicenseDetails(details: details);
       case 'Education':
@@ -429,11 +397,7 @@ class _DetailsPageState extends State<DetailsPage> {
                           ),
                           IconButton(
                             icon: const Icon(Icons.share),
-                            onPressed: () async {
-                              // Use fetchData to get the details
-                              Map<String, dynamic> details = await fetchData;
-                              _handleShare(details);
-                            },
+                            onPressed: _handleShare,
                             color:
                                 Colors.white, // Set share icon color to white
                           ),

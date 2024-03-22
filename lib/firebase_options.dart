@@ -49,7 +49,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '912576608221',
     projectId: 'certracker',
     authDomain: 'certracker.firebaseapp.com',
+    databaseURL: 'https://certracker-default-rtdb.firebaseio.com',
     storageBucket: 'certracker.appspot.com',
+    measurementId: 'G-0HCDHT9EVD',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -57,6 +59,7 @@ class DefaultFirebaseOptions {
     appId: '1:912576608221:android:d312d65a8aef0289f9a834',
     messagingSenderId: '912576608221',
     projectId: 'certracker',
+    databaseURL: 'https://certracker-default-rtdb.firebaseio.com',
     storageBucket: 'certracker.appspot.com',
   );
 
@@ -65,7 +68,10 @@ class DefaultFirebaseOptions {
     appId: '1:912576608221:ios:3ee7c39264ec8412f9a834',
     messagingSenderId: '912576608221',
     projectId: 'certracker',
+    databaseURL: 'https://certracker-default-rtdb.firebaseio.com',
     storageBucket: 'certracker.appspot.com',
+    androidClientId: '912576608221-dsfnnvmi88ooq9e7n0khhg6s1cekre2b.apps.googleusercontent.com',
+    iosClientId: '912576608221-5ndbho3g3inbte2m7jjjugaijlhjfbvj.apps.googleusercontent.com',
     iosBundleId: 'com.rn.certracker',
   );
 
@@ -74,7 +80,10 @@ class DefaultFirebaseOptions {
     appId: '1:912576608221:ios:42bf0087d4a83b6ff9a834',
     messagingSenderId: '912576608221',
     projectId: 'certracker',
+    databaseURL: 'https://certracker-default-rtdb.firebaseio.com',
     storageBucket: 'certracker.appspot.com',
+    androidClientId: '912576608221-dsfnnvmi88ooq9e7n0khhg6s1cekre2b.apps.googleusercontent.com',
+    iosClientId: '912576608221-re3qn0rthi5fnt2hn6ojch3fhq5nt88a.apps.googleusercontent.com',
     iosBundleId: 'com.rn.certracker.RunnerTests',
   );
 }

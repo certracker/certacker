@@ -1,28 +1,31 @@
-import 'package:certracker/main.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:certracker/main.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:flutter/foundation.dart';
 
-class FirebaseApi {
-  final _firebaseMessaging = FirebaseMessaging.instance;
+// class FirebaseApi {
+//   final _firebaseMessaging = FirebaseMessaging.instance;
 
-  Future<void> initNotifications() async {
-    await _firebaseMessaging.requestPermission();
+//   Future<void> initNotifications() async {
+//     await _firebaseMessaging.requestPermission();
 
-    final fCMToken = await _firebaseMessaging.getToken();
+//     final fCMToken = await _firebaseMessaging.getToken();
 
-    print("fCMToken: $fCMToken");
+//     if (kDebugMode) {
+//       print("fCMToken: $fCMToken");
+//     }
 
-    initPushNotifications();
-  }
+//     initPushNotifications();
+//   }
 
-  void handleMessage(RemoteMessage? message) {
-    if (message == null) return;
+//   void handleMessage(RemoteMessage? message) {
+//     if (message == null) return;
 
-    navigatorKey.currentState?.pushNamed('/notifi', arguments: message);
-  }
+//     navigatorKey.currentState?.pushNamed('/notifi', arguments: message);
+//   }
 
-  Future initPushNotifications() async {
-    FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
+//   Future initPushNotifications() async {
+//     FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
 
-    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
-  }
-}
+//     FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
+//   }
+// }

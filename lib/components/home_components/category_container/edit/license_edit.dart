@@ -3,10 +3,13 @@
 import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
-import 'package:certracker/auth/save_data_service.dart';
+import 'package:certracker/auth/cert_auth/license_service.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 class EditLicensePage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
@@ -30,15 +33,10 @@ class _EditLicensePageState extends State<EditLicensePage> {
   late TextEditingController licenseIssueDateController;
   late TextEditingController licenseExpiryDateController;
   late TextEditingController licenseStateController;
-  late TextEditingController licenseFirstReminderController;
-  late TextEditingController licenseSecondReminderController;
-  late TextEditingController licenseFinalReminderController;
   late TextEditingController licensePrivateNoteController;
 
-  String? frontImageUrl;
-  String? backImageUrl;
-
   bool isLoading = false;
+  String? selectedFileUrl;
 
   @override
   void initState() {
@@ -47,23 +45,15 @@ class _EditLicensePageState extends State<EditLicensePage> {
     licenseNameController =
         TextEditingController(text: widget.initialDetails['Title'] ?? '');
     licenseNumberController = TextEditingController(
-        text: widget.initialDetails['licenseNumber'] ?? '');
+        text: widget.initialDetails['Number'] ?? '');
     licenseIssueDateController = TextEditingController(
-        text: widget.initialDetails['licenseIssueDate'] ?? '');
+        text: widget.initialDetails['IssueDate'] ?? '');
     licenseExpiryDateController = TextEditingController(
-        text: widget.initialDetails['licenseExpiryDate'] ?? '');
+        text: widget.initialDetails['ExpiryDate'] ?? '');
     licenseStateController = TextEditingController(
-        text: widget.initialDetails['licenseState'] ?? '');
-    licenseFirstReminderController = TextEditingController(
-        text: widget.initialDetails['licenseFirstReminder'] ?? '');
-    licenseSecondReminderController = TextEditingController(
-        text: widget.initialDetails['licenseSecondReminder'] ?? '');
-    licenseFinalReminderController = TextEditingController(
-        text: widget.initialDetails['licenseFinalReminder'] ?? '');
+        text: widget.initialDetails['State'] ?? '');
     licensePrivateNoteController = TextEditingController(
-        text: widget.initialDetails['licensePrivateNote'] ?? '');
-    frontImageUrl = widget.initialDetails['frontImageUrl'];
-    backImageUrl = widget.initialDetails['backImageUrl'];
+        text: widget.initialDetails['PrivateNote'] ?? '');
   }
 
   @override
@@ -73,9 +63,6 @@ class _EditLicensePageState extends State<EditLicensePage> {
     licenseIssueDateController.dispose();
     licenseExpiryDateController.dispose();
     licenseStateController.dispose();
-    licenseFirstReminderController.dispose();
-    licenseSecondReminderController.dispose();
-    licenseFinalReminderController.dispose();
     licensePrivateNoteController.dispose();
     super.dispose();
   }
@@ -175,85 +162,19 @@ class _EditLicensePageState extends State<EditLicensePage> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: licenseFirstReminderController,
-                  decoration: const InputDecoration(
-                    labelText: "First Reminder",
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
-                  readOnly: true,
-                  onTap: () async {
-                    final DateTime? selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (selectedDate != null) {
-                      licenseFirstReminderController.text =
-                          selectedDate.toLocal().toString().split(' ')[0];
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: licenseSecondReminderController,
-                  decoration: const InputDecoration(
-                    labelText: "Second Reminder",
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
-                  readOnly: true,
-                  onTap: () async {
-                    final DateTime? selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (selectedDate != null) {
-                      licenseSecondReminderController.text =
-                          selectedDate.toLocal().toString().split(' ')[0];
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: licenseFinalReminderController,
-                  decoration: const InputDecoration(
-                    labelText: "Final Reminder",
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
-                  readOnly: true,
-                  onTap: () async {
-                    final DateTime? selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (selectedDate != null) {
-                      licenseFinalReminderController.text =
-                          selectedDate.toLocal().toString().split(' ')[0];
-                    }
-                  },
-                ),
                 const SizedBox(height: 42),
                 const Text(
-                  "Front",
+                  "Upload File",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Image upload for Front
+                // File upload section
                 GestureDetector(
                   onTap: () async {
-                    await pickImageAndSetUrl('front');
+                    await showFileSourceDialog();
                   },
                   child: Container(
                     width: 400,
@@ -262,74 +183,25 @@ class _EditLicensePageState extends State<EditLicensePage> {
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: frontImageUrl != null
-                        ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                    child: selectedFileUrl != null
+                        ? getFileWidget(selectedFileUrl!)
                         : const Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.camera_alt, size: 40),
+                              Icon(Icons.file_upload, size: 40),
                               SizedBox(height: 8),
                               Text(
-                                "Add image",
+                                "Upload File",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "Supported formats: JPEG, PNG, JPG",
-                                style: TextStyle(fontSize: 12),
                               ),
                             ],
                           ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
-                const Text(
-                  "Back",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Image upload for Back
-                GestureDetector(
-                  onTap: () async {
-                    await pickImageAndSetUrl('back');
-                  },
-                  child: Container(
-                    width: 400,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: backImageUrl != null
-                        ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
-                        : const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.camera_alt, size: 40),
-                              SizedBox(height: 8),
-                              Text(
-                                "Add image",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "Supported formats: JPEG, PNG, JPG",
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                  ),
-                ),
                 const SizedBox(height: 42),
                 const Text(
                   "Private Note",
@@ -361,7 +233,7 @@ class _EditLicensePageState extends State<EditLicensePage> {
                     onTap: () async {
                       AuthenticationService authService =
                           AuthenticationService();
-                      String? userId = authService.getCurrentUserId();
+                      authService.getCurrentUserId();
                       if (_formKey.currentState?.validate() ?? false) {
                         setState(() {
                           isLoading = true;
@@ -369,24 +241,10 @@ class _EditLicensePageState extends State<EditLicensePage> {
                         // Retrieve values from the TextEditingControllers
                         String licenseName = licenseNameController.text;
                         String licenseNumber = licenseNumberController.text;
-                        String frontImageURL = frontImageUrl != null
-                            ? await SaveDataService.uploadImageToStorage(
-                                userId!, frontImageUrl!)
-                            : '';
-                        String backImageURL = backImageUrl != null
-                            ? await SaveDataService.uploadImageToStorage(
-                                userId!, backImageUrl!)
-                            : '';
                         String licenseIssueDate =
                             licenseIssueDateController.text;
                         String licenseExpiryDate =
                             licenseExpiryDateController.text;
-                        String licenseFirstReminder =
-                            licenseFirstReminderController.text;
-                        String licenseSecondReminder =
-                            licenseSecondReminderController.text;
-                        String licenseFinalReminder =
-                            licenseFinalReminderController.text;
                         String licensePrivateNote =
                             licensePrivateNoteController.text;
                         String licenseState = licenseStateController.text;
@@ -396,17 +254,12 @@ class _EditLicensePageState extends State<EditLicensePage> {
                           credentialsId: widget.initialDetails['credentialsId'],
                           userId: AuthenticationService().getCurrentUserId()!,
                           updatedData: {
-                            'frontImageUrl': frontImageURL,
-                            'backImageUrl': backImageURL,
                             'Title': licenseName,
-                            'licenseNumber': licenseNumber,
-                            'licenseIssueDate': licenseIssueDate,
-                            'licenseExpiryDate': licenseExpiryDate,
-                            'licenseState': licenseState,
-                            'licenseFirstReminder': licenseFirstReminder,
-                            'licenseSecondReminder': licenseSecondReminder,
-                            'licenseFinalReminder': licenseFinalReminder,
-                            'licensePrivateNote': licensePrivateNote,
+                            'Number': licenseNumber,
+                            'IssueDate': licenseIssueDate,
+                            'ExpiryDate': licenseExpiryDate,
+                            'State': licenseState,
+                            'PrivateNote': licensePrivateNote,
                           },
                         );
                         setState(() {
@@ -464,17 +317,68 @@ class _EditLicensePageState extends State<EditLicensePage> {
     );
   }
 
-  Future<void> pickImageAndSetUrl(String type) async {
-    final XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        if (type == 'front') {
-          frontImageUrl = pickedFile.path;
-        } else {
-          backImageUrl = pickedFile.path;
-        }
-      });
-    }
+  Future<void> showFileSourceDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select File Source'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context); // Close the dialog
+                  try {
+                    final FilePickerResult? result =
+                        await FilePicker.platform.pickFiles(
+                      type: FileType.any,
+                    );
+                    if (result != null) {
+                      final String? filePath = result.files.single.path;
+                      if (filePath != null) {
+                        pickFileAndSetUrl(filePath);
+                      }
+                    }
+                  } on PlatformException catch (e) {
+                    if (kDebugMode) {
+                      print("Unsupported operation$e");
+                    }
+                  }
+                },
+                child: const Text('Files'),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                  // For now, we're not handling image picking
+                },
+                child: const Text('Camera'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> pickFileAndSetUrl(String filePath) async {
+    setState(() {
+      selectedFileUrl = filePath;
+    });
+  }
+}
+
+// Function to return appropriate widget based on file type
+Widget getFileWidget(String filePath) {
+  if (filePath.toLowerCase().endsWith('.pdf')) {
+    // Display PDF file using PDFViewer widget
+    return PDFView(
+      filePath: filePath,
+    );
+  } else {
+    // Display image file using Image.file widget
+    return Image.file(File(filePath), fit: BoxFit.cover);
   }
 }

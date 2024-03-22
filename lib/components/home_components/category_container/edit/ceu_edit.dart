@@ -3,10 +3,13 @@
 import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
-import 'package:certracker/auth/save_data_service.dart';
+import 'package:certracker/auth/cert_auth/ceu_service.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 class EditCEUPage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
@@ -31,10 +34,8 @@ class _EditCEUPageState extends State<EditCEUPage> {
   late TextEditingController ceuCompletionDateController;
   late TextEditingController ceuprivateNoteController;
 
-  String? frontImageUrl;
-  String? backImageUrl;
-
   bool isLoading = false;
+    String? selectedFileUrl;
 
   @override
   void initState() {
@@ -42,15 +43,13 @@ class _EditCEUPageState extends State<EditCEUPage> {
     ceuProgramTitleController =
         TextEditingController(text: widget.initialDetails['Title']);
     ceuProviderNameController =
-        TextEditingController(text: widget.initialDetails['ceuProviderName']);
+        TextEditingController(text: widget.initialDetails['Name']);
     ceuNumberOfContactHourController = TextEditingController(
-        text: widget.initialDetails['ceuNumberOfContactHour']);
+        text: widget.initialDetails['Number_Of_Contact_Hour']);
     ceuCompletionDateController =
-        TextEditingController(text: widget.initialDetails['ceuCompletionDate']);
+        TextEditingController(text: widget.initialDetails['Completion_Date']);
     ceuprivateNoteController =
-        TextEditingController(text: widget.initialDetails['ceuPrivateNote']);
-    frontImageUrl = widget.initialDetails['frontImageUrl'];
-    backImageUrl = widget.initialDetails['backImageUrl'];
+        TextEditingController(text: widget.initialDetails['PrivateNote']);
   }
 
   @override
@@ -138,25 +137,17 @@ class _EditCEUPageState extends State<EditCEUPage> {
                 ),
                 const SizedBox(height: 42),
                 const Text(
-                  "Upload Photo",
+                  "Upload File",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  "Front",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Image upload for Front
+                // File upload section
                 GestureDetector(
                   onTap: () async {
-                    await pickImageAndSetUrl('front');
+                    await showFileSourceDialog();
                   },
                   child: Container(
                     width: 400,
@@ -165,69 +156,19 @@ class _EditCEUPageState extends State<EditCEUPage> {
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: frontImageUrl != null
-                        ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                    child: selectedFileUrl != null
+                        ? getFileWidget(selectedFileUrl!)
                         : const Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.camera_alt, size: 40),
+                              Icon(Icons.file_upload, size: 40),
                               SizedBox(height: 8),
                               Text(
-                                "Add image",
+                                "Upload File",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "Supported formats: JPEG, PNG, JPG",
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-                const Text(
-                  "Back",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Image upload for Back
-                GestureDetector(
-                  onTap: () async {
-                    await pickImageAndSetUrl('back');
-                  },
-                  child: Container(
-                    width: 400,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: backImageUrl != null
-                        ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
-                        : const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.camera_alt, size: 40),
-                              SizedBox(height: 8),
-                              Text(
-                                "Add image",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "Supported formats: JPEG, PNG, JPG",
-                                style: TextStyle(fontSize: 12),
                               ),
                             ],
                           ),
@@ -264,21 +205,13 @@ class _EditCEUPageState extends State<EditCEUPage> {
                     onTap: () async {
                       AuthenticationService authService =
                           AuthenticationService();
-                      String? userId = authService.getCurrentUserId();
+                      authService.getCurrentUserId();
                       if (_formKey.currentState?.validate() ?? false) {
                         setState(() {
                           isLoading = true;
                         });
 
                         try {
-                          String frontImageURL = frontImageUrl != null
-                              ? await SaveDataService.uploadImageToStorage(
-                                  userId!, frontImageUrl!)
-                              : '';
-                          String backImageURL = backImageUrl != null
-                              ? await SaveDataService.uploadImageToStorage(
-                                  userId!, backImageUrl!)
-                              : '';
                           String ceuProgramTitle =
                               ceuProgramTitleController.text;
                           String ceuProviderName =
@@ -295,13 +228,11 @@ class _EditCEUPageState extends State<EditCEUPage> {
                                 widget.initialDetails['credentialsId'],
                             userId: AuthenticationService().getCurrentUserId()!,
                             updatedData: {
-                              'frontImageUrl': frontImageURL,
-                              'backImageUrl': backImageURL,
                               'Title': ceuProgramTitle,
-                              'ceuProviderName': ceuProviderName,
-                              'ceuNumberOfContactHour': ceuNumberOfContactHour,
-                              'ceuCompletionDate': ceuCompletionDate,
-                              'ceuPrivateNote': ceuPrivateNote,
+                              'Name': ceuProviderName,
+                              'Number_Of_Contact_Hour': ceuNumberOfContactHour,
+                              'Completion_Date': ceuCompletionDate,
+                              'PrivateNote': ceuPrivateNote,
                             },
                           );
 
@@ -380,17 +311,69 @@ class _EditCEUPageState extends State<EditCEUPage> {
     );
   }
 
-  Future<void> pickImageAndSetUrl(String type) async {
-    final XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        if (type == 'front') {
-          frontImageUrl = pickedFile.path;
-        } else {
-          backImageUrl = pickedFile.path;
-        }
-      });
-    }
+  Future<void> showFileSourceDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select File Source'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context); // Close the dialog
+                  try {
+                    final FilePickerResult? result =
+                        await FilePicker.platform.pickFiles(
+                      type: FileType.any,
+                    );
+                    if (result != null) {
+                      final String? filePath = result.files.single.path;
+                      if (filePath != null) {
+                        pickFileAndSetUrl(filePath);
+                      }
+                    }
+                  } on PlatformException catch (e) {
+                    if (kDebugMode) {
+                      print("Unsupported operation$e");
+                    }
+                  }
+                },
+                child: const Text('Files'),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                  // For now, we're not handling image picking
+                },
+                child: const Text('Camera'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> pickFileAndSetUrl(String filePath) async {
+    setState(() {
+      selectedFileUrl = filePath;
+    });
+  }
+  
+}
+
+// Function to return appropriate widget based on file type
+Widget getFileWidget(String filePath) {
+  if (filePath.toLowerCase().endsWith('.pdf')) {
+    // Display PDF file using PDFViewer widget
+    return PDFView(
+      filePath: filePath,
+    );
+  } else {
+    // Display image file using Image.file widget
+    return Image.file(File(filePath), fit: BoxFit.cover);
   }
 }

@@ -1,5 +1,9 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:path/path.dart' as path;
+import 'package:image/image.dart' as img;
+import 'package:pdf/widgets.dart' as pdfwidgets;
 import 'package:certracker/auth/auth_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,10 +47,9 @@ class SaveDataService {
 
       // Delete the document
       await documentReference.delete();
-
-      print('Document deleted successfully!');
     } catch (e) {
-      print('Error deleting document: $e');
+      print('Deleting document with credentialsId: $credentialsId');
+      
       throw Exception('Error deleting document: $e');
     }
   }
@@ -76,28 +79,19 @@ class SaveDataService {
           // Merge existing data with updated data
           Map<String, dynamic> newData = {...existingData, ...updatedData};
 
-          print('Updating document with ID: $credentialsId');
-          print('Existing data: $existingData');
-          print('Updated data: $updatedData');
-
           // Update the document
           await documentReference.update(newData);
-
-          print('Document updated successfully!');
         } else {
           // Throw an exception if the current user is not the owner
-          print(
-              'Current user does not have permission to edit this credential.');
           throw Exception('Permission denied.');
         }
       } else {
         // Handle the case where no document with the specified ID is found
-        print('Document with ID $credentialsId not found.');
+
         throw Exception('Document not found.');
       }
     } catch (e) {
       // Handle error
-      print('Error updating document: $e');
       throw Exception('Error updating document');
     }
   }
@@ -106,36 +100,73 @@ class SaveDataService {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
 
-  static Future<String> uploadImageToStorage(
-      String userId, String imagePath) async {
-    if (imagePath.isEmpty) {
-      return ''; // Return an empty string for empty image paths
+  static Future<String> uploadFileToStorage(
+      String userId, String filePath) async {
+    if (filePath.isEmpty) {
+      return ''; // Return an empty string for empty file paths
     }
 
     try {
-      // Create the path with "credentials_images/userId/"
-      String storagePath = 'credentials_images/$userId/';
+      // Create the path with "credentials_files/userId/"
+      String storagePath = 'credentials_files/$userId/';
       Reference ref = FirebaseStorage.instance
           .ref()
-          .child('$storagePath${DateTime.now().millisecondsSinceEpoch}');
+          .child('$storagePath${path.basenameWithoutExtension(filePath)}.pdf');
 
-      final File imageFile = File(imagePath);
+      final file = File(filePath);
 
-      // Read the file as bytes
-      List<int> imageBytes = await imageFile.readAsBytes();
+      if (path.extension(filePath).toLowerCase() == '.pdf') {
+        // If the file is already a PDF, directly upload it
+        await ref.putFile(file);
+      } else {
+        // If the file is an image, convert it to PDF before uploading
+        Uint8List? pdfBytes;
+        if (path.extension(filePath).toLowerCase() == '.jpeg' ||
+            path.extension(filePath).toLowerCase() == '.jpg' ||
+            path.extension(filePath).toLowerCase() == '.png') {
+          pdfBytes = await convertImageToPdf(file);
+        } else if (path.extension(filePath).toLowerCase() == '.doc') {
+          // Handle conversion of doc to PDF if needed
+          // Example: pdfBytes = await convertDocToPdf(file);
+          throw UnsupportedError('Converting doc to PDF is not implemented.');
+        } else {
+          throw UnsupportedError(
+              'Unsupported file format: ${path.extension(filePath)}');
+        }
 
-      // Convert List<int> to Uint8List
-      Uint8List uint8List = Uint8List.fromList(imageBytes);
+        // Upload the PDF bytes to Firebase Storage
+        await ref.putData(pdfBytes);
+      }
 
-      // Upload the bytes to Firebase Storage
-      TaskSnapshot snapshot = await ref.putData(uint8List);
-      String imageUrl = await snapshot.ref.getDownloadURL();
+      // Get the download URL of the uploaded file
+      final String downloadURL = await ref.getDownloadURL();
 
-      return imageUrl;
+      return downloadURL;
     } catch (e) {
-      print('Error uploading image: $e');
-      throw Exception('Error uploading image');
+      throw Exception('Error uploading file');
     }
+  }
+
+  static Future<Uint8List> convertImageToPdf(File imageFile) async {
+    final imageBytes = await imageFile.readAsBytes();
+    final img.Image image = img.decodeImage(imageBytes)!;
+
+    final pdfDoc = pdfwidgets.Document();
+    final pdfImage = pdfwidgets.MemoryImage(
+      img.encodeJpg(image, quality: 100),
+    );
+
+    pdfDoc.addPage(
+      pdfwidgets.Page(
+        build: (context) {
+          return pdfwidgets.Center(
+            child: pdfwidgets.Image(pdfImage),
+          );
+        },
+      ),
+    );
+
+    return await pdfDoc.save();
   }
 }
 
@@ -177,450 +208,3 @@ class CategoryService {
   }
 }
 
-class CertificationService {
-  static Future<void> updateCertificationData({
-    required String credentialsId,
-    required String userId,
-    required Map<String, dynamic> updatedData,
-  }) async {
-    String tableName = 'Certification';
-
-    await SaveDataService.updateData(
-      tableName: tableName,
-      userId: userId,
-      credentialsId: credentialsId,
-      updatedData: updatedData,
-    );
-  }
-
-  static Future<void> saveCertificationData({
-    required String certificationName,
-    required String certificationNumber,
-    required String frontImageUrl,
-    required String backImageUrl,
-    required String certificationIssueDate,
-    required String certificationExpiryDate,
-    required String certificationPrivateNote,
-    // Add other necessary fields for Certification
-  }) async {
-    String tableName = 'Certification';
-    String credentialsId = SaveDataService.generateUniqueCredentialsId();
-    Map<String, dynamic> data = {
-      'Title': certificationName.toLowerCase(),
-      'certificationNumber': certificationNumber,
-      'frontImageUrl': frontImageUrl,
-      'backImageUrl': backImageUrl,
-      'certificationIssueDate': certificationIssueDate,
-      'certificationExpiryDate': certificationExpiryDate,
-      'certificationPrivateNote': certificationPrivateNote,
-      // Add other fields for Certification
-    };
-
-    // Get the current user's ID
-    String? userId = AuthenticationService().getCurrentUserId();
-    if (userId != null) {
-      await SaveDataService.saveData(
-        tableName: tableName,
-        data: data,
-        userId: userId,
-        credentialsId: credentialsId,
-      );
-    } else {
-      // Handle if the user ID is null (user not authenticated)
-      throw Exception('User not authenticated!');
-    }
-  }
-
-  // A placeholder method for generating unique credentialsId
-  static String generateUniqueCredentialsId() {
-    return DateTime.now().millisecondsSinceEpoch.toString();
-  }
-}
-
-class LicenseService {
-  static Future<void> updateLicenseData({
-    required String credentialsId,
-    required String userId,
-    required Map<String, dynamic> updatedData,
-  }) async {
-    String tableName = 'License';
-
-    await SaveDataService.updateData(
-      tableName: tableName,
-      userId: userId,
-      credentialsId: credentialsId,
-      updatedData: updatedData,
-    );
-  }
-
-  static Future<void> saveLicenseData({
-    required String licenseName,
-    required String licenseNumber,
-    required String frontImageUrl,
-    required String backImageUrl,
-    required String licenseIssueDate,
-    required String licenseExpiryDate,
-    required String licenseFirstReminder,
-    required String licenseSecondReminder,
-    required String licenseFinalReminder,
-    required String licensePrivateNote,
-    required String licenseState,
-    // Add other necessary fields for License
-  }) async {
-    String tableName = 'License';
-    String credentialsId = generateUniqueCredentialsId();
-    String? userId = AuthenticationService().getCurrentUserId();
-
-    if (userId != null) {
-      Map<String, dynamic> data = {
-        'Title': licenseName.toLowerCase(),
-        'licenseNumber': licenseNumber,
-        'frontImageUrl': frontImageUrl,
-        'backImageUrl': backImageUrl,
-        'licenseIssueDate': licenseIssueDate,
-        'licenseExpiryDate': licenseExpiryDate,
-        'licenseFirstReminder': licenseFirstReminder,
-        'licenseSecondReminder': licenseSecondReminder,
-        'licenseFinalReminder': licenseFinalReminder,
-        'licensePrivateNote': licensePrivateNote,
-        'licenseState': licenseState,
-        // Add other fields for License
-      };
-
-      // Save license data to the database
-      await SaveDataService.saveData(
-        tableName: tableName,
-        data: data,
-        userId: userId,
-        credentialsId: credentialsId,
-      );
-    } else {
-      throw Exception('User not authenticated!');
-    }
-  }
-
-  // A placeholder method for generating unique credentialsId
-  static String generateUniqueCredentialsId() {
-    return DateTime.now().millisecondsSinceEpoch.toString();
-  }
-}
-
-class EducationService {
-  static Future<void> updateEducationData({
-    required String credentialsId,
-    required String userId,
-    required Map<String, dynamic> updatedData,
-  }) async {
-    String tableName = 'Education';
-
-    await SaveDataService.updateData(
-      tableName: tableName,
-      userId: userId,
-      credentialsId: credentialsId,
-      updatedData: updatedData,
-    );
-  }
-
-  static Future<void> saveEducationData({
-    required String educationName,
-    required String educationDegree,
-    required String startDate,
-    required String educationField,
-    required String graduationDate,
-    required String educationPrivateNote,
-    required String frontImageUrl,
-    required String backImageUrl,
-    // Add other necessary fields for Education
-  }) async {
-    String tableName = 'Education';
-    String credentialsId = generateUniqueCredentialsId();
-    String? userId = AuthenticationService().getCurrentUserId();
-
-    if (userId != null) {
-      Map<String, dynamic> data = {
-        'Title': educationName.toLowerCase(),
-        'educationDegree': educationDegree,
-        'startDate': startDate,
-        'educationField': educationField,
-        'graduationDate': graduationDate,
-        'educationPrivateNote': educationPrivateNote,
-        'frontImageUrl': frontImageUrl,
-        'backImageUrl': backImageUrl,
-        // Add other fields for Education
-      };
-
-      // Save education data to the database
-      await SaveDataService.saveData(
-        tableName: tableName,
-        data: data,
-        userId: userId,
-        credentialsId: credentialsId,
-      );
-    } else {
-      throw Exception('User not authenticated!');
-    }
-  }
-
-  // A placeholder method for generating unique credentialsId
-  static String generateUniqueCredentialsId() {
-    return DateTime.now().millisecondsSinceEpoch.toString();
-  }
-}
-
-class CEUCMEService {
-  static Future<void> updateCEUData({
-    required String credentialsId,
-    required String userId,
-    required Map<String, dynamic> updatedData,
-  }) async {
-    String tableName = 'CEU';
-
-    await SaveDataService.updateData(
-      tableName: tableName,
-      userId: userId,
-      credentialsId: credentialsId,
-      updatedData: updatedData,
-    );
-  }
-
-  static Future<void> saveCEUData({
-    required String frontImageUrl,
-    required String backImageUrl,
-    required String ceuProgramTitle,
-    required String ceuProviderName,
-    required String ceuNumberOfContactHour,
-    required String ceuCompletionDate,
-    required String ceuPrivateNote,
-    // Add other necessary fields for CEU/CME
-  }) async {
-    String tableName = 'CEU';
-    String credentialsId = generateUniqueCredentialsId();
-    String? userId = AuthenticationService().getCurrentUserId();
-
-    if (userId != null) {
-      Map<String, dynamic> data = {
-        'frontImageUrl': frontImageUrl,
-        'backImageUrl': backImageUrl,
-        'Title': ceuProgramTitle.toLowerCase(),
-        'ceuProviderName': ceuProviderName,
-        'ceuNumberOfContactHour': ceuNumberOfContactHour,
-        'ceuCompletionDate': ceuCompletionDate,
-        'ceuPrivateNote': ceuPrivateNote,
-        // Add other fields for CEU/CME
-      };
-
-      // Save CEU/CME data to the database
-      await SaveDataService.saveData(
-        tableName: tableName,
-        data: data,
-        userId: userId,
-        credentialsId: credentialsId,
-      );
-    } else {
-      throw Exception('User not authenticated!');
-    }
-  }
-
-  // A placeholder method for generating unique credentialsId
-  static String generateUniqueCredentialsId() {
-    return DateTime.now().millisecondsSinceEpoch.toString();
-  }
-}
-
-class OthersService {
-  static Future<void> updateOthersData({
-    required String credentialsId,
-    required String userId,
-    required Map<String, dynamic> updatedData,
-  }) async {
-    String tableName = 'Others';
-
-    await SaveDataService.updateData(
-      tableName: tableName,
-      userId: userId,
-      credentialsId: credentialsId,
-      updatedData: updatedData,
-    );
-  }
-
-  static Future<void> saveOthersData({
-    required String othersName,
-    // required String othersDetails,
-    required String frontImageUrl,
-    required String backImageUrl,
-    required String otherNumber,
-    required String otherIssueDate,
-    required String otherExpiryDate,
-    required String otherFirstReminder,
-    required String otherSecondReminder,
-    required String otherFinalReminder,
-    required String otherPrivateNote,
-    // Add other necessary fields for Others
-  }) async {
-    String tableName = 'Others';
-    String credentialsId = generateUniqueCredentialsId();
-    String? userId = AuthenticationService().getCurrentUserId();
-
-    if (userId != null) {
-      Map<String, dynamic> data = {
-        'Title': othersName.toLowerCase(),
-        // 'othersDetails': othersDetails,
-        'frontImageUrl': frontImageUrl,
-        'backImageUrl': backImageUrl,
-        'otherNumber': otherNumber,
-        'otherIssueDate': otherIssueDate,
-        'otherExpiryDate': otherExpiryDate,
-        'otherFirstReminder': otherFirstReminder,
-        'otherSecondReminder': otherSecondReminder,
-        'otherFinalReminder': otherFinalReminder,
-        'otherPrivateNote': otherPrivateNote,
-        // Add other fields for Others
-      };
-
-      // Save Others data to the database
-      await SaveDataService.saveData(
-        tableName: tableName,
-        data: data,
-        userId: userId,
-        credentialsId: credentialsId,
-      );
-    } else {
-      throw Exception('User not authenticated!');
-    }
-  }
-
-  // A placeholder method for generating unique credentialsId
-  static String generateUniqueCredentialsId() {
-    return DateTime.now().millisecondsSinceEpoch.toString();
-  }
-}
-
-class TravelService {
-  static Future<void> updateTravelData({
-    required String userId,
-    required String credentialsId,
-    required Map<String, dynamic> updatedData,
-  }) async {
-    String tableName = 'Travel';
-
-    await SaveDataService.updateData(
-      tableName: tableName,
-      userId: userId,
-      credentialsId: credentialsId,
-      updatedData: updatedData,
-    );
-  }
-
-  static Future<void> saveTravelData({
-    required String frontImageUrl,
-    required String backImageUrl,
-    required String travelCountry,
-    required String placeOfIssue,
-    required String documentNumber,
-    required String issueDate,
-    required String expiryDate,
-    required String travelPrivateNote,
-    required String documentType,
-    // Add other necessary fields for Travel
-  }) async {
-    String tableName = 'Travel';
-    String credentialsId = generateUniqueCredentialsId();
-    String? userId = AuthenticationService().getCurrentUserId();
-
-    if (userId != null) {
-      Map<String, dynamic> data = {
-        'frontImageUrl': frontImageUrl,
-        'backImageUrl': backImageUrl,
-        'travelCountry': travelCountry,
-        'placeOfIssue': placeOfIssue,
-        'documentNumber': documentNumber,
-        'issueDate': issueDate,
-        'expiryDate': expiryDate,
-        'travelPrivateNote': travelPrivateNote,
-        'Title': documentType.toLowerCase(),
-        // Add other fields for Travel
-      };
-
-      // Save Travel data to the database
-      await SaveDataService.saveData(
-        tableName: tableName,
-        data: data,
-        userId: userId,
-        credentialsId: credentialsId,
-      );
-    } else {
-      throw Exception('User not authenticated!');
-    }
-  }
-
-  // A placeholder method for generating unique credentialsId
-  static String generateUniqueCredentialsId() {
-    return DateTime.now().millisecondsSinceEpoch.toString();
-  }
-}
-
-class VaccinationService {
-  static Future<void> updateVaccinationData({
-    required String userId,
-    required String credentialsId,
-    required Map<String, dynamic> updatedData,
-  }) async {
-    String tableName = 'Vaccination';
-
-    await SaveDataService.updateData(
-      tableName: tableName,
-      userId: userId,
-      credentialsId: credentialsId,
-      updatedData: updatedData,
-    );
-  }
-
-  static Future<void> saveVaccinationData({
-    required String vaccinationType,
-    required String vaccinationManufacturer,
-    required String frontImageUrl,
-    required String backImageUrl,
-    required String vaccineType,
-    required String vaccineManufacturer,
-    required String vaccineLotNumber,
-    required String vaccineIssueDate,
-    required String vaccineExpiryDate,
-    required String vaccinePrivateNote,
-    // Add other necessary fields for Vaccination
-  }) async {
-    String tableName = 'Vaccination';
-    String credentialsId = generateUniqueCredentialsId();
-    String? userId = AuthenticationService().getCurrentUserId();
-
-    if (userId != null) {
-      Map<String, dynamic> data = {
-        'Title': vaccinationType.toLowerCase(),
-        'vaccinationManufacturer': vaccinationManufacturer,
-        'frontImageUrl': frontImageUrl,
-        'backImageUrl': backImageUrl,
-        'vaccineType': vaccineType,
-        'vaccineManufacturer': vaccineManufacturer,
-        'vaccineLotNumber': vaccineLotNumber,
-        'vaccineIssueDate': vaccineIssueDate,
-        'vaccineExpiryDate': vaccineExpiryDate,
-        'vaccinePrivateNote': vaccinePrivateNote,
-        // Add other fields for Vaccination
-      };
-
-      // Save Vaccination data to the database
-      await SaveDataService.saveData(
-        tableName: tableName,
-        data: data,
-        userId: userId,
-        credentialsId: credentialsId,
-      );
-    } else {
-      throw Exception('User not authenticated!');
-    }
-  }
-
-  // A placeholder method for generating unique credentialsId
-  static String generateUniqueCredentialsId() {
-    return DateTime.now().millisecondsSinceEpoch.toString();
-  }
-}

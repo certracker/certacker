@@ -12,6 +12,7 @@ import 'package:certracker/components/home_components/pages/ceu.dart';
 import 'package:certracker/components/home_components/pages/others.dart';
 // import 'package:certracker/components/home_components/recyle_bin/recyclebin.dart';
 import 'package:certracker/components/home_components/search/search_page.dart';
+import 'package:certracker/components/home_components/select_mutilple/data_fetching.dart';
 import 'package:certracker/components/home_components/select_mutilple/selete_muiltple.dart';
 import 'package:flutter/material.dart';
 
@@ -75,17 +76,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _navigateToDeletePage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context,) => SeleteMuiltple(
-          profilePicture: userDetails?['profilePicture'] ?? '',
-          firstName: userDetails?['firstName'] ?? '',
-        ),
-      ),
-    );
-  }
+  void _navigateToDeletePage() async {
+  List<Map<String, dynamic>> userData = await fetchUserData();
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => SelectMultiple(data: userData),
+    ),
+  );
+}
 
   void _searchPage() {
     Navigator.push(
@@ -100,7 +99,10 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const SetReminderPage(certificationName: '', certificationExpiryDate: '',),
+        builder: (context) => const SetReminderPage(
+          certificationName: '',
+          certificationExpiryDate: '',
+        ),
       ),
     );
   }
@@ -145,8 +147,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 elevation: 4,
                 child: Container(
                   color: const Color(0XFF591A8F),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 20,),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [

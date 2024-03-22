@@ -3,10 +3,13 @@
 import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
-import 'package:certracker/auth/save_data_service.dart';
+import 'package:certracker/auth/cert_auth/vaccination_service.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 class VaccinationForm extends StatefulWidget {
   const VaccinationForm({super.key});
@@ -35,10 +38,8 @@ class _VaccinationFormState extends State<VaccinationForm> {
   final TextEditingController vaccinePrivateNoteController =
       TextEditingController();
 
-  String? frontImageUrl;
-  String? backImageUrl;
-
   bool isLoading = false;
+  String? selectedFileUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +107,7 @@ class _VaccinationFormState extends State<VaccinationForm> {
               }
             },
           ),
-          const SizedBox(height: 42),
+          const SizedBox(height: 16),
           TextFormField(
             controller: vaccineExpiryDateController,
             decoration: const InputDecoration(
@@ -130,69 +131,17 @@ class _VaccinationFormState extends State<VaccinationForm> {
           ),
           const SizedBox(height: 42),
           const Text(
-            "Upload Photo",
+            "Upload File",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            "Front",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          const SizedBox(height: 16),
-         GestureDetector(
-            onTap: () async {
-              await showImageSourceDialog('front');
-            },
-            child: Container(
-              width: 400,
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: frontImageUrl != null
-                  ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
-                  : const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.camera_alt, size: 40),
-                        SizedBox(height: 8),
-                        Text(
-                          "Add image",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "Supported formats: JPEG, PNG, JPG",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-          const Text(
-            "Back",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Image upload for Back
+          // File upload section
           GestureDetector(
             onTap: () async {
-              await showImageSourceDialog('back');
+              await showFileSourceDialog();
             },
             child: Container(
               width: 400,
@@ -201,24 +150,19 @@ class _VaccinationFormState extends State<VaccinationForm> {
                 color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: backImageUrl != null
-                  ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
+              child: selectedFileUrl != null
+                  ? getFileWidget(selectedFileUrl!)
                   : const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.camera_alt, size: 40),
+                        Icon(Icons.file_upload, size: 40),
                         SizedBox(height: 8),
                         Text(
-                          "Add image",
+                          "Upload File",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "Supported formats: JPEG, PNG, JPG",
-                          style: TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
@@ -253,8 +197,8 @@ class _VaccinationFormState extends State<VaccinationForm> {
             alignment: Alignment.center,
             child: GestureDetector(
               onTap: () async {
-                 AuthenticationService authService = AuthenticationService();
-                String? userId = authService.getCurrentUserId();
+                AuthenticationService authService = AuthenticationService();
+                authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
                   setState(() {
                     isLoading = true;
@@ -263,17 +207,7 @@ class _VaccinationFormState extends State<VaccinationForm> {
                   String vaccinationType = vaccineTypeController.text;
                   String vaccinationManufacturer =
                       vaccineManufacturerController.text;
-                   String frontImageURL = frontImageUrl != null
-                      ? await SaveDataService.uploadImageToStorage(
-                          userId!, frontImageUrl!)
-                      : '';
-                  String backImageURL = backImageUrl != null
-                      ? await SaveDataService.uploadImageToStorage(
-                          userId!, backImageUrl!)
-                      : '';
-                  String vaccineType = vaccineTypeController.text;
-                  String vaccineManufacturer =
-                      vaccineManufacturerController.text;
+
                   String vaccineLotNumber = vaccineLotNumberController.text;
                   String vaccineIssueDate = vaccineIssueDateController.text;
                   String vaccineExpiryDate = vaccineExpiryDateController.text;
@@ -282,15 +216,12 @@ class _VaccinationFormState extends State<VaccinationForm> {
                   // Call the service function to save vaccination data
                   await VaccinationService.saveVaccinationData(
                     vaccinationType: vaccinationType,
-                    vaccinationManufacturer: vaccinationManufacturer,
-                    frontImageUrl: frontImageURL,
-                    backImageUrl: backImageURL,
-                    vaccineType: vaccineType,
-                    vaccineManufacturer: vaccineManufacturer,
-                    vaccineLotNumber: vaccineLotNumber,
-                    vaccineIssueDate: vaccineIssueDate,
-                    vaccineExpiryDate: vaccineExpiryDate,
-                    vaccinePrivateNote: vaccinePrivateNote,
+                    manufacturer: vaccinationManufacturer,
+                    lotNumber: vaccineLotNumber,
+                    issueDate: vaccineIssueDate,
+                    expiryDate: vaccineExpiryDate,
+                    privateNote: vaccinePrivateNote,
+                    filePath: selectedFileUrl ?? '',
                   );
                   setState(() {
                     isLoading = false;
@@ -344,29 +275,44 @@ class _VaccinationFormState extends State<VaccinationForm> {
     );
   }
 
-   Future<void> showImageSourceDialog(String type) async {
+  Future<void> showFileSourceDialog() async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Select Image Source'),
+          title: const Text('Select File Source'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context); // Close the dialog
-                  pickImageAndSetUrl(type, 'camera');
+                  try {
+                    final FilePickerResult? result =
+                        await FilePicker.platform.pickFiles(
+                      type: FileType.any,
+                    );
+                    if (result != null) {
+                      final String? filePath = result.files.single.path;
+                      if (filePath != null) {
+                        pickFileAndSetUrl(filePath);
+                      }
+                    }
+                  } on PlatformException catch (e) {
+                    if (kDebugMode) {
+                      print("Unsupported operation$e");
+                    }
+                  }
                 },
-                child: const Text('Camera'),
+                child: const Text('Files'),
               ),
               const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context); // Close the dialog
-                  pickImageAndSetUrl(type, 'gallery');
+                  // For now, we're not handling image picking
                 },
-                child: const Text('Gallery'),
+                child: const Text('Camera'),
               ),
             ],
           ),
@@ -375,20 +321,22 @@ class _VaccinationFormState extends State<VaccinationForm> {
     );
   }
 
-  Future<void> pickImageAndSetUrl(String type, String source) async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(
-      source: source == 'camera' ? ImageSource.camera : ImageSource.gallery,
-    );
+  Future<void> pickFileAndSetUrl(String filePath) async {
+    setState(() {
+      selectedFileUrl = filePath;
+    });
+  }
+}
 
-    if (pickedFile != null) {
-      setState(() {
-        if (type == 'front') {
-          frontImageUrl = pickedFile.path;
-        } else {
-          backImageUrl = pickedFile.path;
-        }
-      });
-    }
+// Function to return appropriate widget based on file type
+Widget getFileWidget(String filePath) {
+  if (filePath.toLowerCase().endsWith('.pdf')) {
+    // Display PDF file using PDFViewer widget
+    return PDFView(
+      filePath: filePath,
+    );
+  } else {
+    // Display image file using Image.file widget
+    return Image.file(File(filePath), fit: BoxFit.cover);
   }
 }

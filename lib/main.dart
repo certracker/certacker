@@ -1,4 +1,4 @@
-import 'package:certracker/api/firebase_api.dart';
+// import 'package:certracker/api/firebase_api.dart';
 import 'package:certracker/auth/auth_page.dart';
 import 'package:certracker/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,7 +21,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await FirebaseApi().initNotifications();
+  // await FirebaseApi().initNotifications();
 
   runApp(const MyApp());
 }

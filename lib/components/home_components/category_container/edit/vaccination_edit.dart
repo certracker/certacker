@@ -3,10 +3,13 @@
 import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
-import 'package:certracker/auth/save_data_service.dart';
+import 'package:certracker/auth/cert_auth/vaccination_service.dart';
 import 'package:certracker/components/nav_bar/nav_bar.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 class EditVaccinationPage extends StatefulWidget {
   final Map<String, dynamic> initialDetails;
@@ -32,10 +35,8 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
   late TextEditingController vaccineExpiryDateController;
   late TextEditingController vaccinePrivateNoteController;
 
-  String? frontImageUrl;
-  String? backImageUrl;
-
   bool isLoading = false;
+  String? selectedFileUrl;
 
   @override
   void initState() {
@@ -44,17 +45,15 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
     vaccineTypeController =
         TextEditingController(text: widget.initialDetails['vaccineType'] ?? '');
     vaccineManufacturerController = TextEditingController(
-        text: widget.initialDetails['vaccineManufacturer'] ?? '');
+        text: widget.initialDetails['Manufacturer'] ?? '');
     vaccineLotNumberController = TextEditingController(
-        text: widget.initialDetails['vaccineLotNumber'] ?? '');
+        text: widget.initialDetails['LotNumber'] ?? '');
     vaccineIssueDateController = TextEditingController(
-        text: widget.initialDetails['vaccineIssueDate'] ?? '');
+        text: widget.initialDetails['IssueDate'] ?? '');
     vaccineExpiryDateController = TextEditingController(
-        text: widget.initialDetails['vaccineExpiryDate'] ?? '');
+        text: widget.initialDetails['ExpiryDate'] ?? '');
     vaccinePrivateNoteController = TextEditingController(
-        text: widget.initialDetails['vaccinePrivateNote'] ?? '');
-    frontImageUrl = widget.initialDetails['frontImageUrl'];
-    backImageUrl = widget.initialDetails['backImageUrl'];
+        text: widget.initialDetails['PrivateNote'] ?? '');
   }
 
   @override
@@ -157,17 +156,17 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                 ),
                 const SizedBox(height: 42),
                 const Text(
-                  "Front",
+                  "Upload File",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Image upload for Front
+                // File upload section
                 GestureDetector(
                   onTap: () async {
-                    await pickImageAndSetUrl('front');
+                    await showFileSourceDialog();
                   },
                   child: Container(
                     width: 400,
@@ -176,123 +175,25 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: frontImageUrl != null
-                        ? Image.file(File(frontImageUrl!), fit: BoxFit.cover)
+                    child: selectedFileUrl != null
+                        ? getFileWidget(selectedFileUrl!)
                         : const Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.camera_alt, size: 40),
+                              Icon(Icons.file_upload, size: 40),
                               SizedBox(height: 8),
                               Text(
-                                "Add image",
+                                "Upload File",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "Supported formats: JPEG, PNG, JPG",
-                                style: TextStyle(fontSize: 12),
                               ),
                             ],
                           ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
-                const Text(
-                  "Back",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Image upload for Back
-                GestureDetector(
-                  onTap: () async {
-                    await pickImageAndSetUrl('back');
-                  },
-                  child: Container(
-                    width: 400,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: backImageUrl != null
-                        ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
-                        : const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.camera_alt, size: 40),
-                              SizedBox(height: 8),
-                              Text(
-                                "Add image",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "Supported formats: JPEG, PNG, JPG",
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  "Back",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                GestureDetector(
-                  onTap: () async {
-                    final XFile? pickedFile = await ImagePicker()
-                        .pickImage(source: ImageSource.gallery);
-                    if (pickedFile != null) {
-                      setState(() {
-                        backImageUrl = pickedFile.path;
-                      });
-                    }
-                  },
-                  child: Container(
-                    width: 400,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: backImageUrl != null
-                        ? Image.file(File(backImageUrl!), fit: BoxFit.cover)
-                        : const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.camera_alt, size: 40),
-                              SizedBox(height: 8),
-                              Text(
-                                "Add image",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "Supported formats: JPEG, PNG, JPG",
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                  ),
-                ),
                 const SizedBox(height: 42),
                 const Text(
                   "Private Note",
@@ -324,7 +225,7 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                     onTap: () async {
                       AuthenticationService authService =
                           AuthenticationService();
-                      String? userId = authService.getCurrentUserId();
+                      authService.getCurrentUserId();
                       if (_formKey.currentState?.validate() ?? false) {
                         setState(() {
                           isLoading = true;
@@ -333,14 +234,7 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                         String vaccinationType = vaccineTypeController.text;
                         String vaccinationManufacturer =
                             vaccineManufacturerController.text;
-                        String frontImageURL = frontImageUrl != null
-                            ? await SaveDataService.uploadImageToStorage(
-                                userId!, frontImageUrl!)
-                            : '';
-                        String backImageURL = backImageUrl != null
-                            ? await SaveDataService.uploadImageToStorage(
-                                userId!, backImageUrl!)
-                            : '';
+
                         String vaccineLotNumber =
                             vaccineLotNumberController.text;
                         String vaccineIssueDate =
@@ -356,13 +250,11 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
                           userId: AuthenticationService().getCurrentUserId()!,
                           updatedData: {
                             'Title': vaccinationType,
-                            'vaccineManufacturer': vaccinationManufacturer,
-                            'frontImageUrl': frontImageURL,
-                            'backImageUrl': backImageURL,
-                            'vaccineLotNumber': vaccineLotNumber,
-                            'vaccineIssueDate': vaccineIssueDate,
-                            'vaccineExpiryDate': vaccineExpiryDate,
-                            'vaccinePrivateNote': vaccinePrivateNote,
+                            'Manufacturer': vaccinationManufacturer,
+                            'LotNumber': vaccineLotNumber,
+                            'IssueDate': vaccineIssueDate,
+                            'ExpiryDate': vaccineExpiryDate,
+                            'PrivateNote': vaccinePrivateNote,
                           },
                         );
                         setState(() {
@@ -420,17 +312,68 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
     );
   }
 
-  Future<void> pickImageAndSetUrl(String type) async {
-    final XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        if (type == 'front') {
-          frontImageUrl = pickedFile.path;
-        } else {
-          backImageUrl = pickedFile.path;
-        }
-      });
-    }
+  Future<void> showFileSourceDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select File Source'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context); // Close the dialog
+                  try {
+                    final FilePickerResult? result =
+                        await FilePicker.platform.pickFiles(
+                      type: FileType.any,
+                    );
+                    if (result != null) {
+                      final String? filePath = result.files.single.path;
+                      if (filePath != null) {
+                        pickFileAndSetUrl(filePath);
+                      }
+                    }
+                  } on PlatformException catch (e) {
+                    if (kDebugMode) {
+                      print("Unsupported operation$e");
+                    }
+                  }
+                },
+                child: const Text('Files'),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                  // For now, we're not handling image picking
+                },
+                child: const Text('Camera'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> pickFileAndSetUrl(String filePath) async {
+    setState(() {
+      selectedFileUrl = filePath;
+    });
+  }
+}
+
+// Function to return appropriate widget based on file type
+Widget getFileWidget(String filePath) {
+  if (filePath.toLowerCase().endsWith('.pdf')) {
+    // Display PDF file using PDFViewer widget
+    return PDFView(
+      filePath: filePath,
+    );
+  } else {
+    // Display image file using Image.file widget
+    return Image.file(File(filePath), fit: BoxFit.cover);
   }
 }
