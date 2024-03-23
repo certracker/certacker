@@ -288,6 +288,7 @@ class _CEUFormState extends State<CEUForm> {
                       final String? filePath = result.files.single.path;
                       if (filePath != null) {
                         pickFileAndSetUrl(filePath);
+                        isFileSelected = true;
                       }
                     }
                   } on PlatformException catch (e) {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:certracker/components/home_components/category_container/mult_select_container.dart';
 
@@ -82,7 +83,9 @@ class _SelectMultipleState extends State<SelectMultiple> {
                 setState(() {
                   if (value != null && value) {
                     _selectedItems.add(item);
-                    // print('Selected item: $item'); // Print the details of the selected item
+                    if (kDebugMode) {
+                      print('Selected item: $item');
+                    }
                   } else {
                     _selectedItems.remove(item);
                   }

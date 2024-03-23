@@ -1,3 +1,5 @@
+import 'package:certracker/components/home_components/select_mutilple/data_fetching.dart';
+import 'package:certracker/components/home_components/select_mutilple/selete_muiltple.dart';
 import 'package:flutter/material.dart';
 import 'details_page.dart';
 
@@ -28,6 +30,18 @@ class CategoryContainer extends StatelessWidget {
               category: category,
               imagePath: imagePath,
               color: color,
+            ),
+          ),
+        );
+      },
+      onLongPress: () async{
+        List<Map<String, dynamic>> userData = await fetchUserData();
+        // Navigate to the multiple selection page when long-pressed
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SelectMultiple(
+              data: userData // Pass data if required
             ),
           ),
         );

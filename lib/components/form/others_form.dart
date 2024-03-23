@@ -306,6 +306,7 @@ class _OthersFormState extends State<OthersForm> {
                       final String? filePath = result.files.single.path;
                       if (filePath != null) {
                         pickFileAndSetUrl(filePath);
+                        isFileSelected = true;
                       }
                     }
                   } on PlatformException catch (e) {

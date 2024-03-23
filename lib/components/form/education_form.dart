@@ -284,6 +284,7 @@ class _EducationFormState extends State<EducationForm> {
                       final String? filePath = result.files.single.path;
                       if (filePath != null) {
                         pickFileAndSetUrl(filePath);
+                        isFileSelected = true;
                       }
                     }
                   } on PlatformException catch (e) {

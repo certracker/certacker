@@ -322,6 +322,7 @@ class _TravelFormState extends State<TravelForm> {
                       final String? filePath = result.files.single.path;
                       if (filePath != null) {
                         pickFileAndSetUrl(filePath);
+                        isFileSelected = true;
                       }
                     }
                   } on PlatformException catch (e) {

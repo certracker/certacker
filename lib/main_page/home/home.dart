@@ -1,7 +1,6 @@
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/user_data_service.dart';
 import 'package:certracker/components/form/add_credential.dart';
-import 'package:certracker/components/form/remider_page/certificate_remider.dart';
 import 'package:certracker/components/home_components/pages/Certification.dart';
 import 'package:certracker/components/home_components/pages/Education.dart';
 import 'package:certracker/components/home_components/pages/License.dart';
@@ -10,10 +9,7 @@ import 'package:certracker/components/home_components/pages/Vaccination.dart';
 import 'package:certracker/components/home_components/pages/all.dart';
 import 'package:certracker/components/home_components/pages/ceu.dart';
 import 'package:certracker/components/home_components/pages/others.dart';
-// import 'package:certracker/components/home_components/recyle_bin/recyclebin.dart';
 import 'package:certracker/components/home_components/search/search_page.dart';
-import 'package:certracker/components/home_components/select_mutilple/data_fetching.dart';
-import 'package:certracker/components/home_components/select_mutilple/selete_muiltple.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -45,81 +41,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Inside _DashboardPageState class
-  void _showMoreOptions() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Container(
-          height: 150,
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildBottomSheetItem(
-                icon: Icons.check_circle_outline,
-                text: 'Select Multiple',
-                onTap: () {
-                  Navigator.pop(context);
-                  _navigateToDeletePage();
-                },
-              ),
-              _buildBottomSheetItem(
-                icon: Icons.delete_outline_outlined,
-                text: 'Recycle Bin',
-                onTap: _navigateToRecycleBinPage,
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _navigateToDeletePage() async {
-  List<Map<String, dynamic>> userData = await fetchUserData();
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => SelectMultiple(data: userData),
-    ),
-  );
-}
-
   void _searchPage() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const SearchPage(),
-      ),
-    );
-  }
-
-  void _navigateToRecycleBinPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const SetReminderPage(
-          certificationName: '',
-          certificationExpiryDate: '',
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomSheetItem({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Row(
-        children: [
-          Icon(icon),
-          const SizedBox(width: 12),
-          Text(text),
-        ],
       ),
     );
   }
@@ -170,9 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             onPressed: _searchPage,
                           ),
                           IconButton(
-                            icon: const Icon(Icons.more_vert,
+                            icon: const Icon(Icons.notifications,
                                 color: Colors.white),
-                            onPressed: _showMoreOptions,
+                            onPressed: () {},
                           ),
                         ],
                       ),
