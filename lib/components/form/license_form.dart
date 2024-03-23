@@ -4,13 +4,13 @@ import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/cert_auth/license_service.dart';
-import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 
+import 'remider_page/certificate_remider.dart';
 
 class LicenseForm extends StatefulWidget {
   const LicenseForm({super.key});
@@ -47,6 +47,7 @@ class _LicenseFormState extends State<LicenseForm> {
   final TextEditingController licenseStateController = TextEditingController();
 
   bool isLoading = false;
+  bool isFileSelected = false;
   String? selectedFileUrl;
 
   @override
@@ -209,36 +210,52 @@ class _LicenseFormState extends State<LicenseForm> {
                 AuthenticationService authService = AuthenticationService();
                 authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  String licenseName = licenseNameController.text;
-                  String licenseNumber = licenseNumberController.text;
-                  String licenseIssueDate = licenseIssueDateController.text;
-                  String licenseExpiryDate = licenseExpiryDateController.text;
-                  String licensePrivateNote = licensePrivateNoteController.text;
-                  String licenseState = licenseStateController.text;
+                  if (isFileSelected) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    String licenseName = licenseNameController.text;
+                    String licenseNumber = licenseNumberController.text;
+                    String licenseIssueDate = licenseIssueDateController.text;
+                    String licenseExpiryDate = licenseExpiryDateController.text;
+                    String licensePrivateNote =
+                        licensePrivateNoteController.text;
+                    String licenseState = licenseStateController.text;
 
-                  // Call the service function to save license data
-                  await LicenseService.saveLicenseData(
-                    name: licenseName,
-                    number: licenseNumber,
-                    issueDate: licenseIssueDate,
-                    expiryDate: licenseExpiryDate,
-                    privateNote: licensePrivateNote,
-                    state: licenseState,
-                    filePath: selectedFileUrl ?? '',
-                  );
-                  setState(() {
-                    isLoading = false;
-                  });
+                    // Call the service function to save license data
+                    await LicenseService.saveLicenseData(
+                      name: licenseName,
+                      number: licenseNumber,
+                      issueDate: licenseIssueDate,
+                      expiryDate: licenseExpiryDate,
+                      privateNote: licensePrivateNote,
+                      state: licenseState,
+                      filePath: selectedFileUrl ?? '',
+                    );
+                    setState(() {
+                      isLoading = false;
+                    });
 
-                  // Navigate back to the dashboard
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const BottomNavBar()),
-                  );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SetReminderPage(
+                          certificationName: '',
+                          certificationExpiryDate: '',
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text(
+                          'Please select a file.',
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -346,4 +363,3 @@ Widget getFileWidget(String filePath) {
     return Image.file(File(filePath), fit: BoxFit.cover);
   }
 }
-

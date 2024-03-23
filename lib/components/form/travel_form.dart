@@ -1,15 +1,14 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/cert_auth/travel_service.dart';
-import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+
+import 'remider_page/certificate_remider.dart';
 
 class TravelForm extends StatefulWidget {
   const TravelForm({super.key});
@@ -19,7 +18,6 @@ class TravelForm extends StatefulWidget {
 }
 
 class _TravelFormState extends State<TravelForm> {
-  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController travelCountryController = TextEditingController();
   final TextEditingController travelPlaceOfIssueController =
       TextEditingController();
@@ -34,6 +32,7 @@ class _TravelFormState extends State<TravelForm> {
 
   String documentType = 'Passport'; // Default value
   bool isLoading = false;
+  bool isFileSelected = false;
   String? selectedFileUrl;
 
   @override
@@ -221,36 +220,52 @@ class _TravelFormState extends State<TravelForm> {
               AuthenticationService authService = AuthenticationService();
               authService.getCurrentUserId();
               if (_validateForm()) {
-                setState(() {
-                  isLoading = true;
-                });
-                String travelCountry = travelCountryController.text;
-                String placeOfIssue = travelPlaceOfIssueController.text;
-                String documentNumber = travelDocumentNumberController.text;
-                String issueDate = travelIssueDateController.text;
-                String expiryDate = travelExpiryDateController.text;
-                String travelPrivateNote = travelPrivateNoteController.text;
+                if (isFileSelected) {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  String travelCountry = travelCountryController.text;
+                  String placeOfIssue = travelPlaceOfIssueController.text;
+                  String documentNumber = travelDocumentNumberController.text;
+                  String issueDate = travelIssueDateController.text;
+                  String expiryDate = travelExpiryDateController.text;
+                  String travelPrivateNote = travelPrivateNoteController.text;
 
-                // Call the service function to save travel data
-                await TravelService.saveTravelData(
-                  country: travelCountry,
-                  placeOfIssue: placeOfIssue,
-                  documentNumber: documentNumber,
-                  issueDate: issueDate,
-                  expiryDate: expiryDate,
-                  privateNote: travelPrivateNote,
-                  documentType: documentType,
-                  filePath: selectedFileUrl ?? '',
-                );
-                setState(() {
-                  isLoading = false;
-                });
+                  // Call the service function to save travel data
+                  await TravelService.saveTravelData(
+                    country: travelCountry,
+                    placeOfIssue: placeOfIssue,
+                    documentNumber: documentNumber,
+                    issueDate: issueDate,
+                    expiryDate: expiryDate,
+                    privateNote: travelPrivateNote,
+                    documentType: documentType,
+                    filePath: selectedFileUrl ?? '',
+                  );
+                  setState(() {
+                    isLoading = false;
+                  });
 
-                // Navigate back to the dashboard
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const BottomNavBar()),
-                );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SetReminderPage(
+                        certificationName: '',
+                        certificationExpiryDate: '',
+                      ),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      backgroundColor: Colors.red,
+                      content: Text(
+                        'Please select a file.',
+                      ),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
               }
             },
             child: Visibility(
@@ -283,7 +298,6 @@ class _TravelFormState extends State<TravelForm> {
   }
 
   bool _validateForm() {
-    // You can add more validation checks here if needed
     return documentType.isNotEmpty;
   }
 
@@ -336,19 +350,17 @@ class _TravelFormState extends State<TravelForm> {
   Future<void> pickFileAndSetUrl(String filePath) async {
     setState(() {
       selectedFileUrl = filePath;
+      isFileSelected = true;
     });
   }
 }
 
-// Function to return appropriate widget based on file type
 Widget getFileWidget(String filePath) {
   if (filePath.toLowerCase().endsWith('.pdf')) {
-    // Display PDF file using PDFViewer widget
     return PDFView(
       filePath: filePath,
     );
   } else {
-    // Display image file using Image.file widget
     return Image.file(File(filePath), fit: BoxFit.cover);
   }
 }

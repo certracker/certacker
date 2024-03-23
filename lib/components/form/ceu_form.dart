@@ -4,12 +4,13 @@ import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/cert_auth/ceu_service.dart';
-import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+
+import 'remider_page/certificate_remider.dart';
 
 class CEUForm extends StatefulWidget {
   const CEUForm({super.key});
@@ -37,6 +38,7 @@ class _CEUFormState extends State<CEUForm> {
       TextEditingController();
 
   bool isLoading = false;
+  bool isFileSelected = false;
   String? selectedFileUrl;
 
   @override
@@ -176,38 +178,53 @@ class _CEUFormState extends State<CEUForm> {
                 AuthenticationService authService = AuthenticationService();
                 authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
-                  setState(() {
-                    isLoading = true;
-                  });
+                  if (isFileSelected) {
+                    setState(() {
+                      isLoading = true;
+                    });
 
-                  // Retrieve values from the TextEditingControllers
+                    // Retrieve values from the TextEditingControllers
 
-                  String ceuProgramTitle = ceuProgramTitleController.text;
-                  String ceuProviderName = ceuProviderNameController.text;
-                  String ceuNumberOfContactHour =
-                      ceuNumberOfContactHourController.text;
-                  String ceuCompletionDate = ceuCompletionDateController.text;
-                  String ceuPrivateNote = ceuprivateNoteController.text;
+                    String ceuProgramTitle = ceuProgramTitleController.text;
+                    String ceuProviderName = ceuProviderNameController.text;
+                    String ceuNumberOfContactHour =
+                        ceuNumberOfContactHourController.text;
+                    String ceuCompletionDate = ceuCompletionDateController.text;
+                    String ceuPrivateNote = ceuprivateNoteController.text;
 
-                  // Call the service function to save CEU/CME data
-                  await CEUCMEService.saveCEUData(
-                    title: ceuProgramTitle,
-                    name: ceuProviderName,
-                    numberOfContactHour: ceuNumberOfContactHour,
-                    completionDate: ceuCompletionDate,
-                    filePath: selectedFileUrl ?? '',
-                    privateNote: ceuPrivateNote,
-                  );
-                  setState(() {
-                    isLoading = false;
-                  });
+                    // Call the service function to save CEU/CME data
+                    await CEUCMEService.saveCEUData(
+                      title: ceuProgramTitle,
+                      name: ceuProviderName,
+                      numberOfContactHour: ceuNumberOfContactHour,
+                      completionDate: ceuCompletionDate,
+                      filePath: selectedFileUrl ?? '',
+                      privateNote: ceuPrivateNote,
+                    );
+                    setState(() {
+                      isLoading = false;
+                    });
 
-                  // Navigate back to the dashboard
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const BottomNavBar()),
-                  );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SetReminderPage(
+                          certificationName: '',
+                          certificationExpiryDate: '',
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text(
+                          'Please select a file.',
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(

@@ -70,13 +70,13 @@ class CEUDetails extends StatelessWidget {
       }),
     );
   }
-}
 
-Widget _buildPDFView(BuildContext context, String pdfPath) {
-  return SizedBox(
-    height: 400, // Set a fixed height for the PDF view
-    child: PDFView(
-      filePath: pdfPath,
-    ),
-  );
+ Widget _buildPDFView(BuildContext context, String pdfPath) {
+    return SizedBox(
+      height: 400, // Set a fixed height for the PDF view
+      child: PDFView(
+        filePath: pdfPath,
+      ),
+    );
+  }
 }

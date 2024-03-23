@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/cert_auth/education_service.dart';
-import 'package:certracker/components/nav_bar/nav_bar.dart';
+import 'package:certracker/components/form/remider_page/certificate_remider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +36,7 @@ class _EducationFormState extends State<EducationForm> {
       TextEditingController();
 
   bool isLoading = false;
+  bool isFileSelected = false;
   String? selectedFileUrl;
 
   @override
@@ -176,6 +177,7 @@ class _EducationFormState extends State<EducationForm> {
                 AuthenticationService authService = AuthenticationService();
                 authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
+                   if (isFileSelected) {
                   setState(() {
                     isLoading = true;
                   });
@@ -199,12 +201,26 @@ class _EducationFormState extends State<EducationForm> {
                     isLoading = false;
                   });
 
-                  // Navigate back to the dashboard
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const BottomNavBar()),
-                  );
+                                      Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SetReminderPage(
+                          certificationName: '',
+                          certificationExpiryDate: '',
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text(
+                          'Please select a file.',
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(

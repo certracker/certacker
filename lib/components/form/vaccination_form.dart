@@ -4,12 +4,13 @@ import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/cert_auth/vaccination_service.dart';
-import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+
+import 'remider_page/certificate_remider.dart';
 
 class VaccinationForm extends StatefulWidget {
   const VaccinationForm({super.key});
@@ -39,6 +40,7 @@ class _VaccinationFormState extends State<VaccinationForm> {
       TextEditingController();
 
   bool isLoading = false;
+  bool isFileSelected = false;
   String? selectedFileUrl;
 
   @override
@@ -200,39 +202,55 @@ class _VaccinationFormState extends State<VaccinationForm> {
                 AuthenticationService authService = AuthenticationService();
                 authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  // Retrieve values from the TextEditingControllers
-                  String vaccinationType = vaccineTypeController.text;
-                  String vaccinationManufacturer =
-                      vaccineManufacturerController.text;
+                  if (isFileSelected) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    // Retrieve values from the TextEditingControllers
+                    String vaccinationType = vaccineTypeController.text;
+                    String vaccinationManufacturer =
+                        vaccineManufacturerController.text;
 
-                  String vaccineLotNumber = vaccineLotNumberController.text;
-                  String vaccineIssueDate = vaccineIssueDateController.text;
-                  String vaccineExpiryDate = vaccineExpiryDateController.text;
-                  String vaccinePrivateNote = vaccinePrivateNoteController.text;
+                    String vaccineLotNumber = vaccineLotNumberController.text;
+                    String vaccineIssueDate = vaccineIssueDateController.text;
+                    String vaccineExpiryDate = vaccineExpiryDateController.text;
+                    String vaccinePrivateNote =
+                        vaccinePrivateNoteController.text;
 
-                  // Call the service function to save vaccination data
-                  await VaccinationService.saveVaccinationData(
-                    vaccinationType: vaccinationType,
-                    manufacturer: vaccinationManufacturer,
-                    lotNumber: vaccineLotNumber,
-                    issueDate: vaccineIssueDate,
-                    expiryDate: vaccineExpiryDate,
-                    privateNote: vaccinePrivateNote,
-                    filePath: selectedFileUrl ?? '',
-                  );
-                  setState(() {
-                    isLoading = false;
-                  });
+                    // Call the service function to save vaccination data
+                    await VaccinationService.saveVaccinationData(
+                      vaccinationType: vaccinationType,
+                      manufacturer: vaccinationManufacturer,
+                      lotNumber: vaccineLotNumber,
+                      issueDate: vaccineIssueDate,
+                      expiryDate: vaccineExpiryDate,
+                      privateNote: vaccinePrivateNote,
+                      filePath: selectedFileUrl ?? '',
+                    );
+                    setState(() {
+                      isLoading = false;
+                    });
 
-                  // Navigate back to the dashboard
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const BottomNavBar()),
-                  );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SetReminderPage(
+                          certificationName: '',
+                          certificationExpiryDate: '',
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text(
+                          'Please select a file.',
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(

@@ -4,12 +4,13 @@ import 'dart:io';
 
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/cert_auth/others_service.dart';
-import 'package:certracker/components/nav_bar/nav_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+
+import 'remider_page/certificate_remider.dart';
 
 class OthersForm extends StatefulWidget {
   const OthersForm({super.key});
@@ -44,6 +45,7 @@ class _OthersFormState extends State<OthersForm> {
       TextEditingController();
 
   bool isLoading = false;
+  bool isFileSelected = false;
   String? selectedFileUrl;
 
   @override
@@ -197,35 +199,50 @@ class _OthersFormState extends State<OthersForm> {
                 AuthenticationService authService = AuthenticationService();
                 authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  String othersName = otherNameController.text;
-                  String otherNumber = otherNumberController.text;
-                  String otherIssueDate = otherIssueDateController.text;
-                  String otherExpiryDate = otherExpiryDateController.text;
-                  String otherPrivateNote = otherPrivateNoteController.text;
+                  if (isFileSelected) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    String othersName = otherNameController.text;
+                    String otherNumber = otherNumberController.text;
+                    String otherIssueDate = otherIssueDateController.text;
+                    String otherExpiryDate = otherExpiryDateController.text;
+                    String otherPrivateNote = otherPrivateNoteController.text;
 
-                  // Call the service function to save Others data
-                  await OthersService.saveOthersData(
-                    name: othersName,
-                    // othersDetails: othersDetails,
-                    number: otherNumber,
-                    issueDate: otherIssueDate,
-                    expiryDate: otherExpiryDate,
-                    privateNote: otherPrivateNote,
-                    filePath: selectedFileUrl ?? '',
-                  );
-                  setState(() {
-                    isLoading = false;
-                  });
+                    // Call the service function to save Others data
+                    await OthersService.saveOthersData(
+                      name: othersName,
+                      // othersDetails: othersDetails,
+                      number: otherNumber,
+                      issueDate: otherIssueDate,
+                      expiryDate: otherExpiryDate,
+                      privateNote: otherPrivateNote,
+                      filePath: selectedFileUrl ?? '',
+                    );
+                    setState(() {
+                      isLoading = false;
+                    });
 
-                  // Navigate back to the dashboard
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const BottomNavBar()),
-                  );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SetReminderPage(
+                          certificationName: '',
+                          certificationExpiryDate: '',
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text(
+                          'Please select a file.',
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(

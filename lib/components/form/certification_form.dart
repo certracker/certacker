@@ -34,6 +34,7 @@ class _CertificationFormState extends State<CertificationForm> {
       TextEditingController();
 
   bool isLoading = false;
+  bool isFileSelected = false;
   String? selectedFileUrl;
 
   @override
@@ -187,44 +188,56 @@ class _CertificationFormState extends State<CertificationForm> {
                 AuthenticationService authService = AuthenticationService();
                 authService.getCurrentUserId();
                 if (_formKey.currentState?.validate() ?? false) {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  // Assuming you have retrieved the values from the TextEditingController instances
-                  String certificationName = certificationNameController.text;
-                  String certificationNumber =
-                      certificationNumberController.text;
-                  String certificationIssueDate =
-                      certificationIssueDateController.text;
-                  String certificationExpiryDate =
-                      certificationExpiryDateController.text;
-                  String certificationPrivateNote =
-                      certificationPrivateNoteController.text;
+                  if (isFileSelected) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    // Assuming you have retrieved the values from the TextEditingController instances
+                    String certificationName = certificationNameController.text;
+                    String certificationNumber =
+                        certificationNumberController.text;
+                    String certificationIssueDate =
+                        certificationIssueDateController.text;
+                    String certificationExpiryDate =
+                        certificationExpiryDateController.text;
+                    String certificationPrivateNote =
+                        certificationPrivateNoteController.text;
 
-                  // Call the saveCertificationData method with the gathered data
-                  await CertificationService.saveCertificationData(
-                    name: certificationName,
-                    number: certificationNumber,
-                    issueDate: certificationIssueDate,
-                    expiryDate: certificationExpiryDate,
-                    privateNote: certificationPrivateNote,
-                    filePath: selectedFileUrl ?? '', // Pass file path here
-                  );
-                  setState(() {
-                    isLoading = false;
-                  });
+                    // Call the saveCertificationData method with the gathered data
+                    await CertificationService.saveCertificationData(
+                      name: certificationName,
+                      number: certificationNumber,
+                      issueDate: certificationIssueDate,
+                      expiryDate: certificationExpiryDate,
+                      privateNote: certificationPrivateNote,
+                      filePath: selectedFileUrl ?? '', // Pass file path here
+                    );
+                    setState(() {
+                      isLoading = false;
+                    });
 
-                  // Navigate back to the dashboard
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SetReminderPage(
-                        certificationName: certificationNameController.text,
-                        certificationExpiryDate:
-                            certificationExpiryDateController.text,
+                    // Navigate back to the dashboard
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SetReminderPage(
+                          certificationName: certificationNameController.text,
+                          certificationExpiryDate:
+                              certificationExpiryDateController.text,
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text(
+                          'Please select a file.',
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -288,6 +301,7 @@ class _CertificationFormState extends State<CertificationForm> {
                       final String? filePath = result.files.single.path;
                       if (filePath != null) {
                         pickFileAndSetUrl(filePath);
+                        isFileSelected = true;
                       }
                     }
                   } on PlatformException catch (e) {

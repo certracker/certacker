@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>912576608221-5ndbho3g3inbte2m7jjjugaijlhjfbvj.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.912576608221-5ndbho3g3inbte2m7jjjugaijlhjfbvj</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>912576608221-dsfnnvmi88ooq9e7n0khhg6s1cekre2b.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyCBM7xusxdC9OFw6GUUopky2TMHOjV280Y</string>
 	<key>GCM_SENDER_ID</key>
@@ -25,6 +31,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:912576608221:ios:ba745d12fbaa545ef9a834</string>
+	<string>1:912576608221:ios:3ee7c39264ec8412f9a834</string>
+	<key>DATABASE_URL</key>
+	<string>https://certracker-default-rtdb.firebaseio.com</string>
 </dict>
 </plist>
