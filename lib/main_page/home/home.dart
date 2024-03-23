@@ -45,7 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const SearchPage(),
+        builder: (context) => const SearchPage(userData: [
+          
+        ],),
       ),
     );
   }

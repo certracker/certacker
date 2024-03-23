@@ -11,7 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({Key? key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -19,6 +19,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isObscured = true;
+  bool _isLoading = false;
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -30,20 +31,12 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void signUserIn() async {
+  Future<void> signUserIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 20),
-              Text("Logging In..."),
-            ],
-          ),
-          duration: Duration(seconds: 1),
-        ),
-      );
       try {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text,
@@ -99,6 +92,10 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -194,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 20),
                     GestureDetector(
-                      onTap: signUserIn,
+                      onTap: _isLoading ? null : signUserIn,
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
@@ -208,15 +205,22 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         padding: const EdgeInsets.all(18),
-                        child: const Text(
-                          'Login',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                ),
+                              )
+                            : const Text(
+                                'Login',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -239,13 +243,12 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 20),
                     GoogleButton(
                         imagepath: "assets/images/signup/google-icon.png",
-                        onTap: () => GogleAuthService().signInWithGoogle(context)),
+                        onTap: () => GoogleAuthService().signInWithGoogle(context)),
                     const SizedBox(height: 80),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "Don’t have an account?",
+                        const Text("Don’t have an account?",
                           style: TextStyle(fontSize: 18),
                         ),
                         const SizedBox(width: 5),
@@ -274,3 +277,5 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
+                         

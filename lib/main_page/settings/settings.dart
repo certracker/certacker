@@ -2,6 +2,7 @@
 
 import 'package:certracker/components/settings_components/about/about_page.dart';
 import 'package:certracker/components/settings_components/change_password/change_password_page.dart';
+import 'package:certracker/components/settings_components/delete_account/delete_account.dart';
 import 'package:certracker/components/settings_components/edit_profile/edit_profile.dart';
 import 'package:certracker/components/settings_components/help/help_page.dart';
 import 'package:certracker/components/settings_components/log_out/log_out_page.dart';
@@ -19,15 +20,15 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   void signUserOut(BuildContext context) async {
-  await FirebaseAuth.instance.signOut();
+    await FirebaseAuth.instance.signOut();
 
-  // Navigate to the login page after signing out
-  Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(builder: (context) => const LoginPage()),
-    (route) => false,
-  );
-}
+    // Navigate to the login page after signing out
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'Change Password',
       'Help',
       'About',
+      'Delete My Account', // New option added here
     ];
 
     return Card(
@@ -88,33 +90,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildLogoutContainer(BuildContext context) {
-  return GestureDetector(
-    onTap: () {
-      signUserOut(context);
-    },
-    child: Container(
-      margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF6F0A0A),
-        borderRadius: BorderRadius.circular(10.0), // Adding border radius
+    return GestureDetector(
+      onTap: () {
+        signUserOut(context);
+      },
+      child: Container(
+        margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF6F0A0A),
+          borderRadius: BorderRadius.circular(10.0), // Adding border radius
+        ),
+        child: const Row(
+          children: [
+            Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+            SizedBox(width: 10),
+            Text(
+              'Log Out',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ],
+        ),
       ),
-      child: const Row(
-        children: [
-          Icon(
-            Icons.logout,
-            color: Colors.white,
-          ),
-          SizedBox(width: 10),
-          Text(
-            'Log Out',
-            style: TextStyle(fontSize: 16, color: Colors.white),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildSettingsItem(BuildContext context, String text) {
     return Column(
@@ -147,7 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
         ),
-        if (text != 'About')
+        if (text != 'About' && text != 'Delete My Account')
           const Divider(
               height: 0), // Add divider for each item except the last one
       ],
@@ -167,7 +169,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       case 'About':
         return Icons.info;
       default:
-        return Icons.logout;
+        return Icons
+            .delete; // Change default to delete icon for "Delete My Account"
     }
   }
 
@@ -201,6 +204,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const AboutPage()),
+        );
+        break;
+      case 'Delete My Account':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const DeleteAccountPage()),
         );
         break;
       case 'Log Out':

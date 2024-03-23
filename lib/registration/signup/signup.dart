@@ -1,15 +1,13 @@
-// ignore_for_file: use_build_context_synchronously
-
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:certracker/model/user/user_model.dart';
 import 'package:certracker/components/buttons/google_button.dart';
 import 'package:certracker/components/colors/app_colors.dart';
-import 'package:certracker/model/user/user_model.dart';
 import 'package:certracker/registration/complete_profile/complete_profile.dart';
 import 'package:certracker/registration/login/login.dart';
 import 'package:certracker/services/auth_services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -29,6 +27,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  bool _isLoading = false; // Define _isLoading here
+
   String? _passwordMatchValidator(String? value) {
     if (value != passwordController.text) {
       return 'Passwords do not match';
@@ -38,15 +38,15 @@ class _SignUpPageState extends State<SignUpPage> {
 
   bool _isChecked = false;
 
-  // ...
-
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       if (firstNameController.text.isEmpty || lastNameController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Please enter your first and last name."),
         ));
+        return; // Stop the sign-up process if first name or last name is empty
       }
+
       // Check if passwords match
       if (passwordController.text != confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -68,18 +68,10 @@ class _SignUpPageState extends State<SignUpPage> {
         return; // Stop the sign-up process if checkbox is not checked
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 20),
-              Text("Signing Up..."),
-            ],
-          ),
-          duration: Duration(seconds: 1), // Adjust the duration as needed
-        ),
-      );
+      setState(() {
+        _isLoading = true; // Start showing loading indicator
+      });
+
       try {
         UserCredential userCredential =
             await _auth.createUserWithEmailAndPassword(
@@ -102,17 +94,11 @@ class _SignUpPageState extends State<SignUpPage> {
         // Send email verification
         await userCredential.user!.sendEmailVerification();
 
-        ScaffoldMessenger.of(context)
-            .hideCurrentSnackBar(); // Dismiss the loading SnackBar
-
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const CompleteProfile()),
         );
       } on FirebaseAuthException catch (e) {
-        ScaffoldMessenger.of(context)
-            .hideCurrentSnackBar(); // Dismiss the loading SnackBar
-
         String errorMessage = "Failed to sign up. Please try again.";
 
         if (e.code == 'weak-password') {
@@ -140,15 +126,16 @@ class _SignUpPageState extends State<SignUpPage> {
           print('Error during sign-up: $e');
         }
 
-        ScaffoldMessenger.of(context)
-            .hideCurrentSnackBar(); // Dismiss the loading SnackBar
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Failed to sign up. Please try again."),
             duration: Duration(seconds: 3),
           ),
         );
+      } finally {
+        setState(() {
+          _isLoading = false; // Stop showing loading indicator
+        });
       }
     }
   }
@@ -301,9 +288,9 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 20),
                     GestureDetector(
-                      onTap: () {
-                        _signUp();
-                      },
+                      onTap: _isLoading
+                          ? null
+                          : _signUp,
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
@@ -317,15 +304,23 @@ class _SignUpPageState extends State<SignUpPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         padding: const EdgeInsets.all(18),
-                        child: const Text(
-                          'Sign Up',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const Center(
+                              child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                            )
+                            : const Text(
+                                'Sign Up',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -342,8 +337,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 20),
                     GoogleButton(
-                        imagepath: "assets/images/signup/google-icon.png",
-                        onTap: () => GogleAuthService().signInWithGoogle(context)),
+                      imagepath: "assets/images/signup/google-icon.png",
+                      onTap: () =>
+                          GoogleAuthService().signInWithGoogle(context),
+                    ),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -361,8 +358,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           child: const Text(
                             'Login',
                             style: TextStyle(
-                              color: Colors
-                                  .blue, // Change the color to your desired color
+                              color: Colors.blue,
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
                             ),

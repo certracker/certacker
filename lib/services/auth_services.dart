@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'; // Import the material package
 import 'package:google_sign_in/google_sign_in.dart';
 
-class GogleAuthService {
+class GoogleAuthService {
   final UserDataService _userDataService = UserDataService(); // Initialize UserDataService
 
   Future<void> signInWithGoogle(BuildContext context) async {
