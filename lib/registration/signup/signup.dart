@@ -10,7 +10,7 @@ import 'package:certracker/registration/login/login.dart';
 import 'package:certracker/services/auth_services.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  const SignUpPage({Key? key}) : super(key: key);
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -27,7 +27,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  bool _isLoading = false; // Define _isLoading here
+  bool _isLoading = false;
 
   String? _passwordMatchValidator(String? value) {
     if (value != passwordController.text) {
@@ -44,18 +44,7 @@ class _SignUpPageState extends State<SignUpPage> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Please enter your first and last name."),
         ));
-        return; // Stop the sign-up process if first name or last name is empty
-      }
-
-      // Check if passwords match
-      if (passwordController.text != confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Passwords do not match."),
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return; // Stop the sign-up process if passwords don't match
+        return;
       }
 
       if (!_isChecked) {
@@ -65,11 +54,11 @@ class _SignUpPageState extends State<SignUpPage> {
             duration: Duration(seconds: 3),
           ),
         );
-        return; // Stop the sign-up process if checkbox is not checked
+        return;
       }
 
       setState(() {
-        _isLoading = true; // Start showing loading indicator
+        _isLoading = true;
       });
 
       try {
@@ -91,7 +80,6 @@ class _SignUpPageState extends State<SignUpPage> {
             .doc(userCredential.user!.uid)
             .set(newUser.toJson());
 
-        // Send email verification
         await userCredential.user!.sendEmailVerification();
 
         Navigator.push(
@@ -121,7 +109,6 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
         );
       } catch (e) {
-        // Handle other errors
         if (kDebugMode) {
           print('Error during sign-up: $e');
         }
@@ -134,10 +121,19 @@ class _SignUpPageState extends State<SignUpPage> {
         );
       } finally {
         setState(() {
-          _isLoading = false; // Stop showing loading indicator
+          _isLoading = false;
         });
       }
     }
+  }
+
+  bool _isStrongPassword(String value) {
+    // Strong password criteria: at least one capital letter, one number, and one symbol
+    bool hasUppercase = value.contains(RegExp(r'[A-Z]'));
+    bool hasDigits = value.contains(RegExp(r'[0-9]'));
+    bool hasSpecialCharacters = value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+
+    return hasUppercase && hasDigits && hasSpecialCharacters;
   }
 
   @override
@@ -152,7 +148,7 @@ class _SignUpPageState extends State<SignUpPage> {
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage(
-                      "assets/images/signup/signup.png"), // Replace with your image path
+                      "assets/images/signup/signup.png"),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -164,7 +160,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 const EdgeInsets.all(16.0),
               ),
               child: Form(
-                key: _formKey, // Assign the form key to the Form widget
+                key: _formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -184,7 +180,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
+                          return 'Please enter your first name';
                         }
                         return null;
                       },
@@ -205,7 +201,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
+                          return 'Please enter your last name';
                         }
                         return null;
                       },
@@ -226,7 +222,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
+                          return 'Please enter your email';
                         }
                         return null;
                       },
@@ -246,9 +242,13 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                         ),
                       ),
-                      validator: (value) {
+                                           validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your password';
+                        } else if (value.length < 8) {
+                          return 'Password must be at least 8 characters long';
+                        } else if (!_isStrongPassword(value)) {
+                          return 'Password must contain at least one uppercase letter, one number, and one symbol';
                         }
                         return null;
                       },
@@ -288,9 +288,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 20),
                     GestureDetector(
-                      onTap: _isLoading
-                          ? null
-                          : _signUp,
+                      onTap: _isLoading ? null : _signUp,
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
@@ -306,12 +304,12 @@ class _SignUpPageState extends State<SignUpPage> {
                         padding: const EdgeInsets.all(18),
                         child: _isLoading
                             ? const Center(
-                              child: CircularProgressIndicator(
+                                child: CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                     Colors.white,
                                   ),
                                 ),
-                            )
+                              )
                             : const Text(
                                 'Sign Up',
                                 textAlign: TextAlign.center,

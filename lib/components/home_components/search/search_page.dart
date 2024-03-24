@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/components/home_components/category_container/category_container.dart';
 
 class SearchPage extends StatefulWidget {
-  final List<Map<String, dynamic>> userData;
-
-  const SearchPage({super.key, required this.userData});
+  const SearchPage({super.key});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -84,17 +84,81 @@ class _SearchPageState extends State<SearchPage> {
       return;
     }
 
-    // Perform search in already fetched data
-    List<Map<String, dynamic>> results = [];
-    for (Map<String, dynamic> userData in widget.userData) {
-      if (userData['Title'].toLowerCase().contains(query.toLowerCase())) {
-        results.add(userData);
-      }
-    }
+    fetchSearchData(query.toLowerCase());
+  }
 
-    setState(() {
-      searchResults = results;
-    });
+  Future<void> fetchSearchData(String query) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      String? userId = AuthenticationService().getCurrentUserId();
+
+      if (userId != null) {
+        List<QuerySnapshot> snapshots = await Future.wait([
+          FirebaseFirestore.instance
+              .collection('Certification')
+              .where('userId', isEqualTo: userId)
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
+          FirebaseFirestore.instance
+              .collection('License')
+              .where('userId', isEqualTo: userId)
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
+          FirebaseFirestore.instance
+              .collection('Education')
+              .where('userId', isEqualTo: userId)
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
+          FirebaseFirestore.instance
+              .collection('Vaccination')
+              .where('userId', isEqualTo: userId)
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
+          FirebaseFirestore.instance
+              .collection('Travel')
+              .where('userId', isEqualTo: userId)
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
+          FirebaseFirestore.instance
+              .collection('CEU')
+              .where('userId', isEqualTo: userId)
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
+          FirebaseFirestore.instance
+              .collection('Others')
+              .where('userId', isEqualTo: userId)
+              .orderBy('Title', descending: false)
+              .startAt([query]).endAt(['$query\uf8ff']).get(),
+        ]);
+
+        List<Map<String, dynamic>> userData = [];
+        for (QuerySnapshot snapshot in snapshots) {
+          userData.addAll(
+            snapshot.docs.map((doc) => {
+                  ...doc.data() as Map<String, dynamic>,
+                  'tableName': doc.reference.parent.id,
+                  'timestamp': doc['timestamp'],
+                }),
+          );
+        }
+
+        setState(() {
+          searchResults = userData;
+          isLoading = false;
+        });
+      } else {
+        throw Exception('User not authenticated!');
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+      setState(() {
+        isLoading = false;
+      });
+      rethrow;
+    }
   }
 
   Color _getDefaultColor(String tableName) {

@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:certracker/auth/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-Future<List<Map<String, dynamic>>> fetchUserData() async {
+Future<List<Map<String, dynamic>>> fetchUserDat() async {
   try {
     String? userId = AuthenticationService().getCurrentUserId();
 
@@ -42,10 +44,12 @@ Future<List<Map<String, dynamic>>> fetchUserData() async {
           snapshot.docs.map((doc) => {
             ...doc.data() as Map<String, dynamic>,
             'tableName': doc.reference.parent.id,
+            'credentialsId': doc.id,
             'timestamp': doc['timestamp'],
           }),
         );
       }
+      print(userData);
       return userData;
     } else {
       throw Exception('User not authenticated!');

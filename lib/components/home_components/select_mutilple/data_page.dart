@@ -72,6 +72,7 @@ Future<List<Map<String, dynamic>>> fetchUserDataWithPdf() async {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
           String tableName = doc.reference.parent.id;
           data['tableName'] = tableName;
+          data['credentialsId'] = doc.id;
           data['timestamp'] = doc['timestamp'];
 
           // Download PDF and add its path to data

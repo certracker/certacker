@@ -45,12 +45,12 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const SearchPage(userData: [
-          
-        ],),
+        builder: (context) => const SearchPage(),
       ),
     );
   }
+
+
 
   void selectItem(int index) {
     setState(() {
