@@ -1,6 +1,6 @@
 name: certracker
 description: "CerTracker is a platform that helps healthcare workers and licensed professionals manage, monitor, and protect their credentials and certifications. It has features that allow healthcare workers to easily manage, monitor, and protect essential records."
-version: 1.1.0+15
+version: 1.1.0+18
 homepage: https://www.certracker.com
 
 environment:
