@@ -30,7 +30,7 @@ class DeleteDataService {
     
     
     // Handle error as needed
-    throw e;
+    rethrow;
   }
 }
 
