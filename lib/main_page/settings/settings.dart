@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:certracker/components/settings_components/about/about_page.dart';
 import 'package:certracker/components/settings_components/change_password/change_password_page.dart';
 import 'package:certracker/components/settings_components/delete_account/delete_account.dart';
@@ -45,17 +43,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: _buildSettingsCard(context),
-            ),
-            const SizedBox(height: 20),
-            _buildLogoutContainer(context),
-          ],
-        ),
+      body: ListView(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: _buildSettingsCard(context),
+          ),
+          const SizedBox(height: 20),
+          _buildLogoutContainer(context),
+        ],
       ),
     );
   }
@@ -67,7 +63,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'Change Password',
       'Help',
       'About',
-      'Delete My Account', // New option added here
+      'Delete My Account',
     ];
 
     return Card(
@@ -77,13 +73,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: settings.length,
-          itemBuilder: (context, index) {
-            final String text = settings[index];
-            return _buildSettingsItem(context, text);
-          },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: settings
+              .map((text) => _buildSettingsItem(context, text))
+              .toList(),
         ),
       ),
     );
@@ -99,7 +93,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: const Color(0xFF6F0A0A),
-          borderRadius: BorderRadius.circular(10.0), // Adding border radius
+          borderRadius: BorderRadius.circular(10.0),
         ),
         child: const Row(
           children: [
@@ -123,8 +117,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         InkWell(
           onTap: () {
-            _navigateToSettingsPage(
-                context, text); // Navigate to the respective page
+            _navigateToSettingsPage(context, text);
           },
           child: Container(
             height: 70,
@@ -135,8 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Row(
                   children: [
-                    Icon(_getIconForSetting(
-                        text)), // Get respective icon for each setting
+                    Icon(_getIconForSetting(text)),
                     const SizedBox(width: 10),
                     Text(
                       text,
@@ -149,9 +141,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
         ),
-        if (text != 'About' && text != 'Delete My Account')
-          const Divider(
-              height: 0), // Add divider for each item except the last one
+        if (text != 'Delete My Account') const Divider(height: 0),
       ],
     );
   }
@@ -169,8 +159,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       case 'About':
         return Icons.info;
       default:
-        return Icons
-            .delete; // Change default to delete icon for "Delete My Account"
+        return Icons.delete;
     }
   }
 
@@ -219,7 +208,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
         break;
       default:
-        // Handle other settings
+// Handle other settings
         break;
     }
   }

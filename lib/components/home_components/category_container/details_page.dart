@@ -357,92 +357,91 @@ class _DetailsPageState extends State<DetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            AppBar(
-              automaticallyImplyLeading: false,
-              flexibleSpace: SizedBox(
-                height: 170,
-                child: Stack(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        toolbarHeight: 180,
+        flexibleSpace: SizedBox(
+          child: Stack(
+            children: [
+              Image.asset(
+                widget.imagePath,
+                width: double.infinity,
+                fit: BoxFit.fitHeight,
+              ),
+              Container(
+                color: widget.color.withOpacity(0.7),
+              ),
+              Positioned(
+                top: 60.0,
+                left: 16.0,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  color: Colors.white,
+                ),
+              ),
+              Positioned(
+                top: 60.0,
+                right: 16.0,
+                child: Row(
                   children: [
-                    Image.asset(
-                      widget.imagePath,
-                      width: double.infinity,
-                      fit: BoxFit.fitHeight,
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: _handleEdit,
+                      color: Colors.white, // Set edit icon color to white
                     ),
-                    Container(
-                      color: widget.color.withOpacity(0.7),
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: _handleShare,
+                      color: Colors.white, // Set share icon color to white
                     ),
-                    Positioned(
-                      top: 16.0,
-                      left: 16.0,
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        color: Colors.white,
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: _showDeleteConfirmationDialog,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 16.0,
+                left: 16.0,
+                right: 16.0,
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        widget.title,
+                        style: const TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                    Positioned(
-                      top: 16.0,
-                      right: 16.0,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: _handleEdit,
-                            color: Colors.white, // Set edit icon color to white
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.share),
-                            onPressed: _handleShare,
-                            color:
-                                Colors.white, // Set share icon color to white
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: _showDeleteConfirmationDialog,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 16.0,
-                      left: 16.0,
-                      right: 16.0,
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              widget.title,
-                              style: const TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              widget.category,
-                              style: const TextStyle(
-                                fontSize: 18.0,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        widget.category,
+                        style: const TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
+            ],
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
             Expanded(
               child: FutureBuilder(
                 future: fetchData,

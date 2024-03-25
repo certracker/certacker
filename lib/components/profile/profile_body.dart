@@ -5,7 +5,7 @@ import 'package:certracker/components/colors/app_colors.dart';
 import 'package:certracker/components/settings_components/edit_profile/edit_profile.dart';
 
 class ProfileBody extends StatefulWidget {
-  const ProfileBody({super.key});
+  const ProfileBody({Key? key}) : super(key: key);
 
   @override
   State<ProfileBody> createState() => _ProfileBodyState();
@@ -18,6 +18,7 @@ class _ProfileBodyState extends State<ProfileBody> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      padding: EdgeInsets.zero, 
       child: FutureBuilder(
         future: _userDataService.getUserDetails(
           _authenticationService.getCurrentUserId() ?? '',

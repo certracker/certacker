@@ -35,17 +35,40 @@ class CategoryContainer extends StatelessWidget {
           ),
         );
       },
-      onLongPress: () async{
-        List<Map<String, dynamic>> userData = await fetchUserDataWithPdf();
-        // Navigate to the multiple selection page when long-pressed
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SelectMultiple(
-              data: userData // Pass data if required
-            ),
-          ),
+      onLongPress: () {
+        // Show loading indicator
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          },
         );
+
+        // Fetch user data asynchronously
+        fetchUserDataWithPdf().then((userData) {
+          // Close loading indicator
+          Navigator.of(context).pop();
+
+          // Navigate to the multiple selection page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SelectMultiple(
+                data: userData, // Pass data if required
+              ),
+            ),
+          );
+        }).catchError((error) {
+          // Handle error if data fetching fails
+          Navigator.of(context).pop(); // Close loading indicator
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to fetch user data: $error'),
+            ),
+          );
+        });
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),

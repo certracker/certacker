@@ -1,6 +1,7 @@
 import 'package:certracker/auth/auth_service.dart';
 import 'package:certracker/auth/user_data_service.dart';
 import 'package:certracker/components/form/add_credential.dart';
+import 'package:certracker/components/home_components/notification/notification.dart';
 import 'package:certracker/components/home_components/pages/Certification.dart';
 import 'package:certracker/components/home_components/pages/Education.dart';
 import 'package:certracker/components/home_components/pages/License.dart';
@@ -50,7 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
+  void _notificationPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NotificationPage(),
+      ),
+    );
+  }
 
   void selectItem(int index) {
     setState(() {
@@ -63,9 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
     String profilePicture = userDetails?['profilePicture'] ?? '';
     String firstName = userDetails?['firstName'] ?? '';
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(170.0),
-        child: AppBar(
+      appBar: AppBar(
+        toolbarHeight: 170,
+        backgroundColor: const Color(0XFF591A8F),
           automaticallyImplyLeading: false,
           elevation: 4,
           flexibleSpace: Column(
@@ -100,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           IconButton(
                             icon: const Icon(Icons.notifications,
                                 color: Colors.white),
-                            onPressed: () {},
+                            onPressed: _notificationPage,
                           ),
                         ],
                       ),
@@ -167,7 +175,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-        ),
       ),
       body: IndexedStack(
         index: selectedIndex,

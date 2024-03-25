@@ -30,7 +30,10 @@ class _SelectMultipleState extends State<SelectMultiple> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Multiple'),
+        title: const Text('Multiple Selection', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0XFF591A8F),
+        iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: true,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
