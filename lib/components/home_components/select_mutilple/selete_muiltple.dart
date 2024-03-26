@@ -1,9 +1,8 @@
+import 'package:certracker/components/home_components/select_mutilple/function.dart';
+import 'package:certracker/components/home_components/select_mutilple/multiple_bottom_nav.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:certracker/components/home_components/category_container/mult_select_container.dart';
-
-import 'function.dart';
-import 'multiple_bottom_nav.dart'; // Import DeleteDataService here
 
 class SelectMultiple extends StatefulWidget {
   final List<Map<String, dynamic>> data;
@@ -100,19 +99,53 @@ class _SelectMultipleState extends State<SelectMultiple> {
       ),
       bottomNavigationBar: BottomNavBar(
         onSharePressed: () {
-          // Share selected PDF files
-          shareSelectedPDFs(_selectedItems);
+          // Show confirmation dialog before sharing
+          showConfirmationDialog('Share PDF Files', 'Are you sure you want to share the selected PDF files?', () {
+            // Share selected PDF files
+            shareSelectedPDFs(_selectedItems);
+          });
         },
         onDeletePressed: () {
-          // Delete selected data
-          DeleteDataService.deleteSelectedData(
-              _selectedItems); // Call the deleteSelectedData function
+          // Show confirmation dialog before deleting
+          showConfirmationDialog('Delete Data', 'Are you sure you want to delete the selected data?', () {
+            // Delete selected data
+            DeleteDataService.deleteSelectedData(_selectedItems);
+          });
         },
         onCancelPressed: () {
           // Add your cancel functionality here
-          print('Cancel pressed');
+          if (kDebugMode) {
+            print('Cancel pressed');
+          }
         },
       ),
+    );
+  }
+
+  void showConfirmationDialog(String title, String content, Function onPressed) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                onPressed();
+                Navigator.pop(context);
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

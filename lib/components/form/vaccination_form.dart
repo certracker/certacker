@@ -141,34 +141,48 @@ class _VaccinationFormState extends State<VaccinationForm> {
           ),
           const SizedBox(height: 16),
           // File upload section
-          GestureDetector(
-            onTap: () async {
-              await showFileSourceDialog();
-            },
-            child: Container(
-              width: 400,
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: selectedFileUrl != null
-                  ? getFileWidget(selectedFileUrl!)
-                  : const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.file_upload, size: 40),
-                        SizedBox(height: 8),
-                        Text(
-                          "Upload File",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                  Column(
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  await showFileSourceDialog();
+                },
+                child: Container(
+                  width: 400,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: selectedFileUrl != null
+                      ? getFileWidget(selectedFileUrl!)
+                      : const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.file_upload, size: 40),
+                            SizedBox(height: 8),
+                            Text(
+                              "Upload File",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-            ),
+                ),
+              ),
+              if (selectedFileUrl != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await showFileSourceDialog();
+                    },
+                    child: Text('Change File'),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 42),
           const Text(

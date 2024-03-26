@@ -41,15 +41,15 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
     super.initState();
     _certificationNameController =
         TextEditingController(text: widget.initialDetails['Title']);
-    _certificationNumberController = TextEditingController(
-        text: widget.initialDetails['Number']);
-    _issueDateController = TextEditingController(
-        text: widget.initialDetails['IssueDate']);
-    _expiryDateController = TextEditingController(
-        text: widget.initialDetails['ExpiryDate']);
-    _privateNoteController = TextEditingController(
-        text: widget.initialDetails['PrivateNote']);
-        selectedFileUrl = widget.initialDetails['frontImageUrl'];
+    _certificationNumberController =
+        TextEditingController(text: widget.initialDetails['Number']);
+    _issueDateController =
+        TextEditingController(text: widget.initialDetails['IssueDate']);
+    _expiryDateController =
+        TextEditingController(text: widget.initialDetails['ExpiryDate']);
+    _privateNoteController =
+        TextEditingController(text: widget.initialDetails['PrivateNote']);
+    selectedFileUrl = widget.initialDetails['frontImageUrl'];
   }
 
   @override
@@ -159,34 +159,52 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
                 ),
                 const SizedBox(height: 16),
                 // File upload section
-                GestureDetector(
-                  onTap: () async {
-                    await showFileSourceDialog();
-                  },
-                  child: Container(
-                    width: 400,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: selectedFileUrl != null
-                        ? getFileWidget(selectedFileUrl!)
-                        : const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.file_upload, size: 40),
-                              SizedBox(height: 8),
-                              Text(
-                                "Upload File",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
+                Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        await showFileSourceDialog();
+                      },
+                      child: Container(
+                        width: 400,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: selectedFileUrl != null
+                            ? Stack(
+                                children: [
+                                  getFileWidget(selectedFileUrl!),
+                                  Positioned(
+                                    bottom: 8,
+                                    right: 8,
+                                    child: ElevatedButton(
+                                      onPressed: () async {
+                                        await showFileSourceDialog();
+                                      },
+                                      child: const Text('Change File'),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.file_upload, size: 40),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    "Upload File",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 42),
                 const Text(
@@ -357,7 +375,6 @@ class _EditCertificationPageState extends State<EditCertificationPage> {
       selectedFileUrl = filePath;
     });
   }
-  
 }
 
 // Function to return appropriate widget based on file type
