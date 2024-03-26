@@ -59,6 +59,7 @@ class TravelPage extends StatelessWidget {
                 category: "Travel",
                 imagePath: categoryImagePath,
                 color: categoryColor,
+                expiryDate: credentialsId['ExpiryDate'],
               );
             }).toList(),
           );

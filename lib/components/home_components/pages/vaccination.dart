@@ -59,6 +59,7 @@ class VaccinationPage extends StatelessWidget {
                 category: "Vaccination",
                 imagePath: categoryImagePath,
                 color: categoryColor,
+                expiryDate: credentialsId['ExpiryDate'],
               );
             }).toList(),
           );

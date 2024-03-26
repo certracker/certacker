@@ -82,6 +82,7 @@ class AllPage extends StatelessWidget {
                 category: tableName,
                 imagePath: categoryImagePath,
                 color: categoryColor,
+                expiryDate: credentialsId['ExpiryDate'],
               );
             }).toList(),
           );

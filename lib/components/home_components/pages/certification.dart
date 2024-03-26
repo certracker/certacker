@@ -59,9 +59,14 @@ class CertificationPage extends StatelessWidget {
                 category: "Certification",
                 imagePath: categoryImagePath,
                 color: categoryColor,
+                expiryDate: credentialsId['ExpiryDate'], 
+                
               );
+              
             }).toList(),
+            
           );
+          
         }
       },
     );

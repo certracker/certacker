@@ -59,6 +59,7 @@ class LicensesPage extends StatelessWidget {
                 category: "License",
                 imagePath: categoryImagePath,
                 color: categoryColor,
+                expiryDate: credentialsId['ExpiryDate'],
               );
             }).toList(),
           );

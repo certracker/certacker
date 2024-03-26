@@ -43,7 +43,7 @@ class _EditVaccinationPageState extends State<EditVaccinationPage> {
     super.initState();
 
     vaccineTypeController =
-        TextEditingController(text: widget.initialDetails['vaccineType'] ?? '');
+        TextEditingController(text: widget.initialDetails['Title'] ?? '');
     vaccineManufacturerController = TextEditingController(
         text: widget.initialDetails['Manufacturer'] ?? '');
     vaccineLotNumberController = TextEditingController(

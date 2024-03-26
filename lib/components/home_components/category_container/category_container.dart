@@ -9,6 +9,7 @@ class CategoryContainer extends StatelessWidget {
   final String category;
   final String imagePath;
   final Color color;
+  final String? expiryDate;
 
   const CategoryContainer({
     super.key,
@@ -16,6 +17,7 @@ class CategoryContainer extends StatelessWidget {
     required this.category,
     required this.imagePath,
     required this.color,
+    this.expiryDate,
   });
 
   @override
@@ -40,7 +42,7 @@ class CategoryContainer extends StatelessWidget {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           },
@@ -105,7 +107,8 @@ class CategoryContainer extends StatelessWidget {
                     height: 50,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: color.withOpacity(0.3), // Background color with opacity
+                      color: color
+                          .withOpacity(0.3), // Background color with opacity
                     ),
                     child: Center(
                       child: Image.asset(
@@ -141,6 +144,26 @@ class CategoryContainer extends StatelessWidget {
                   const SizedBox(width: 16),
                 ],
               ),
+            ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: expiryDate != null
+                  ? Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.red), // Red border
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Expiry Date: $expiryDate',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    )
+                  : const SizedBox(width: 0, height: 0),
             ),
           ],
         ),
