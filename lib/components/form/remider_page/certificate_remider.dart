@@ -1,7 +1,7 @@
-import 'package:certracker/components/nav_bar/nav_bar.dart';
-import 'package:certracker/services/notification_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:certracker/components/nav_bar/nav_bar.dart';
+import 'package:certracker/services/notification_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class SetReminderPage extends StatefulWidget {
@@ -9,10 +9,10 @@ class SetReminderPage extends StatefulWidget {
   final String certificationExpiryDate;
 
   const SetReminderPage({
-    super.key,
+    Key? key,
     required this.certificationName,
     required this.certificationExpiryDate,
-  });
+  }) : super(key: key);
 
   @override
   State<SetReminderPage> createState() => _SetReminderPageState();
@@ -21,7 +21,6 @@ class SetReminderPage extends StatefulWidget {
 class _SetReminderPageState extends State<SetReminderPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _noteController = TextEditingController();
   late DateTime _selectedDate;
   late TimeOfDay _selectedTime;
 
@@ -63,32 +62,32 @@ class _SetReminderPageState extends State<SetReminderPage> {
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      String title = _titleController.text;
-      String note = _noteController.text;
-      DateTime scheduledDate = DateTime(
-        _selectedDate.year,
-        _selectedDate.month,
-        _selectedDate.day,
-        _selectedTime.hour,
-        _selectedTime.minute,
-      );
+  if (_formKey.currentState!.validate()) {
+    String title = _titleController.text;
+    DateTime scheduledDate = DateTime(
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
+      _selectedTime.hour,
+      _selectedTime.minute,
+    );
 
-      // Schedule reminder
-      _scheduleReminder(title, note, scheduledDate);
+    // Schedule reminder
+    _scheduleReminder(title, widget.certificationName, scheduledDate);
 
-      // Show success message
-      _showSnackBar("Reminder set successfully", true);
+    // Show success message
+    _showSnackBar("Reminder set successfully", true);
 
-      // Navigate to the main page after a short delay
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const BottomNavBar()),
-        ); // Assuming the main page is the previous page
-      });
-    }
+    // Navigate to the main page after a short delay
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const BottomNavBar()),
+      ); // Assuming the main page is the previous page
+    });
   }
+}
+
 
   void _showSnackBar(String message, bool isSuccess) {
     final snackBar = SnackBar(
@@ -98,73 +97,40 @@ class _SetReminderPageState extends State<SetReminderPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  // Future<void> _scheduleReminder(
-  //     String title, String note, DateTime scheduledDate) async {
-  //   const int notificationId = 0;
-  //   final DateTime now = DateTime.now();
-  //   final Duration timeDifference = scheduledDate.difference(now);
-  //   final int seconds = timeDifference.inSeconds;
+  Future<void> _scheduleReminder(
+      String title, String note, DateTime scheduledDate) async {
+    final int notificationId = DateTime.now().millisecondsSinceEpoch %
+        (1 << 31); // Ensure the ID stays within the range
+    final DateTime now = DateTime.now();
+    final Duration timeDifference = scheduledDate.difference(now);
+    final int seconds = timeDifference.inSeconds;
 
-  //   if (seconds > 0) {
-  //   const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-  //     "NotificationChannel",
-  //     "NotificationChannelForandroid",
-  //     importance: Importance.max,
-  //     priority: Priority.high,
-  //     showWhen: false, // Do not show the timestamp in the notification
-  //   );
+    if (seconds > 0) {
+      Future.delayed(Duration(seconds: seconds), () {
+        notificationService.showNotification(
+            notificationId,
+            title,
+            "$title\n$note",
+            const NotificationDetails(
+              android: AndroidNotificationDetails(
+                "ReminderID",
+                "Reminder",
+              ),
+            ));
+      });
 
-  //    const NotificationDetails platformChannelSpecifics =
-  //       NotificationDetails(android: androidPlatformChannelSpecifics);
-
-  //   final String notificationBody = "$title\n$note"; // Combine title and note in the notification body
-
-  //   Future.delayed(Duration(seconds: seconds), () {
-  //     notificationService.showNotification(notificationId, title, notificationBody, platformChannelSpecifics);
-  //   });
-
-  //     if (kDebugMode) {
-  //       print('Reminder scheduled: $title, $note, $scheduledDate');
-  //       print('Setting up reminder: $title, $note, $scheduledDate');
-  //       print('Time difference: $timeDifference');
-  //       print('Seconds: $seconds');
-  //     }
-  //   } else {
-  //     if (kDebugMode) {
-  //       print('Invalid scheduled date, please choose a future date and time.');
-  //     }
-  //   }
-  // }
-
-  Future<void> _scheduleReminder(String title, String note, DateTime scheduledDate) async {
-  final int notificationId = DateTime.now().millisecondsSinceEpoch % (1 << 31); // Ensure the ID stays within the range
-  final DateTime now = DateTime.now();
-  final Duration timeDifference = scheduledDate.difference(now);
-  final int seconds = timeDifference.inSeconds;
-
-  if (seconds > 0) {
-    Future.delayed(Duration(seconds: seconds), () {
-      notificationService.showNotification(notificationId, title, "$title\n$note" , const NotificationDetails(
-        android: AndroidNotificationDetails(
-          "ReminderID",
-          "Reminder",
-        )
-      ));
-    });
-
-    if (kDebugMode) {
-      print('Reminder scheduled: $title, $note, $scheduledDate');
-      print('Setting up reminder: $title, $note, $scheduledDate');
-      print('Time difference: $timeDifference');
-      print('Seconds: $seconds');
-    }
-  } else {
-    if (kDebugMode) {
-      print('Invalid scheduled date, please choose a future date and time.');
+      if (kDebugMode) {
+        print('Reminder scheduled: $title, $note, $scheduledDate');
+        print('Setting up reminder: $title, $note, $scheduledDate');
+        print('Time difference: $timeDifference');
+        print('Seconds: $seconds');
+      }
+    } else {
+      if (kDebugMode) {
+        print('Invalid scheduled date, please choose a future date and time.');
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -181,6 +147,7 @@ class _SetReminderPageState extends State<SetReminderPage> {
             child: Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextFormField(
                     controller: _titleController,
@@ -188,17 +155,6 @@ class _SetReminderPageState extends State<SetReminderPage> {
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Please enter a title";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _noteController,
-                    decoration: const InputDecoration(labelText: 'Note'),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "Please enter a note";
                       }
                       return null;
                     },
@@ -248,25 +204,56 @@ class _SetReminderPageState extends State<SetReminderPage> {
                     ],
                   ),
                   const SizedBox(height: 25),
-                  ElevatedButton(
-                    onPressed: _submitForm,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 34),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const BottomNavBar()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            "Skip",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
-                      elevation: 4,
-                    ),
-                    child: const Text(
-                      "Set Reminder",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _submitForm,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            "Set Reminder",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
