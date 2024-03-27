@@ -9,10 +9,10 @@ class SetReminderPage extends StatefulWidget {
   final String certificationExpiryDate;
 
   const SetReminderPage({
-    Key? key,
+    super.key,
     required this.certificationName,
     required this.certificationExpiryDate,
-  }) : super(key: key);
+  });
 
   @override
   State<SetReminderPage> createState() => _SetReminderPageState();

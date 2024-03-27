@@ -20,8 +20,22 @@ class CategoryContainer extends StatelessWidget {
     this.expiryDate,
   });
 
+  int calculateRemainingDays(DateTime expiryDate) {
+    final now = DateTime.now();
+    final difference = expiryDate.difference(now).inDays;
+    return difference;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final expiryDateTime =
+        expiryDate != null ? DateTime.parse(expiryDate!) : null;
+    final remainingDays =
+        expiryDateTime != null ? calculateRemainingDays(expiryDateTime) : null;
+
+    bool isExpired =
+        expiryDateTime != null && expiryDateTime.isBefore(DateTime.now());
+
     return GestureDetector(
       onTap: () {
         // Navigate to the details page when container is clicked
@@ -152,18 +166,32 @@ class CategoryContainer extends StatelessWidget {
                   ? Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.red), // Red border
+                        border: Border.all(color: Colors.red),
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(10),
                           bottomRight: Radius.circular(10),
                         ),
+                        color: isExpired
+                            ? Colors.red
+                            : Colors.transparent, // Change background color
                       ),
-                      child: Text(
-                        'Expiry Date: $expiryDate',
-                        style: const TextStyle(color: Colors.red),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            isExpired
+                                ? 'Expired'
+                                : 'Expiries in $remainingDays' ' days',
+                            style: TextStyle(
+                              color: isExpired
+                                  ? Colors.white
+                                  : Colors.black, // Change text color
+                            ),
+                          ),
+                        ],
                       ),
                     )
-                  : const SizedBox(width: 0, height: 0),
+                  : const SizedBox(),
             ),
           ],
         ),
